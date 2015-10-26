@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="am.velopark.velopark" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Velopark</name>
+    <description>
+        VeloPark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+    </description>
+    <author email="info@aparg.com" href="http://aparg.com">
+        Aparg
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <platform name="android">
+        <icon src="www/img/ldpi.png" density="ldpi" />
+        <icon src="www/img/mdpi.png" density="mdpi" />
+        <icon src="www/img/hdpi.png" density="hdpi" />
+        <icon src="www/img/xhdpi.png" density="xhdpi" />
+    </platform>
+    <platform name="android">
+        <splash src="www/img/screen-hdpi-portrait.9.png" density="port-hdpi"/>
+        <splash src="www/img/screen-ldpi-portrait.9.png" density="port-ldpi"/>
+        <splash src="www/img/screen-mdpi-portrait.9.png" density="port-mdpi"/>
+        <splash src="www/img/screen-xhdpi-portrait.9.png" density="port-xhdpi"/>
+        <splash src="www/img/screen-xxhdpi-portrait.9.png" density="port-xxhdpi"/>
+    </platform>
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="10000" />
+	<preference name="Orientation" value="portrait" />
+</widget>

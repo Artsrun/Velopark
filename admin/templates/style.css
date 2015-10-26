@@ -1,0 +1,281 @@
+/* CSS Document */
+*{
+    padding:0; margin:0;
+}
+
+img{
+    border:none;
+}
+
+.clr{
+    clear:both;
+}
+
+a{
+    outline: none;
+}
+
+a:hover{
+    text-decoration:none;
+}
+
+body{
+    background:#f2f2f2;
+}
+
+.wrapper{
+    width:1300px; 
+    margin:0 auto; 
+    background:#fff; 
+}
+
+.head{
+    overflow:hidden; 
+    border-bottom:3px solid #d8d7d7;
+    background-color: #2ecc71;
+}
+
+.head p{
+    font:12px Tahoma; 
+    float:right; 
+    color:beige;; 
+    margin:15px 30px 0 0;
+}
+
+.head p a{
+    color:beige;
+    text-decoration: none;
+}
+
+.logo {
+    border-radius: 3px;
+    display: block;
+    float:left;
+    background-image: url(images/velopark_bg.png);
+    background-color: #2ecc71;
+    width: 220px;
+    height: 70px;
+    background-size: cover;
+    margin-left: 50px;
+    margin-top: 20px;
+}
+
+.content-main{
+    width:100%;
+    overflow:hidden;
+}	
+.leftBar{
+    float:left; 
+    padding:20px 0 30px 30px;
+}
+
+.nav-left{
+    list-style:none; 
+    font:14px "Trebuchet MS"; 
+    color:#283964;
+}
+
+.nav-left li{	
+    margin:10px 0 0 0;
+}
+
+.nav-left li a{
+    color:#283964; 
+    font-weight:bold;	
+}
+
+.nav-left ul{
+    list-style:none; 
+    margin:0 0 10px 15px; 
+    font-size:13px;
+}
+
+.nav-left ul li{
+    margin:5px 0 0 0;
+}
+
+.content{
+    padding:20px 0 30px 0; 
+    margin:0 30px 0 230px; 
+    position:relative;
+}
+
+.add, .save{
+    display: block;
+    background-color: #2ecc71;
+    width: 120px;
+    text-align: center;
+    padding: 5px;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 20px;
+    border-radius: 3px;
+    border: none;
+}
+
+.content h2{
+    font:18px "Trebuchet MS"; 
+    color:#545555; 
+    margin:0 0 20px 0;
+}
+
+.tabl{
+    background:#f7f7f7; 
+    width:100%; 
+    font:14px Tahoma; 
+    color:#555555; 
+    margin:0 0 20px 0;
+}
+
+a.edit{
+    color:#495d90;
+}
+
+a.del{
+    color:#C80A0A;
+}
+
+a.vote{
+    color:green;
+}
+
+.tabl th{
+    padding:5px 0;
+}
+
+.tabl td{
+    background:#fff; 
+    text-align:center; 
+    padding:7px 10px;
+    line-height: 24px;
+}
+	
+.add_edit_page{
+    font: 14px Tahoma; 
+    color:#666666; 
+    width:100%; 
+    border:0;
+}
+
+.add_edit_page td{
+    padding:8px 10px 8px 0;
+}
+
+.head-text{
+    border:1px solid #666666; 
+    height:20px; 
+    width:320px; 
+    padding:0 10px; 
+    font:12px Verdana, Arial, Helvetica, sans-serif; 
+    color:#666;
+}
+
+.add-edit-txt{
+    width:155px;
+}
+
+.pager{
+    list-style:none; 
+    overflow:hidden;
+}
+
+.pager li{
+    float:left;
+}
+
+.pager li a{
+    display:block; 
+    border:1px solid #ccc; 
+    padding: 3px 10px 5px; 
+    color:#3a60bf; 
+    font:13px Tahoma; 
+    margin:0 15px 0 0;
+}
+
+.pager li a.now{
+    display:block; 
+    border:1px solid #ccc; 
+    padding: 3px 10px 5px; 
+    background:#3a60bf; 
+    color:#fff; 
+    font:13px Tahoma;
+}
+
+.error{
+    margin-top:5px;
+    border:1px solid #765858;
+    background:#ffeded !important;
+    color:#7f5354 !important;
+    padding:3px;
+}
+
+.success{
+    margin-top:5px;
+    border:1px solid #adc092;
+    background:#f0faf1 !important;
+    color:#58715e !important;
+    padding:3px;
+}
+
+#upload-image{
+    width: 120px;
+    height: 20px;
+    background-color: #2ecc71;
+    font-size: 12px;
+    text-align: center;
+    color: #fff;
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.enter-admin{
+    display: block;
+    background-color: #2ecc71;
+    width: 80px;
+    text-align: center;
+    padding: 5px;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 20px;
+    border-radius: 3px;
+    border: none;
+}
+
+.enter{
+    font:13px "Trebuchet MS", Arial, Helvetica, sans-serif; 
+    color:#545555; 
+    width:225px; 
+    margin:50px auto 50px auto; 
+    padding:0 0 50px 0;
+}
+
+.enter td{
+    padding:5px;
+}
+
+.pagination{
+    text-align:center;
+    margin: 10px;
+}
+a.nav_active{
+    border: 1px solid #ccc;
+    background-color: #2ecc71;
+    color: #fff;
+    padding: 5px 7px;
+    margin: 0 2px;
+}
+a.nav_link{
+    padding: 5px 7px;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    margin: 0 5px;
+    color: #777;
+}
+a.nav_link:hover{
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+
+
+

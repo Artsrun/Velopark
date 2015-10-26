@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="am.velopark.velopark" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <preference name="loglevel" value="DEBUG" />
+    <feature name="Notification">
+        <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
+    </feature>
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="Device">
+        <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
+    <feature name="File">
+        <param name="android-package" value="org.apache.cordova.file.FileUtils" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="FileTransfer">
+        <param name="android-package" value="org.apache.cordova.filetransfer.FileTransfer" />
+    </feature>
+    <feature name="NetworkStatus">
+        <param name="android-package" value="org.apache.cordova.networkinformation.NetworkManager" />
+    </feature>
+    <feature name="SplashScreen">
+        <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="Camera">
+        <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
+    </feature>
+    <icon density="ldpi" src="www/img/ldpi.png" />
+    <icon density="mdpi" src="www/img/mdpi.png" />
+    <icon density="hdpi" src="www/img/hdpi.png" />
+    <icon density="xhdpi" src="www/img/xhdpi.png" />
+    <splash density="port-hdpi" src="www/img/screen-hdpi-portrait.9.png" />
+    <splash density="port-ldpi" src="www/img/screen-ldpi-portrait.9.png" />
+    <splash density="port-mdpi" src="www/img/screen-mdpi-portrait.9.png" />
+    <splash density="port-xhdpi" src="www/img/screen-xhdpi-portrait.9.png" />
+    <splash density="port-xxhdpi" src="www/img/screen-xxhdpi-portrait.9.png" />
+    <name>Velopark</name>
+    <description>
+        VeloPark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+    </description>
+    <author email="info@aparg.com" href="http://aparg.com">
+        Aparg
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="10000" />
+    <preference name="Orientation" value="portrait" />
+</widget>
