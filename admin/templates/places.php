@@ -52,7 +52,12 @@
                     <br>% -  <?= round($item['votes_yes']*100/+($item['votes_yes'] + $item['votes_no']),2) ?> 
                     <?php endif; ?>
                 </td>
-                <td><a href="?view=edit_place&amp;place_id=<?= $item['id'] ?>" class="edit">edit</a><br><a href="?view=delete_place&amp;place_id=<?= $item['id'] ?>" class="del" onclick="return confirm('are you sure?');">delete</a><br><a href="?view=vote_place&amp;place_id=<?= $item['id'] ?>" class="vote">vote</a></td>
+                <td>
+					<a href="?view=edit_place&amp;place_id=<?= $item['id'] ?>" class="edit">edit</a><br>
+					<a href="?view=delete_place&amp;place_id=<?= $item['id'] ?>" class="del" onclick="return confirm('are you sure?');">delete</a><br>
+					<a href="?view=vote_place&amp;place_id=<?= $item['id'] ?>" class="vote">vote</a>
+					<a href="?view=confirm_place&amp;place_id=<?= $item['id'] ?>" class="vote">confirm</a>
+				</td>
             </tr>
             <?php $i++; ?>
         <?php endforeach; ?>      

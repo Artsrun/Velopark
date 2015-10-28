@@ -80,6 +80,13 @@ switch ($view) {
         redirect('?view=places');
 
         break;
+		
+	case("confirm_place"):
+	    $place_id = abs((int) $_GET['place_id']);
+        confirm_place($place_id, $link);
+        redirect('?view=places');
+
+        break;
 
     case("vote_place"):
         $place_id = abs((int) $_GET['place_id']);

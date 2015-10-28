@@ -8,5 +8,5 @@ define("DB_NAME", "velopark");
 ini_set('allow_url_include', 'on');
 ini_set('allow_url_fopen', 'on');
 
-define("PATH","http://192.168.0.105/");
+define("PATH","http://velopark/");
 
