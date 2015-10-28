@@ -11,7 +11,7 @@ if (!empty($_GET['do'])) {
 
 require_once '../config.php';
 if (!isset($_SESSION['auth']['admin'])) {
-    include $_SERVER['DOCUMENT_ROOT'] . '/admin/auth/index.php';
+    include 'auth/index.php';
 }
 $link = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 if ($link->connect_errno) {
