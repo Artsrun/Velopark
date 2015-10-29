@@ -13,8 +13,7 @@
         <!--    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyD7gPtsOo5EzPh1eD0n8hOLqA4CVgmZHEc"></script> -->
         <script type="text/javascript" src="js/jquery.swipebox.js"></script>
         <script type="text/javascript" src="js/functions.js"></script> 
-        <script type="text/javascript" src="js/index.js"></script>   
-        <script type="text/javascript" src="js/googlemap.js"></script> 
+        <script type="text/javascript" src="js/index.js"></script>
 
         <title>Velopark</title>
     </head>
@@ -22,20 +21,20 @@
 
         <div class="container overflow_hide" >
             <header>
-                <div class="green-menu">
-                    <img src="img/backg-cubs.png" class="backg-cubs" alt="">
+                <div class="green-menu add_places shadow">
+                    <a class="backg-cubs menu_btn"></a>
                     <div class="pl_count"></div>
                     <div class="logo"></div>
-                    <div class="arr-wrapper">
-                        <img src="img/arr_down.png" class="arr" id="arr_down" alt="">
+                    <div class="arr-wrapper arr arr_down">
+                       <!--  <img src="img/arr_down.png" class="arr" id="arr_down" alt=""> -->
                     </div>
                 </div>
-                <ul class="menu">
-                    <li> <a class="addpl">Add</a></li>
-                    <li> <a class="newpl">Review</a></li>
-                    <li> <a class="ab">About</a></li>
+                <ul class="menu shadow">
+                    <li data-page="add_places"> <a class="addpl">Add</a></li>
+                    <li data-page="new_places"> <a class="newpl">Review</a></li>
+                    <li data-page="about"> <a class="ab">About</a></li>
                 </ul>
-                <nav>
+                <nav class="shadow nav_down">
                     <ul class="menu_list">
                         <li>
                             <img src="img/menu_icon1.png" id="icon_park" alt="">
@@ -56,10 +55,11 @@
                 </nav>
             </header>
 
-            <div class="wrapper" id="main" >
-                <div id="map-canvas" >
-                </div>
-                <img src="img/gps_icon1.png" class="gps1" alt="">
+            <div id="main" class="page wrapper active"  data-scroll="false">
+				<!-- <div class="wrapper" > -->
+					<div id="map-canvas"></div>
+					<img src="img/gps_icon1.png" class="gps1" alt="">
+				<!-- </div> -->
             </div>
             <footer>
                 <img src="img/i_icon.png" id="info" alt="">
@@ -74,56 +74,65 @@
             </footer>
 
 
-            <div id="new_places">
+            <div id="new_places" class="page">
                 <div class="wrapper" >
                     <h1>Review</h1>
+					<div class="content"></div>
                 </div>
             </div>
-            <div id="add_places">
+            <div id="add_places" class="page">
                 <div class="wrapper" >
                     <h1>Add new place</h1>
-                    <div>
-                        <a class="add-src swipebox_new" href="" onclick="return false;"><img class="add-image" src="" /></a>
-                        <div class='form-wrap'>
-                            <p class="add-name-wrap">
-                                <label>Name</label>
-                                <input class="add-name" name="desc" type="text"/>
-                                <label>Address</label>
-                                <input class="add-address" name="address" type="text"/>
-                                <input class="hidden-lat" name="hidden1" type="hidden"/>
-                                <input class="hidden-long" name="hidden2" type="hidden"/>
-                            </p>
-                        </div>
-                    </div>
-                    <div style="clear: both;"></div>
-                    <div class="add-radio">
-                        <h2>Description</h2>
-                        <div class="radio-wrap">
-                            <textarea class="add-descript" name="descrip"/></textarea>
-                        </div>
-                    </div>
-                    <div class="add-radio">
-                        <h2>Type</h2>
-                        <div class="radio-wrap">
-                            <img class='add_img_icon add_img_icon_park active_icon' src='img/menu_icon1.png' data-type='parking'/>
-                            <img class='add_img_icon' src='img/menu_icon2.png' data-type='rent' />
-                            <img class='add_img_icon' src='img/menu_icon3.png' data-type='shop' />
-                            <img class='add_img_icon' src='img/menu_icon4.png' data-type='parts' />
-                        </div>
-                    </div>
-                    <div class="add-radio">
-                        <h2>Place</h2>
-                        <div id="add-map"></div>
-                    </div>
-                    <div class="add_place_icon_wrapper">
-                        <img src="img/add_place.png" class="add_place_icon" alt="">
-                    </div>
-                </div>
+					<div class="content">
+						<div>
+							<a class="add-src swipebox_add" rel="addnewPlace" href="" onclick="return false;"><img class="add-image" src="" /></a>
+							<div class='form-wrap'>
+								<p class="add-name-wrap">
+									<label>Name</label>
+									<input class="add-name" name="desc" type="text"/>
+									<label>Address</label>
+									<input class="add-address" name="address" type="text"/>
+									<input class="hidden-lat" name="hidden1" type="hidden"/>
+									<input class="hidden-long" name="hidden2" type="hidden"/>
+								</p>
+							</div>
+						</div>
+						<div style="clear: both;"></div>
+						<div class="add-radio">
+							<h2>Description</h2>
+							<div class="radio-wrap">
+								<textarea class="add-descript" name="descrip"/></textarea>
+							</div>
+						</div>
+						<div class="add-radio">
+							<h2>Type</h2>
+							<div class="radio-wrap">
+								<img class='add_img_icon add_img_icon_park active_icon' src='img/menu_icon1.png' data-type='parking'/>
+								<img class='add_img_icon' src='img/menu_icon2.png' data-type='rent' />
+								<img class='add_img_icon' src='img/menu_icon3.png' data-type='shop' />
+								<img class='add_img_icon' src='img/menu_icon4.png' data-type='parts' />
+							</div>
+						</div>
+						<div class="add-radio">
+							<h2>Place</h2>
+							<div id="add-map"></div>
+						</div>
+						<div class="add_place_icon_wrapper">
+							<img src="img/add_place.png" class="add_place_icon" alt="">
+						</div>
+					</div>
+				</div>
             </div>
-            <div id="about">
+            <div id="about" class="page">
                 <div class="wrapper">
                     <h1>About</h1>
-                    <p class="about_text"><strong>VeloPark</strong> is an app for bicycle lovers. This app will keep you in touch with the community and also provide information about parking places, shops and rent places all over Armenia.</p>
+					<div class="content">
+						<p class="about_text">Promoting healthy lifestyle and supporting  environmental protection Aparg team presents free and unique application for bike lovers in Armenia.
+Velopark is an application developed for those who consider bike riding as a lifestyle or just a hobby.  It allows to detect the nearest bike parking spots in Yerevan and partly in regions of Armenia. Velopark makes also possible to view the nearest bicycle rent spots, bike maintenance centers, shops and spare parts sale centers.
+One of the advantages of the app is its friendly interface. Due to its social component it also provides an opportunity for adding new places with detailed information such as address, coordinates, pictures by community members after being validated by other members.
+The application is available for both Ios and Android mobile platforms.
+Start riding with Velopark!</p>
+					</div>
                 </div>
             </div>
         </div>

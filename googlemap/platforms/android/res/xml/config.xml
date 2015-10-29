@@ -28,15 +28,18 @@
     <feature name="Camera">
         <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
     </feature>
-    <icon density="ldpi" src="www/img/ldpi.png" />
-    <icon density="mdpi" src="www/img/mdpi.png" />
-    <icon density="hdpi" src="www/img/hdpi.png" />
-    <icon density="xhdpi" src="www/img/xhdpi.png" />
-    <splash density="port-hdpi" src="www/img/screen-hdpi-portrait.9.png" />
-    <splash density="port-ldpi" src="www/img/screen-ldpi-portrait.9.png" />
-    <splash density="port-mdpi" src="www/img/screen-mdpi-portrait.9.png" />
-    <splash density="port-xhdpi" src="www/img/screen-xhdpi-portrait.9.png" />
-    <splash density="port-xxhdpi" src="www/img/screen-xxhdpi-portrait.9.png" />
+    <icon density="ldpi" src="www/res/icon/ldpi.png" />
+    <icon density="mdpi" src="www/res/icon/mdpi.png" />
+    <icon density="hdpi" src="www/res/icon/hdpi.png" />
+    <icon density="xhdpi" src="www/res/icon/xhdpi.png" />
+    <icon density="xxhdpi" src="www/res/icon/xxhdpi.png" />
+    <icon density="xxxhdpi" src="www/res/icon/xxxhdpi.png" />
+    <splash density="port-hdpi" src="www/res/splash/screen-hdpi-portrait.9.png" />
+    <splash density="port-ldpi" src="www/res/splash/screen-ldpi-portrait.9.png" />
+    <splash density="port-mdpi" src="www/res/splash/screen-mdpi-portrait.9.png" />
+    <splash density="port-xhdpi" src="www/res/splash/screen-xhdpi-portrait.9.png" />
+    <splash density="port-xxhdpi" src="www/res/splash/screen-xxhdpi-portrait.9.png" />
+    <splash density="port-xxxhdpi" src="www/res/splash/screen-xxxhdpi-portrait.9.png" />
     <name>Velopark</name>
     <description>
         VeloPark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.

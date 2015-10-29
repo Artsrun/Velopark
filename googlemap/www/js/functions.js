@@ -1,6 +1,8 @@
-var db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
+//var db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
+ device = {};
+ device.uuid = 'aaaa'; 
 function selectPlaces(database) {
-    var data = {};
+    var data = {}; 
     var parking = [];
     var rent = [];
     var shop = [];
@@ -16,8 +18,8 @@ function selectPlaces(database) {
                     "address": results.rows.item(i).address,
                     "desc": results.rows.item(i).description,
                     "img": results.rows.item(i).image,
-                    "id": results.rows.item(i).server_id,
-                }
+                    "id": results.rows.item(i).server_id
+                };
                 if (results.rows.item(i).type == "parking")
                     parking.push(obj);
                 else if (results.rows.item(i).type == "rent")
@@ -55,54 +57,9 @@ function selectVoting(data) {
         }
         places.push(obj);
     }
-
+	
     printPlaces(places);
 
-}
-
-
-function openNav() {
-    $("nav").css("marginTop", 0 - 1.4 * $("nav").height());
-    $("nav").css("display", "block");
-    $("footer").css({"marginBottom": 0 - $("footer").height() - 50});
-    $(document).on('click', "#arr_down", function () {
-        if ($(this).hasClass("arr_up")) {
-            $("nav").removeClass("nav_up");
-            $("nav").addClass("nav_down");
-            $(this).removeClass("arr_up");
-            $(this).addClass("arr_down");
-        }
-        else
-        {
-            $("nav").removeClass("nav_down");
-            $("nav").addClass("nav_up");
-            $(this).addClass("arr_up");
-            $(this).removeClass("arr_down");
-            if ($(".backg-cubs").hasClass("backg_up")) {
-                $(".backg-cubs").trigger("click");
-            }
-        }
-    });
-}
-
-function openMenu() {
-
-    $(".menu").fadeOut(200);
-    $(".backg-cubs").on('click', function () {
-        $(".menu").fadeIn(200);
-        $("nav").removeClass("nav_up");
-        $("nav").addClass("nav_down");
-        $("#arr_down").removeClass("arr_up");
-        $("#arr_down").addClass("arr_down");
-        return false;
-    });
-    $(document).on("click", function () {
-        $(".menu").fadeOut(200);
-        return false;
-    })
-    $(document).on("click", ".menu", function () {
-        return false;
-    })
 }
 
 function addAllMarkers(data) {
@@ -113,7 +70,7 @@ function addAllMarkers(data) {
     $("#icon_park").addClass("border_icon_park");
     for (var i = 0; i < data.parking.length; i++) {
         var myLatlng = new google.maps.LatLng(data.parking[i].lat, data.parking[i].long);
-        var marker = addMarker(map, "img/marker1.png", myLatlng);
+        var marker = addMarker(app.map, "img/marker1.png", myLatlng);
         marker.setAnimation(null);
         markers_parking.push(marker);
     }
@@ -127,7 +84,7 @@ function addAllMarkers(data) {
                     var dataParking = data.parking[t];
                     if (data.parking[t].img != "") {
                         $(".footer-image").attr("src", "data:image/jpg;base64," + data.parking[t].img);
-                        $(".foot-link").attr("href", "http://185.8.2.232:7002/velopark/uploads/" + data.parking[t].id + ".jpg");
+                        $(".foot-link").attr("href", app.uploadsURL + data.parking[t].id + ".jpg");
                     }
                     else {
                         $(".footer-image").attr("src", "img/foot_icon1.png");
@@ -157,7 +114,7 @@ function addAllMarkers(data) {
 
             for (var i = 0; i < data.parking.length; i++) {
                 var myLatlng = new google.maps.LatLng(data.parking[i].lat, data.parking[i].long);
-                var marker = addMarker(map, "img/marker1.png", myLatlng);
+                var marker = addMarker(app.map, "img/marker1.png", myLatlng);
                 markers_parking.push(marker);
             }
             for (var k = 0; k < markers_parking.length; k++) {
@@ -170,7 +127,7 @@ function addAllMarkers(data) {
                             var dataParking = data.parking[t];
                             if (data.parking[t].img != "") {
                                 $(".footer-image").attr("src", "data:image/jpg;base64," + data.parking[t].img);
-                                $(".foot-link").attr("href", "http://185.8.2.232:7002/velopark/uploads/" + data.parking[t].id + ".jpg");
+                                $(".foot-link").attr("href", app.uploadsURL + data.parking[t].id + ".jpg");
                             }
                             else {
                                 $(".footer-image").attr("src", "img/foot_icon1.png");
@@ -211,7 +168,7 @@ function addAllMarkers(data) {
 
             for (var i = 0; i < data.rent.length; i++) {
                 var myLatlng = new google.maps.LatLng(data.rent[i].lat, data.rent[i].long);
-                var marker = addMarker(map, "img/marker2.png", myLatlng);
+                var marker = addMarker(app.map, "img/marker2.png", myLatlng);
                 markers_rent.push(marker);
             }
             for (var k = 0; k < markers_rent.length; k++) {
@@ -225,7 +182,7 @@ function addAllMarkers(data) {
 
                             if (data.rent[t].img != "") {
                                 $(".footer-image").attr("src", "data:image/jpg;base64," + data.rent[t].img);
-                                $(".foot-link").attr("href", "http://185.8.2.232:7002/velopark/uploads/" + data.rent[t].id + ".jpg");
+                                $(".foot-link").attr("href", app.uploadsURL + data.rent[t].id + ".jpg");
                             }
                             else {
                                 $(".footer-image").attr("src", "img/foot_icon2.png");
@@ -267,7 +224,7 @@ function addAllMarkers(data) {
             for (var i = 0; i < data.shop.length; i++) {
                 var data_result = data.shop[i];
                 var myLatlng = new google.maps.LatLng(data.shop[i].lat, data.shop[i].long);
-                var marker = addMarker(map, "img/marker3.png", myLatlng);
+                var marker = addMarker(app.map, "img/marker3.png", myLatlng);
                 markers_shop.push(marker);
             }
             for (var k = 0; k < markers_shop.length; k++) {
@@ -280,7 +237,7 @@ function addAllMarkers(data) {
                             var dataShop = data.shop[t];
                             if (data.shop[t].img != "") {
                                 $(".footer-image").attr("src", "data:image/jpg;base64," + data.shop[t].img);
-                                $(".foot-link").attr("href", "http://185.8.2.232:7002/velopark/uploads/" + data.shop[t].id + ".jpg");
+                                $(".foot-link").attr("href", app.uploadsURL + data.shop[t].id + ".jpg");
                             }
                             else {
                                 $(".footer-image").attr("src", "img/foot_icon3.png");
@@ -324,7 +281,7 @@ function addAllMarkers(data) {
             for (var i = 0; i < data.parts.length; i++) {
                 var data_result = data.parts[i];
                 var myLatlng = new google.maps.LatLng(data.parts[i].lat, data.parts[i].long);
-                var marker = addMarker(map, "img/marker4.png", myLatlng);
+                var marker = addMarker(app.map, "img/marker4.png", myLatlng);
                 markers_parts.push(marker);
             }
             for (var k = 0; k < markers_parts.length; k++) {
@@ -337,7 +294,7 @@ function addAllMarkers(data) {
                             var dataParts = data.parts[t];
                             if (data.parts[t].img != "") {
                                 $(".footer-image").attr("src", "data:image/jpg;base64," + data.parts[t].img);
-                                $(".foot-link").attr("href", "http://185.8.2.232:7002/velopark/uploads/" + data.parts[t].id + ".jpg");
+                                $(".foot-link").attr("href", app.uploadsURL + data.parts[t].id + ".jpg");
                             }
                             else {
                                 $(".footer-image").attr("src", "img/foot_icon4.png");
@@ -386,7 +343,7 @@ function load_place(i, places, map_size) {
     var output = "<div class='vot_wrap' id='vot_" + places[i].server_id + "' >";
 
     if (places[i].img) {
-        output += "<a class='swipebox_new' href='http://185.8.2.232:7002/velopark/uploads/" + places[i].server_id + ".jpg' onclick='return false;'><img class='vot_img' src='data:image/jpg;base64," + places[i].img + "' alt='' /></a>";
+        output += "<a class='swipebox_places' rel='"+i+"' href='"+app.uploadsURL + places[i].server_id + ".jpg' onclick='return false;'><img class='vot_img' src='data:image/jpg;base64," + places[i].img + "' alt='' /></a>";
     } else {
         if (places[i].type == "parking") {
             output += "<img class='vot_img' src='img/foot_icon1.png' />";
@@ -415,47 +372,87 @@ function load_place(i, places, map_size) {
         output += "<p>Description</p><p class='cont'>" + places[i].desc + "</p>";
     }
     output += "</div>";
-    output += "<div style='width:100%; margin: 15px auto; ' class='place_map' id='place_map_" + places[i].server_id + "'><img alt='map' src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].lat + "," + places[i].long + "&markers=color:red%7C" + places[i].lat + "," + places[i].long + "&zoom=18&size=" + map_size + "x" + 180 + "&maptype=roadmap&sensor=false&key=AIzaSyDWni7BlYAkC1YNv-ACLopJ5kxoc1jTCWY'></div>";
+    output += "<div style='width:100%; margin: 15px auto; ' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].lat + "," + places[i].long + "&markers=color:red%7C" + places[i].lat + "," + places[i].long + "&zoom=18&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&key=AIzaSyDWni7BlYAkC1YNv-ACLopJ5kxoc1jTCWY'></div>";
     output += "<div class='new_place_icon_wrap'><img src='img/add_place.png' class='new_place_icon' alt='' data-value='1'><img src='img/new_place.png' class='new_place_icon' alt='' data-value='0'></div>"
     output += "<div class='overlay'></div></div>";
-    $("#new_places .wrapper").append(output);
+    $("#new_places .content").append(output);
+	
+	$('#vot_' + places[i].server_id + ' .swipebox_places').swipebox();
 }
 
+function elementInViewport(el) {
+  var top = el.offsetTop;
+  var left = el.offsetLeft;
+  var width = el.offsetWidth;
+  var height = el.offsetHeight;
+
+  while(el.offsetParent) {
+    el = el.offsetParent;
+    top += el.offsetTop;
+    left += el.offsetLeft;
+  }
+
+  return (
+    top < (window.pageYOffset + window.innerHeight) &&
+    left < (window.pageXOffset + window.innerWidth) &&
+    (top + height) > window.pageYOffset &&
+    (left + width) > window.pageXOffset
+  );
+}
 
 function printPlaces(places) {
-    var map_size = Math.round($("#new_places").width() * 92 / 100);
+	$("#new_places .wrapper .content").empty();
+    
+	var map_size = {
+		width: Math.round($("#new_places").width() * 92 / 100),
+		height: 180
+	}
+	
     var limit = 5;
 
     if (places.length) {
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < places.length; i++) {
             load_place(i, places, map_size);
         }
 
         $(window).unbind("scroll");
+		var scrollTimer;
         $(window).scroll(function () {
-            if ($(window).scrollTop() + $(window).height() == $(document).height()) {
-                x = $(".vot_wrap").length;
-                if (x < places.length) {
-                    for (var i = x; i < x + limit; i++) {
-                        if (i < places.length) {
-                            load_place(i, places, map_size);
-                        }
-                    }
-                }
-            }
+			clearTimeout(scrollTimer);
+			if( app.getActivePage() != 'new_places'){
+				return true;
+			}			
+			scrollTimer = setTimeout(function(){
+				var allVoteElements = $('.vot_wrap:not(".loaded")');
+				allVoteElements.each(function(){
+					if(elementInViewport( $(this)[0] ) ){
+						$(this).addClass('loaded');
+						var $mapContainer = $(this).find('.place_map[data-src]');
+						var $img = $('<img />');
+						$img.css('opacity',0);
+						$img[0].onload = function(){
+							$mapContainer.css('background-image','none');
+							console.log( $(this))
+							$img.css('opacity',1);
+						}						
+						$mapContainer.html($img);
+						$img.attr('src',$mapContainer.data('src'));
+					}
+				});				
+			},400);
         });
-
+		$(window).trigger('scroll');
+		
         $("#new_places .new_place_icon_wrap .new_place_icon").unbind("click");
         $(document).on("click", "#new_places .new_place_icon_wrap .new_place_icon", function () {
             $(this).closest(".vot_wrap").find(".overlay").show();
             var div_wrapper = $(this).closest(".vot_wrap");
             var vote_id = parseInt($(div_wrapper).attr("id").substring(4));
             var unique_id = device.uuid;
-            // var unique_id = "dfdfdfdfsdf";
             var vote = $(this).attr("data-value");
 
             $.ajax({
-                url: "http://185.8.2.232:7002/velopark/",
+                url: app.apiURL,
                 method: "POST",
                 data: {
                     action: "voting",
@@ -495,10 +492,6 @@ function printPlaces(places) {
     } else {
         $("#new_places .wrapper ").append("<p class='no_place_text'>There is no place to vote.</p>");
     }
-
-
-
-
 }
 
 function addMarker(map, myicon, pos) {
@@ -541,11 +534,11 @@ function printDesc(marker, data) {
 }
 
 
-function addPlace() {
+/* function addPlace() {
     $("#add_places").show();
     navigator.notification.confirm("Take a picture or select from gallery", confirmCamera, "", ["camera", "gallery", "close"]);
     //cameraSuccess();
-}
+} */
 
 function confirmCamera(buttonIndex) {
     if (buttonIndex == 1) {
@@ -553,16 +546,7 @@ function confirmCamera(buttonIndex) {
     } else if (buttonIndex == 2) {
         navigator.camera.getPicture(cameraSuccess, cameraError, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800});
     } else {
-        $("#add_places").hide();
-        $(".gps1, footer, .arr-wrapper").show();
-        $("#main").removeClass("left_pos");
-        $("#main").addClass("null_pos");
-        $(".container").addClass("overflow_hide");
-        $(".add-name").val("");
-        $(".add-descript").val("");
-        $(".add-src").css("background-image", "none");
-        $("#add-map").html("");
-        $(".menu li").removeClass("active_menu");
+		app.goToPage('main');
     }
 
 }
@@ -639,7 +623,7 @@ function newPlace(center) {
     })
 }
 
-function win(res) {
+/* function win(res) {
     $("#add_places").hide();
     $(".add-name").val("");
     $(".add-descript").val("");
@@ -654,7 +638,7 @@ function win(res) {
     $(".container").addClass("overflow_hide");
     $(".menu li").removeClass("active_menu");
 
-}
+} */
 
 function fail() {
     navigator.notification.alert('Please, try later',alertVote,'','OK');
