@@ -124,8 +124,8 @@ $link->close();
 // HEADER
 include 'templates/header.php';
 
-// LEFTBAR
-include 'templates/leftbar.php';
+// TOPBAR
+include 'templates/topbar.php';
 
 // CONTENT
 include 'templates/' . $view . '.php';

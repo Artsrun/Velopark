@@ -1,8 +1,14 @@
 /* CSS Document */
 *{
     padding:0; margin:0;
+    font-family:sans-serif;
 }
-
+.green{
+    color:#008000;
+}
+.red{
+    color:#C80A0A;
+}
 img{
     border:none;
 }
@@ -64,9 +70,9 @@ body{
     width:100%;
     overflow:hidden;
 }	
-.leftBar{
-    float:left; 
-    padding:20px 0 30px 30px;
+.topBar{    
+    padding:20px 0 40px 30px;
+    border-bottom: 2px solid #2ecc71;
 }
 
 .nav-left{
@@ -76,7 +82,8 @@ body{
 }
 
 .nav-left li{	
-    margin:10px 0 0 0;
+    margin:10px 10px 0 0;
+    float: left;
 }
 
 .nav-left li a{
@@ -96,7 +103,7 @@ body{
 
 .content{
     padding:20px 0 30px 0; 
-    margin:0 30px 0 230px; 
+    margin:0 30px 0 30px; 
     position:relative;
 }
 
@@ -136,7 +143,7 @@ a.del{
 }
 
 a.vote{
-    color:green;
+    color:#008000;
 }
 
 .tabl th{
@@ -144,8 +151,9 @@ a.vote{
 }
 
 .tabl td{
+    text-align:left;
     background:#fff; 
-    text-align:center; 
+    
     padding:7px 10px;
     line-height: 24px;
 }

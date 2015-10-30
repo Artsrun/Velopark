@@ -42,21 +42,23 @@
                 <td><?= $item['type'] ?></td>
                 <td>
                 <?php if ($item['status'] == "1"): ?>
-                        comfirmed
+                       <span class="green"> comfirmed</span>
                     <?php elseif($item['status'] == "0"): ?>
-                        uncomfirmed
+                       <span class="red"> uncomfirmed</span>
                     <?php endif; ?>
                 </td>
-                <td>Yes -  <?= $item['votes_yes'] ?><br>No -  <?= $item['votes_no'] ?>
-                    <?php if($item['votes_yes'] + $item['votes_no']!=0): ?>
-                    <br>% -  <?= round($item['votes_yes']*100/+($item['votes_yes'] + $item['votes_no']),2) ?> 
-                    <?php endif; ?>
+                <td>
+                    <span class="green">Yes -  <?= $item['votes_yes'] ?></span><br>
+                    <span class="red">No -  <?= $item['votes_no'] ?></span><br>
+                    <b><?php if($item['votes_yes'] + $item['votes_no']!=0): ?>
+                    % -  <?= round($item['votes_yes']*100/+($item['votes_yes'] + $item['votes_no']),2) ?>
+                    <?php endif; ?> </b>
                 </td>
                 <td>
 					<a href="?view=edit_place&amp;place_id=<?= $item['id'] ?>" class="edit">edit</a><br>
 					<a href="?view=delete_place&amp;place_id=<?= $item['id'] ?>" class="del" onclick="return confirm('are you sure?');">delete</a><br>
-					<a href="?view=vote_place&amp;place_id=<?= $item['id'] ?>" class="vote">vote</a>
-					<a href="?view=confirm_place&amp;place_id=<?= $item['id'] ?>" class="vote">confirm</a>
+					<a href="?view=vote_place&amp;place_id=<?= $item['id'] ?>" class="vote">vote</a><br>
+					<a href="?view=confirm_place&amp;place_id=<?= $item['id'] ?>" class="vote"><b>confirm<b></a>
 				</td>
             </tr>
             <?php $i++; ?>
