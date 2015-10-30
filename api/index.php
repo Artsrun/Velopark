@@ -42,7 +42,7 @@ function get_places($link) {
         $query = "SELECT id, latitude, longitude, name, address, description, image, type FROM places "
                 . "WHERE status<>'2' AND id NOT IN "
                 . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
-                . "WHERE votes.device_id = '" . $unique_id . "')";
+                . "WHERE votes.device_id = '" . $unique_id . "') ORDER BY id DESC";
         $result = $link->query($query);
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
