@@ -125,7 +125,10 @@ body{
     border: none;
     text-transform:uppercase;
 }
-
+textarea.head-text{	
+	height: 100px;
+	
+}
 .content h2{
     font-size:18px; 
     color:#777; 
@@ -197,6 +200,7 @@ a.vote{
 
 .add-edit-txt{
     width:155px;
+	vertical-align:top;
 }
 
 .pager{

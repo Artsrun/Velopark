@@ -22,7 +22,9 @@
             </tr>
             <tr>
                 <td class="add-edit-txt">Description</td>
-                <td><input class="head-text" type="text" name="description" value="<?= htmlspecialchars($get_place['description']) ?>" /></td>
+                <td>
+                    <textarea class="head-text" name="description" ><?= htmlspecialchars($get_place['description']) ?></textarea>
+                </td>
             </tr>
             <tr>
                 <td>Latitude</td>
