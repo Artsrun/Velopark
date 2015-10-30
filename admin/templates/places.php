@@ -28,26 +28,28 @@
             <tr>
                 <td><?= $i ?></td>
                 <td>
+                    <a href="?view=edit_place&amp;place_id=<?= $item['id'] ?>" class="edit">
                     <?php if ($item['image']): ?>
                         <img src = "data:image/jpg;base64,<?= $item['image'] ?>" style="height: 150px; width:150px; border-radius: 3px">
                     <?php else: ?>
                         <img src = "templates/images/no_image.jpg" style="height: 150px; width:150px; border-radius: 3px">
                     <?php endif; ?>
+                    </a>
                 </td>
                 <td><?= $item['name'] ?></td>
                 <td><?= $item['address'] ?></td>
                 <td><?= $item['description'] ?></td>
                 <td><?= $item['latitude'] ?></td>
                 <td><?= $item['longitude'] ?></td>
-                <td><?= $item['type'] ?></td>
+                <td class='upper blue'><?= $item['type'] ?></td>
                 <td>
                 <?php if ($item['status'] == "1"): ?>
-                       <span class="green"> comfirmed</span>
+                       <span class="green upper"> comfirmed</span>
                     <?php elseif($item['status'] == "0"): ?>
-                       <span class="red"> uncomfirmed</span>
+                       <span class="red upper"> uncomfirmed</span>
                     <?php endif; ?>
                 </td>
-                <td>
+                <td class='upper'>
                     <span class="green">Yes -  <?= $item['votes_yes'] ?></span><br>
                     <span class="red">No -  <?= $item['votes_no'] ?></span><br>
                     <b><?php if($item['votes_yes'] + $item['votes_no']!=0): ?>
@@ -58,7 +60,7 @@
 					<a href="?view=edit_place&amp;place_id=<?= $item['id'] ?>" class="edit">edit</a><br>
 					<a href="?view=delete_place&amp;place_id=<?= $item['id'] ?>" class="del" onclick="return confirm('are you sure?');">delete</a><br>
 					<a href="?view=vote_place&amp;place_id=<?= $item['id'] ?>" class="vote">vote</a><br>
-					<a href="?view=confirm_place&amp;place_id=<?= $item['id'] ?>" class="vote"><b>confirm<b></a>
+					<a href="?view=confirm_place&amp;place_id=<?= $item['id'] ?>" class="confirm"><b>confirm<b></a>
 				</td>
             </tr>
             <?php $i++; ?>
