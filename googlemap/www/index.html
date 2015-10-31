@@ -10,7 +10,6 @@
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <link rel="stylesheet" type="text/css" href="css/swipebox.css">
         <script type="text/javascript" src="js/jquery-2.1.4.js"></script>
-        <!--    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyD7gPtsOo5EzPh1eD0n8hOLqA4CVgmZHEc"></script> -->
         <script type="text/javascript" src="js/jquery.swipebox.js"></script>
         <script type="text/javascript" src="js/functions.js"></script> 
         <script type="text/javascript" src="js/index.js"></script>
@@ -37,37 +36,39 @@
                 <nav class="shadow nav_down">
                     <ul class="menu_list">
                         <li>
-                            <img src="img/menu_icon1.png" id="icon_park" alt="">
+                            <img src="img/menu_icon1.png" id="icon_park" alt="" data-type="parking">
 
                         </li>
                         <li>
-                            <img src="img/menu_icon2.png" id="icon_rent" alt="">
+                            <img src="img/menu_icon2.png" id="icon_rent" alt="" data-type="rent">
 
                         </li>
                         <li>
-                            <img src="img/menu_icon3.png" id="icon_shop" alt="">
+                            <img src="img/menu_icon3.png" id="icon_shop" alt="" data-type="shop">
 
                         </li>
                         <li>
-                            <img src="img/menu_icon4.png" id="icon_parts" alt="">
+                            <img src="img/menu_icon4.png" id="icon_parts" alt="" data-type="parts">
                         </li>
                     </ul>
                 </nav>
             </header>
 
-            <div id="main" class="page wrapper active"  data-scroll="false">
-				<!-- <div class="wrapper" > -->
-					<div id="map-canvas"></div>
-					<img src="img/gps_icon1.png" class="gps1" alt="">
-				<!-- </div> -->
+            <div id="main" class="page active">
+                <div class="wrapper" >
+                    <div id="map-canvas"></div>
+                    <img src="img/gps_icon1.png" class="gps1" alt="">
+                </div>
             </div>
             <footer>
                 <img src="img/i_icon.png" id="info" alt="">
                 <div class="footer-wrap">
 
                     <div class="footer-info">
+                        <p class="name"></p>
+                        <p class="address"></p>
                         <p class="desc" ></p>
-                        <p class="count"></p>
+<!--                        <p class="count"></p>-->
                     </div>
                     <a class="foot-link swipebox" href="" onclick="return false;"><img class="footer-image" src="" alt=""></a>
                 </div>
