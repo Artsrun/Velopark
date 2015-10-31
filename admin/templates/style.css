@@ -3,6 +3,9 @@
     padding:0; margin:0;
     font-family:sans-serif;
 }
+.blue{
+    color:#335ECE;
+}
 .green{
     color:#008000;
 }
@@ -82,7 +85,7 @@ body{
 }
 
 .nav-left li{	
-    margin:10px 10px 0 0;
+    margin:10px 20px 0 0;
     float: left;
 }
 
@@ -90,6 +93,7 @@ body{
     color: #229C55;
     font-weight: bold;
     font-size: 22px;
+    text-transform: uppercase;
 }
 
 .nav-left ul{
@@ -119,12 +123,17 @@ body{
     margin-bottom: 20px;
     border-radius: 3px;
     border: none;
+    text-transform:uppercase;
 }
-
+textarea.head-text{	
+	height: 100px;
+	
+}
 .content h2{
     font-size:18px; 
-    color:#545555; 
+    color:#777; 
     margin:0 0 20px 0;
+    text-transform: uppercase;
 }
 
 .tabl{
@@ -136,17 +145,27 @@ body{
 }
 
 a.edit{
-    color:#495d90;
+    color:#335ECE;
+    text-transform: uppercase;
 }
-
+.upper{
+    text-transform: uppercase;
+}
 a.del{
     color:#C80A0A;
+    text-transform: uppercase;
 }
-
+a.confirm{
+    color:#008000;
+    text-transform: uppercase;
+}
 a.vote{
     color:#008000;
+    text-transform: uppercase;
 }
-
+.add_edit_page label{
+    text-transform: uppercase;
+}
 .tabl th{
     padding:5px 0;
 }
@@ -181,6 +200,7 @@ a.vote{
 
 .add-edit-txt{
     width:155px;
+	vertical-align:top;
 }
 
 .pager{

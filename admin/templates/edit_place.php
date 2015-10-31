@@ -22,7 +22,9 @@
             </tr>
             <tr>
                 <td class="add-edit-txt">Description</td>
-                <td><input class="head-text" type="text" name="description" value="<?= htmlspecialchars($get_place['description']) ?>" /></td>
+                <td>
+                    <textarea class="head-text" name="description" ><?= htmlspecialchars($get_place['description']) ?></textarea>
+                </td>
             </tr>
             <tr>
                 <td>Latitude</td>
@@ -48,7 +50,9 @@
             <tr>
                 <td>
                     <?php if ($get_place['image']): ?>
-                        <img src="../uploads/<?= $get_place['id'] ?>.jpg" alt="" height="150" width="150" style="border-radius:3px;">
+                        <a href="../uploads/<?= $get_place['id'] ?>.jpg" class="swipebox">
+                            <img src="../uploads/<?= $get_place['id'] ?>.jpg" alt="" height="150" width="150" style="border-radius:3px;">
+                        </a>
                     <?php else: ?>
                         <img src = "templates/images/no_image.jpg" style="height: 150px; width:150px; border-radius: 3px">
                     <?php endif; ?>
