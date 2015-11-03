@@ -11,18 +11,20 @@
 
         <table class="add_edit_page" cellspacing="0" cellpadding="0">
             <tr>
-                <td><?= $get_place['name'] ?></td>
+                <td><b>Name</b> - <?= $get_place['name'] ?></td>
             </tr>
             <tr>
-                <td><?= $get_place['address'] ?></td>
+                <td><b>Address</b> - <?= $get_place['address'] ?></td>
             </tr>
             <tr>
-                <td><?= $get_place['description'] ?></td>
+                <td><b>Description</b> - <?= $get_place['description'] ?></td>
             </tr>
             <tr>
                 <td>
                     <?php if ($get_place['image']): ?>
-                        <img src="../uploads/<?= $get_place['id'] ?>.jpg" alt="" height="150" width="150" style="border-radius:3px;">
+                        <a href="../uploads/<?= $get_place['id'] ?>.jpg" class="swipebox">
+                            <img src="../uploads/<?= $get_place['id'] ?>.jpg" alt="" height="150" width="150" style="border-radius:3px;">
+                        </a>
                     <?php else: ?>
                         <img src = "templates/images/no_image.jpg" style="height: 150px; width:150px; border-radius: 3px">
                     <?php endif; ?>
@@ -31,9 +33,9 @@
             </tr>
             <tr>
                 <td>
-                    <label>confirm&nbsp;</label>
+                    <label class='green'>yes&nbsp;</label>
                     <input class="add-type" name="vote" value="yes" type="radio" checked="checked"/><br><br>
-                    <label>refuse&nbsp;</label>
+                    <label class='red'>no&nbsp;</label>
                     <input class="add-type" name="vote" value="no" type="radio" /><br><br>
                 </td>
             </tr>

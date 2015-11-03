@@ -79,8 +79,11 @@ function edit_place($place_id, $link) {
         if (file_exists("temp/tmp.jpg")) {
             $image = imagecreatefromjpeg("temp/tmp.jpg");
             list($width, $height) = getimagesize("temp/tmp.jpg");
-            $thumb = imagecreatetruecolor(150, 150);
-            imagecopyresized($thumb, $image, 0, 0, 0, 0, 150, 150, $width, $height);
+            $size = ($width<$height)?$width:$height;	
+			$x = ($width>$height)?($width-$height)/2:0;
+			$y = ($width<$height)?($height-$width)/2:0;
+			$thumb = imagecreatetruecolor(150, 150);
+			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
             imagejpeg($thumb, '../new.jpg');
             $path = "../new.jpg";
             $data = file_get_contents($path);
@@ -104,7 +107,7 @@ function edit_place($place_id, $link) {
             }
             $status = get_status($place_id, $link);
             if ($status == "1") {
-                $query_version = "UPDATE options SET value = value+0.01 WHERE name='version'";
+                $query_version = "UPDATE options SET CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
                 $vers = $link->query($query_version);
                 if ($link->affected_rows > 0) {
                     $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
@@ -141,7 +144,7 @@ function add_place($link) {
             unlink("temp/tmp.jpg");
         }
         return false;
-    } else if (empty(address)) {
+    } else if (empty($address)) {
         $_SESSION['add_place']['res'] = "<div class='error'>Must be address!</div>";
         $_SESSION['add_place']['description'] = $description;
         $_SESSION['add_place']['name'] = $name;
@@ -188,14 +191,17 @@ function add_place($link) {
         if (file_exists("temp/tmp.jpg")) {
             $image = imagecreatefromjpeg("temp/tmp.jpg");
             list($width, $height) = getimagesize("temp/tmp.jpg");
-            $thumb = imagecreatetruecolor(150, 150);
-            imagecopyresized($thumb, $image, 0, 0, 0, 0, 150, 150, $width, $height);
+            $size = ($width<$height)?$width:$height;	
+			$x = ($width>$height)?($width-$height)/2:0;
+			$y = ($width<$height)?($height-$width)/2:0;
+			$thumb = imagecreatetruecolor(150, 150);
+			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
             imagejpeg($thumb, '../new.jpg');
             $path = "../new.jpg";
             $data = file_get_contents($path);
             $base64 = base64_encode($data);
         }
-        $query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "', 0, '1', 5)";
+        $query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "', 0, '1', 0)";
         $res = $link->query($query);
         if ($link->affected_rows > 0) {
             if (file_exists("temp/tmp.jpg")) {
@@ -221,7 +227,7 @@ function delete_place($place_id, $link) {
         $_SESSION['answer'] = "<div class='success'>Place has been deleted!</div>";
         $query = "UPDATE places SET status='2' WHERE id = $place_id";
         if ($status == "1") {
-            $query_version = "UPDATE options SET value = value+0.01 WHERE name='version'";
+            $query_version = "UPDATE options SET CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
             $link->query($query_version);
             if ($link->affected_rows > 0) {
                 $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
@@ -240,7 +246,7 @@ function confirm_place($place_id, $link) {
         $_SESSION['answer'] = "<div class='success'>Place has been approved!</div>";
         $query = "UPDATE places SET status='1' WHERE id = $place_id";
         if ($status == "0") {
-            $query_version = "UPDATE options SET value = value+0.01 WHERE name='version'";
+            $query_version = "UPDATE options SET CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
             $link->query($query_version);
             if ($link->affected_rows > 0) {
                 $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
@@ -271,10 +277,10 @@ function vote_place($place_id, $link) {
         $votes_count = $votes["votes_yes"] + $votes["votes_no"];
         $precent_yes = $votes["votes_yes"] * 100 / $votes_count;
         if ($votes["status"] == "1" && $precent_yes < 70) {
-            $link->query("UPDATE options SET value = value + 0.01 WHERE name='version'");
+            $link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
             $link->query("UPDATE places SET status = '0', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
         } else if ($votes["status"] == "0" && $precent_yes >= 70 && $votes["votes_yes"] >= 5) {
-            $link->query("UPDATE options SET value = value + 0.01 WHERE name='version'");
+            $link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
             $link->query("UPDATE places SET status = '1', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
         }
         return true;

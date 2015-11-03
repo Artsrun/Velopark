@@ -23,7 +23,14 @@ img{
 a{
     outline: none;
 }
-
+.place_thumb{
+	
+	border-radius:3px;
+	width: 150px;
+	height: 150px;
+	background-size: cover;
+	background-position: center;
+}
 a:hover{
     text-decoration:none;
 }
