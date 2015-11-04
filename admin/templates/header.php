@@ -6,9 +6,9 @@
     <link rel="stylesheet" type="text/css" href="templates/style.css" />
     <link rel="stylesheet" type="text/css" href="templates/css/swipebox.min.css" />
     <script type="text/javascript" src="templates/js/jquery-2.1.4.js"></script>
-    <script type="text/javascript" src="templates/js/ajaxupload.js"></script>
-    <script type="text/javascript" src="templates/js/workscripts.js"></script>
+    <script type="text/javascript" src="templates/js/ajaxupload.js"></script>    
     <script type="text/javascript" src="templates/js/jquery.swipebox.min.js"></script>
+	<script type="text/javascript" src="templates/js/workscripts.js"></script>
     <title>Places</title>
     </head>
 
