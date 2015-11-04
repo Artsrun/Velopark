@@ -243,6 +243,7 @@ a.vote{
     background:#ffeded !important;
     color:#7f5354 !important;
     padding:3px;
+	margin-bottom:10px;
 }
 
 .success{
@@ -251,6 +252,7 @@ a.vote{
     background:#f0faf1 !important;
     color:#58715e !important;
     padding:3px;
+	margin-bottom:10px;
 }
 
 /*#upload-image{
