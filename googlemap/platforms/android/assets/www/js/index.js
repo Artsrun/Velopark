@@ -1,8 +1,8 @@
 /* MAIN APP CLASS */
-var DEBUG = true;
+var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = 'rrr';
+    device.uuid = 'test_user_sd';
 }
 
 var app = {
@@ -272,7 +272,7 @@ var app = {
         if (error) {
             $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required/invalid fields</span>');
             setTimeout(function () {
-                fadeOut('error_msg', function () {
+                fadeOut('.error_msg', function () {
                     $('.error_msg').remove();
                 });
             }, 2000);
@@ -316,10 +316,10 @@ var app = {
     showPlacesForVote: function (places) {
         $("#new_places .wrapper .content").empty();
 
-        var map_widtհ = $("#new_places .wrapper").outerWidth(true);
+        var map_widtհ = parseInt($("#new_places .wrapper").outerWidth(true));
         var map_size = {
             width: map_widtհ,
-            height: map_widtհ / 2
+            height: parseInt(map_widtհ / 2)
         }
         if (places.length) {
             for (var i = 0; i < places.length; i++) {
@@ -347,11 +347,12 @@ var app = {
                     output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
                 output += "<div style='height:" + map_size.height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
-                output += "<div class='new_place_icon_wrap'><img src='img/add_place.png' class='new_place_icon' alt='' data-value='1'><img src='img/new_place.png' class='new_place_icon' alt='' data-value='0'></div>";
+                output += "<div class='new_place_icon_wrap'><a src='img/add_place.png' class='new_place_icon accept' data-value='1'></a><a src='img/new_place.png' class='new_place_icon decline' data-value='0'></a></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
 
                 app.activateSwipebox('#vot_' + places[i].server_id + ' .swipebox_places:not(".noimage")');
+                app.activateRippleButton('#vot_' + places[i].server_id + ' .new_place_icon');
             }
             $('#new_places .wrapper').trigger('scroll');
         } else {
@@ -687,10 +688,11 @@ var app = {
             });
 
             $(document).on("click", "#new_places .new_place_icon_wrap .new_place_icon", function () {
-                var div_wrapper = $(this).closest(".vot_wrap");
+                var that = this;
+                var div_wrapper = $(that).closest(".vot_wrap");
                 app.voteForPlace({
                     device_id: device.uuid,
-                    vote: $(this).attr("data-value"),
+                    vote: $(that).attr("data-value"),
                     place_id: $(div_wrapper).data("id")
                 });
             });
@@ -739,6 +741,52 @@ var app = {
             }
         });
     },
+    activateRippleButton: function (selector) {
+        $(selector).addClass('ripple-effect');
+        $(selector + ':not(".ripple-activated")').on('mousedown', function (e) {
+            if ($(this).hasClass('removing'))
+                return true;
+
+            var $clicked = $(this);
+            $clicked.addClass('clicked');
+
+            //gets the clicked coordinates
+            var offset = $clicked.offset();
+            var relativeX, relativeY, circleK;
+
+
+            relativeX = $clicked.width() / 2;
+            relativeY = $clicked.height() / 2;
+            circleK = 1.2;
+
+
+            var width = $clicked.width();
+
+
+            $clicked.find('.ripple').remove();
+            $clicked.append('<div class="ripple"></div>');
+
+            var $ripple = $clicked.find('.ripple');
+
+            //puts the ripple in the clicked coordinates without animation
+            $ripple.addClass("notransition");
+            $ripple.css({"top": relativeY, "left": relativeX});
+            $ripple[0].offsetHeight;
+            $ripple.removeClass("notransition");
+
+
+            $ripple.css({"width": width * circleK, "height": width * circleK, "margin-left": -width * circleK / 2, "margin-top": -width * circleK / 2});
+
+            setTimeout(function () {
+                $ripple.addClass('ripple-entered');
+                setTimeout(function () {
+                    $ripple.remove();
+                }, 800);
+            }, 300);
+
+        });
+        $(selector).addClass('ripple-activated');
+    },
     setLocationHash: function (hash) {
         location.hash = hash;
     },
@@ -775,7 +823,7 @@ var app = {
         $("#map-canvas").html("");
         var script_tag = document.createElement('script');
         script_tag.setAttribute("type", "text/javascript");
-        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?sensor=false&key=" + this.gMapApiKey + "&callback=app.start");
+        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=" + this.gMapApiKey + "&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
     selectPlaces: function (type, animation) {
@@ -800,6 +848,7 @@ var app = {
     },
     clearPlaces: function (type) {
         app.data[type] = null;
+        $(".controls").removeClass("transition");
     },
     drawGroupMarkers: function (places, type, animation) {
         $('img[data-type="' + type + '"]').addClass('active');
@@ -1076,6 +1125,4 @@ function fadeOut(selector, callback) {
             callback();
         }
     }, 300)
-
-
 }

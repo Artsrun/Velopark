@@ -272,7 +272,7 @@ var app = {
         if (error) {
             $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required/invalid fields</span>');
             setTimeout(function () {
-                fadeOut('error_msg', function () {
+                fadeOut('.error_msg', function () {
                     $('.error_msg').remove();
                 });
             }, 2000);
