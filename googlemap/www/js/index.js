@@ -2,7 +2,7 @@
 var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = 'test_user_sd';
+    device.uuid = 'test_user_sdfsdfd';
 }
 
 var app = {
@@ -227,6 +227,10 @@ var app = {
         });
     },
     notification: function (title, text, button, callback) {
+        if (callback == null) {
+            callback = function () {
+            };
+        }
         if (DEBUG) {
             alert(text)
         } else {
@@ -352,7 +356,6 @@ var app = {
                 $("#new_places .content").append(output);
 
                 app.activateSwipebox('#vot_' + places[i].server_id + ' .swipebox_places:not(".noimage")');
-                app.activateRippleButton('#vot_' + places[i].server_id + ' .new_place_icon');
             }
             $('#new_places .wrapper').trigger('scroll');
         } else {
@@ -389,10 +392,12 @@ var app = {
                     $blockEl.addClass('swipeLeft');
 
 
-                    $blockEl.css('height', blockHeight);
-                    $blockEl.addClass('hideHeight');
-                    $blockEl[0].offsetHeight;
-                    $blockEl.css('height', 0);
+                    setTimeout(function () {
+                        $blockEl.css('height', blockHeight);
+                        $blockEl.addClass('hideHeight');
+                        $blockEl[0].offsetHeight;
+                        $blockEl.css('height', 0);
+                    }, 250);
 
                     setTimeout(function () {
                         $blockEl.remove();
@@ -556,9 +561,13 @@ var app = {
 
         app.onPositionError = function (error) {
             app.positionStatus = false;
-            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-            app.map.setCenter(erLatlng);
+//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+//            app.map.setCenter(erLatlng);
+            navigator.geolocation.clearWatch(app.positionWatchId);
+            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
         }
+
+        this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
 
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
@@ -577,7 +586,7 @@ var app = {
         $(".gps1").on("click.gps", function (e) {
             if (app.positionStatus == false) {
                 navigator.geolocation.clearWatch(app.positionWatchId);
-                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, null, app.geolocationOptions);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
             } else {
                 app.map.panTo(new google.maps.LatLng(app.currentLocation.latitude, app.currentLocation.longitude));
             }
@@ -740,52 +749,6 @@ var app = {
                 app.setLocationHash('swipebox');
             }
         });
-    },
-    activateRippleButton: function (selector) {
-        $(selector).addClass('ripple-effect');
-        $(selector + ':not(".ripple-activated")').on('mousedown', function (e) {
-            if ($(this).hasClass('removing'))
-                return true;
-
-            var $clicked = $(this);
-            $clicked.addClass('clicked');
-
-            //gets the clicked coordinates
-            var offset = $clicked.offset();
-            var relativeX, relativeY, circleK;
-
-
-            relativeX = $clicked.width() / 2;
-            relativeY = $clicked.height() / 2;
-            circleK = 1.2;
-
-
-            var width = $clicked.width();
-
-
-            $clicked.find('.ripple').remove();
-            $clicked.append('<div class="ripple"></div>');
-
-            var $ripple = $clicked.find('.ripple');
-
-            //puts the ripple in the clicked coordinates without animation
-            $ripple.addClass("notransition");
-            $ripple.css({"top": relativeY, "left": relativeX});
-            $ripple[0].offsetHeight;
-            $ripple.removeClass("notransition");
-
-
-            $ripple.css({"width": width * circleK, "height": width * circleK, "margin-left": -width * circleK / 2, "margin-top": -width * circleK / 2});
-
-            setTimeout(function () {
-                $ripple.addClass('ripple-entered');
-                setTimeout(function () {
-                    $ripple.remove();
-                }, 800);
-            }, 300);
-
-        });
-        $(selector).addClass('ripple-activated');
     },
     setLocationHash: function (hash) {
         location.hash = hash;

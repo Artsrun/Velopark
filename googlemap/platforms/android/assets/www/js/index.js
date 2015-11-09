@@ -227,6 +227,10 @@ var app = {
         });
     },
     notification: function (title, text, button, callback) {
+        if (callback == null) {
+            callback = function () {
+            };
+        }
         if (DEBUG) {
             alert(text)
         } else {
@@ -556,10 +560,14 @@ var app = {
 
         app.onPositionError = function (error) {
             app.positionStatus = false;
-            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-            app.map.setCenter(erLatlng);
+//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+//            app.map.setCenter(erLatlng);
+            navigator.geolocation.clearWatch(app.positionWatchId);
+            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
         }
 
+        this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+        
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
         /* hide splashscreen when map loaded */
@@ -577,7 +585,7 @@ var app = {
         $(".gps1").on("click.gps", function (e) {
             if (app.positionStatus == false) {
                 navigator.geolocation.clearWatch(app.positionWatchId);
-                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, null, app.geolocationOptions);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
             } else {
                 app.map.panTo(new google.maps.LatLng(app.currentLocation.latitude, app.currentLocation.longitude));
             }

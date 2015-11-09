@@ -228,6 +228,7 @@ nav.nav_down{
     backface-visibility: hidden;
     z-index: 11111;
     border-radius: 3px;
+    overflow: hidden;
     /* 
 -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3);
 -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3);
@@ -262,8 +263,8 @@ box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3
 }
 
 .new_notification{
-    width: 16%;
-    height: 16%;
+    width: 17%;
+    height: 17%;
     background-image: url(../img/note.png);
     background-size: contain;
     background-repeat: no-repeat;
@@ -273,7 +274,7 @@ box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3
     display: none;
     position: absolute;
     left: 6%;
-    top: 20%;
+    top: 19%;
     min-width: 7px;
     min-height: 7px;
     max-width: 40px;
@@ -375,7 +376,8 @@ ul.menu_list img{
     transition: transform 0.2s;
     position: fixed;
     bottom:0;
-    transform: translate3D(0,100%,0);
+    -webkit-transform: translate(0,100%); 
+    transform: translate(0,100%);
 }
 footer{
     background-color: #fff;
@@ -386,7 +388,8 @@ footer{
 }
 
 .transition{
-    transform: translate3D(0,0,0);
+    -webkit-transform: translate(0,0);
+    transform: translate(0,0);
 }
 
 .controls.transition #info{
@@ -414,10 +417,14 @@ footer .footer-info{
     font-family: "CenturyGothicRegular";
     font-weight: normal;
     color: #555555;
-    width: 72%;
+    /*    width: 72%;
+        font-size: 7px;
+        margin: 6% 0px 5% 2%;
+        margin: 4% 0 8% 2%;*/
+    width: 92%;
     font-size: 7px;
-    /*    margin: 6% 0px 5% 2%;*/
-    margin: 4% 0 8% 2%;
+    padding: 0 4%;
+    margin: 4% auto 8% auto;
 }
 
 footer .footer-info p.desc{
@@ -438,18 +445,20 @@ footer .footer-info p.count{
 
 }
 
-footer .footer-image{
+.foot-link.swipebox{
     width: 20%;
     margin: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right:4%;
     border-radius: 3px;
     max-width: 150px;
-    margin-top:4%;
+    overflow:hidden;
+    float:right;
+    margin: 0 0 2% 5%;
 }
 
+footer .footer-image{
+    width: 100%;
+    border-radius: 3px;
+}
 
 /* new places */
 
@@ -1075,15 +1084,20 @@ input.error, textarea.error{
 
 @media only screen and (min-width: 320px) {
 
+    .menu li a {
+        font-size: 22px;
+    }
+
     footer .footer-info p{
-        font-size: 1.5em;
+        /*        font-size: 1.5em;*/
+        font-size: 2em;
         margin-bottom: 0;
     }
 
-    footer .footer-info p.name{
-        font-size: 2em;
-        margin:0;
-    }
+    /*    footer .footer-info p.name{
+            font-size: 2em;
+            margin:0;
+        }*/
 
     .add-name, .add-address {
         height: 22px;
@@ -1150,6 +1164,9 @@ input.error, textarea.error{
 
 @media only screen and (min-width: 360px) {
 
+    .menu li a {
+        font-size: 26px;
+    }
     .add-name, .add-address{
         height: 24px;
     }
@@ -1215,15 +1232,19 @@ input.error, textarea.error{
 
 @media only screen and (min-width: 480px) {
 
-    footer .footer-info p{
-        font-size: 2.1em;
-        margin:0;
+    .menu li a {
+        font-size: 33px;
     }
-
-    footer .footer-info p.name{
+    footer .footer-info p{
+        /*        font-size: 2.1em;*/
         font-size: 3em;
         margin:0;
     }
+    /*
+        footer .footer-info p.name{
+            font-size: 3em;
+            margin:0;
+        }*/
 
     .add-name, .add-address{
         height: 30px;
@@ -1288,7 +1309,10 @@ input.error, textarea.error{
 }
 
 
-@media only screen and (min-width: 550px) {
+@media only screen and (min-width: 550px) {    
+    .menu li a {
+        font-size: 33px;
+    }
     .add-name, .add-address{
         height: 40px;
     }
@@ -1357,15 +1381,20 @@ input.error, textarea.error{
 
 @media only screen and (min-width: 768px) {
 
-    footer .footer-info p{
-        font-size: 2em;
-        margin:0;
+    .menu li a {
+        font-size: 65px;
     }
 
-    footer .footer-info p.name{
+    footer .footer-info p{
+        /*        font-size: 2em;*/
         font-size: 3.5em;
         margin:0;
     }
+    /*
+        footer .footer-info p.name{
+            font-size: 3.5em;
+            margin:0;
+        }*/
 
     .wrapper h1{
         text-align: left;
@@ -1429,41 +1458,15 @@ input.error, textarea.error{
 @media only screen and (min-width: 992px) {
 
     footer .footer-info p{
-        font-size: 2.7em;;
+        /*        font-size: 2.7em;*/
+        font-size: 3.5em;
         margin:0;
     }
-
-    footer .footer-info p.name{
-        font-size: 4.5em;
-        margin:0;
-    }
+    /*
+        footer .footer-info p.name{
+            font-size: 4.5em;
+            margin:0;
+        }*/
 
 
 }
-
-
-
-/* material ripple */
-.ripple-effect{
-    overflow:visible;
-}
-.ripple-effect.clicked {
-    position: relative;
-}
-
-.ripple { /*stylings for the circular overlay*/
-    position: absolute;
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    width: 0;
-    height: 0;
-    background: rgba(0,0,0, .3);
-    -webkit-transition: all 0.8s ease-out;
-    transition: all 0.8s ease-out;
-    z-index: 2;
-}
-.ripple.ripple-entered{
-    opacity: 0;
-}
-/* end material ripple */

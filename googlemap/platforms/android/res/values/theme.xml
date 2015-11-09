@@ -5,7 +5,7 @@
 
 <color name="custom_theme_color">#2ecc71</color>
 <color name="custom_theme_color_dark">#1F8E4E</color>
-<color name="custom_theme_title_color">#ffffff</color>
+<color name="custom_theme_title_color">#1F8E4E</color>
 
 <style name="Theme.MyAppTheme" parent="Theme">
     <item name="android:windowNoTitle">true</item>
