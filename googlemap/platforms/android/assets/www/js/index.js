@@ -2,7 +2,7 @@
 var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = 'test_user_sd';
+    device.uuid = 'test_user';
 }
 
 var app = {
@@ -210,7 +210,7 @@ var app = {
                     app.showPlacesForVote(res.data);
                 } else {
                     if (app.getActivePage() === 'new_places') {
-                        app.notification('Loading problem', 'Places loading error', 'Close', function () {
+                        app.notification('Oops', 'Something went wrong', 'Close', function () {
                             app.goToPage('main');
                         });
                     }
@@ -219,7 +219,7 @@ var app = {
             error: function (err) {
                 $("#new_places .wrapper .loader").remove();
                 if (app.getActivePage() === 'new_places') {
-                    app.notification('Loading problem', 'Places loading error', 'Close', function () {
+                    app.notification('Oops', 'Something went wrong', 'Close', function () {
                         app.goToPage('main');
                     });
                 }
@@ -273,8 +273,13 @@ var app = {
             error = true;
         }
 
+        if ($(".add-address").val().length > 100) {
+            $(".add-address").addClass('error');
+            error = true;
+        }
+
         if (error) {
-            $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required/invalid fields</span>');
+            $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required fields</span>');
             setTimeout(function () {
                 fadeOut('.error_msg', function () {
                     $('.error_msg').remove();
@@ -312,7 +317,7 @@ var app = {
                     function () {
                         removeLoader('#add_places');
                         if (app.getActivePage() === 'add_places') {
-                            app.notification('Adding problem', 'Please, try later', 'Close', null);
+                            app.notification('Oops', 'Something went wrong', 'Close', null);
                         }
                     }, options);
         }
@@ -320,10 +325,10 @@ var app = {
     showPlacesForVote: function (places) {
         $("#new_places .wrapper .content").empty();
 
-        var map_widtհ = parseInt($("#new_places .wrapper").outerWidth(true));
+        var map_width = parseInt($("#new_places .wrapper").outerWidth(true));
         var map_size = {
-            width: map_widtհ,
-            height: parseInt(map_widtհ / 2)
+            width: map_width,
+            height: parseInt(map_width / 2)
         }
         if (places.length) {
             for (var i = 0; i < places.length; i++) {
@@ -356,11 +361,10 @@ var app = {
                 $("#new_places .content").append(output);
 
                 app.activateSwipebox('#vot_' + places[i].server_id + ' .swipebox_places:not(".noimage")');
-                app.activateRippleButton('#vot_' + places[i].server_id + ' .new_place_icon');
             }
             $('#new_places .wrapper').trigger('scroll');
         } else {
-            $("#new_places .wrapper .content ").html("<p class='no_place_text'>There is no place to vote.</p>");
+            $("#new_places .wrapper .content ").html("<p class='no_place_text'>Nothing to review</p>");
         }
     },
     voteForPlace: function (voteData) {
@@ -393,26 +397,28 @@ var app = {
                     $blockEl.addClass('swipeLeft');
 
 
-                    $blockEl.css('height', blockHeight);
-                    $blockEl.addClass('hideHeight');
-                    $blockEl[0].offsetHeight;
-                    $blockEl.css('height', 0);
+                    setTimeout(function () {
+                        $blockEl.css('height', blockHeight);
+                        $blockEl.addClass('hideHeight');
+                        $blockEl[0].offsetHeight;
+                        $blockEl.css('height', 0);
+                    }, 250);
 
                     setTimeout(function () {
                         $blockEl.remove();
                         $('#new_places .wrapper').trigger('scroll');
                         if ($("#new_places .wrapper .content .vot_wrap").length == 0) {
-                            $("#new_places .wrapper .content").html("<p class='no_place_text'>There is no place to vote.</p>");
+                            $("#new_places .wrapper .content").html("<p class='no_place_text'>Nothing to review</p>");
                         }
                     }, 600);
                 } else {
                     removeLoader('[data-id="' + voteData['place_id'] + '"]');
-                    app.notification('Vote problem', 'Please, try later', 'Close', null);
+                    app.notification('Oops', 'Something went wrong', 'Close', null);
                 }
             },
             error: function (error) {
                 removeLoader('[data-id="' + voteData['place_id'] + '"]');
-                app.notification('Vote problem', 'Please, try later', 'Close', null);
+                app.notification('Oops', 'Something went wrong', 'Close', null);
             }
         });
     },
@@ -422,8 +428,10 @@ var app = {
     },
     onResume: function () {
         setTimeout(function () {
-            navigator.geolocation.clearWatch(app.positionWatchId);
-            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            if (app.getActivePage() == 'main') {
+                navigator.geolocation.clearWatch(app.positionWatchId);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            }
         }, 100);
     },
     getNewPlacesCount: function () {
@@ -567,7 +575,7 @@ var app = {
         }
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-        
+
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
         /* hide splashscreen when map loaded */
@@ -749,52 +757,6 @@ var app = {
             }
         });
     },
-    activateRippleButton: function (selector) {
-        $(selector).addClass('ripple-effect');
-        $(selector + ':not(".ripple-activated")').on('mousedown', function (e) {
-            if ($(this).hasClass('removing'))
-                return true;
-
-            var $clicked = $(this);
-            $clicked.addClass('clicked');
-
-            //gets the clicked coordinates
-            var offset = $clicked.offset();
-            var relativeX, relativeY, circleK;
-
-
-            relativeX = $clicked.width() / 2;
-            relativeY = $clicked.height() / 2;
-            circleK = 1.2;
-
-
-            var width = $clicked.width();
-
-
-            $clicked.find('.ripple').remove();
-            $clicked.append('<div class="ripple"></div>');
-
-            var $ripple = $clicked.find('.ripple');
-
-            //puts the ripple in the clicked coordinates without animation
-            $ripple.addClass("notransition");
-            $ripple.css({"top": relativeY, "left": relativeX});
-            $ripple[0].offsetHeight;
-            $ripple.removeClass("notransition");
-
-
-            $ripple.css({"width": width * circleK, "height": width * circleK, "margin-left": -width * circleK / 2, "margin-top": -width * circleK / 2});
-
-            setTimeout(function () {
-                $ripple.addClass('ripple-entered');
-                setTimeout(function () {
-                    $ripple.remove();
-                }, 800);
-            }, 300);
-
-        });
-        $(selector).addClass('ripple-activated');
-    },
     setLocationHash: function (hash) {
         location.hash = hash;
     },
@@ -802,7 +764,7 @@ var app = {
         if (typeof samePage == 'undefined') {
             samePage = false;
         }
-        navigator.notification.confirm("Take a picture or select fromgallery",
+        navigator.notification.confirm("Use camera or select from gallery",
                 function confirmCamera(buttonIndex) {
                     if (buttonIndex == 1) {
                         navigator.camera.getPicture(function (imageURI) {

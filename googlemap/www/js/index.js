@@ -2,7 +2,7 @@
 var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = 'test_user_sdfsdfd';
+    device.uuid = 'test_user';
 }
 
 var app = {
@@ -210,7 +210,7 @@ var app = {
                     app.showPlacesForVote(res.data);
                 } else {
                     if (app.getActivePage() === 'new_places') {
-                        app.notification('Loading problem', 'Places loading error', 'Close', function () {
+                        app.notification('Oops', 'Something went wrong', 'Close', function () {
                             app.goToPage('main');
                         });
                     }
@@ -219,7 +219,7 @@ var app = {
             error: function (err) {
                 $("#new_places .wrapper .loader").remove();
                 if (app.getActivePage() === 'new_places') {
-                    app.notification('Loading problem', 'Places loading error', 'Close', function () {
+                    app.notification('Oops', 'Something went wrong', 'Close', function () {
                         app.goToPage('main');
                     });
                 }
@@ -273,8 +273,13 @@ var app = {
             error = true;
         }
 
+        if ($(".add-address").val().length > 100) {
+            $(".add-address").addClass('error');
+            error = true;
+        }
+
         if (error) {
-            $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required/invalid fields</span>');
+            $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required fields</span>');
             setTimeout(function () {
                 fadeOut('.error_msg', function () {
                     $('.error_msg').remove();
@@ -312,7 +317,7 @@ var app = {
                     function () {
                         removeLoader('#add_places');
                         if (app.getActivePage() === 'add_places') {
-                            app.notification('Adding problem', 'Please, try later', 'Close', null);
+                            app.notification('Oops', 'Something went wrong', 'Close', null);
                         }
                     }, options);
         }
@@ -320,10 +325,10 @@ var app = {
     showPlacesForVote: function (places) {
         $("#new_places .wrapper .content").empty();
 
-        var map_widtհ = parseInt($("#new_places .wrapper").outerWidth(true));
+        var map_width = parseInt($("#new_places .wrapper").outerWidth(true));
         var map_size = {
-            width: map_widtհ,
-            height: parseInt(map_widtհ / 2)
+            width: map_width,
+            height: parseInt(map_width / 2)
         }
         if (places.length) {
             for (var i = 0; i < places.length; i++) {
@@ -359,7 +364,7 @@ var app = {
             }
             $('#new_places .wrapper').trigger('scroll');
         } else {
-            $("#new_places .wrapper .content ").html("<p class='no_place_text'>There is no place to vote.</p>");
+            $("#new_places .wrapper .content ").html("<p class='no_place_text'>Nothing to review</p>");
         }
     },
     voteForPlace: function (voteData) {
@@ -403,17 +408,17 @@ var app = {
                         $blockEl.remove();
                         $('#new_places .wrapper').trigger('scroll');
                         if ($("#new_places .wrapper .content .vot_wrap").length == 0) {
-                            $("#new_places .wrapper .content").html("<p class='no_place_text'>There is no place to vote.</p>");
+                            $("#new_places .wrapper .content").html("<p class='no_place_text'>Nothing to review</p>");
                         }
                     }, 600);
                 } else {
                     removeLoader('[data-id="' + voteData['place_id'] + '"]');
-                    app.notification('Vote problem', 'Please, try later', 'Close', null);
+                    app.notification('Oops', 'Something went wrong', 'Close', null);
                 }
             },
             error: function (error) {
                 removeLoader('[data-id="' + voteData['place_id'] + '"]');
-                app.notification('Vote problem', 'Please, try later', 'Close', null);
+                app.notification('Oops', 'Something went wrong', 'Close', null);
             }
         });
     },
@@ -423,8 +428,10 @@ var app = {
     },
     onResume: function () {
         setTimeout(function () {
-            navigator.geolocation.clearWatch(app.positionWatchId);
-            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            if (app.getActivePage() == 'main') {
+                navigator.geolocation.clearWatch(app.positionWatchId);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            }
         }, 100);
     },
     getNewPlacesCount: function () {
@@ -757,7 +764,7 @@ var app = {
         if (typeof samePage == 'undefined') {
             samePage = false;
         }
-        navigator.notification.confirm("Take a picture or select fromgallery",
+        navigator.notification.confirm("Use camera or select from gallery",
                 function confirmCamera(buttonIndex) {
                     if (buttonIndex == 1) {
                         navigator.camera.getPicture(function (imageURI) {

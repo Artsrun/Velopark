@@ -31,11 +31,6 @@ html{
     src: url("../fonts/GOTHIC.TTF") format("opentype"); 
 }
 
-@font-face {
-    font-family: "CenturyGothicBold";
-    src: url("../fonts/GOTHICB.TTF") ; 
-}
-
 body {
     -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
     -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
@@ -424,7 +419,7 @@ footer .footer-info{
     width: 92%;
     font-size: 7px;
     padding: 0 4%;
-    margin: 4% auto 8% auto;
+    margin: 4% auto 4% auto;
 }
 
 footer .footer-info p.desc{
@@ -1080,6 +1075,25 @@ input.error, textarea.error{
 
 .fadeOut{
     opacity:0;
+}
+
+.poweredBy{
+    width: 30%;
+    display: block;
+    max-width: 294px;
+    margin: 0 auto;
+    margin-top: 80px;
+}
+.poweredBy img {
+    width:100%;
+}
+
+a.infoMail:link,
+a.infoMail:visited,
+a.infoMail:hover,
+a.infoMail:focus,
+a.infoMail:active{
+    color:#2ecc71;
 }
 
 @media only screen and (min-width: 320px) {

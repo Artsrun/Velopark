@@ -28,18 +28,18 @@
     <feature name="Camera">
         <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
     </feature>
-    <icon density="ldpi" src="www/res/icon/ldpi.png" />
-    <icon density="mdpi" src="www/res/icon/mdpi.png" />
-    <icon density="hdpi" src="www/res/icon/hdpi.png" />
-    <icon density="xhdpi" src="www/res/icon/xhdpi.png" />
-    <icon density="xxhdpi" src="www/res/icon/xxhdpi.png" />
-    <icon density="xxxhdpi" src="www/res/icon/xxxhdpi.png" />
-    <splash density="port-hdpi" src="www/res/splash/screen-hdpi-portrait.9.png" />
-    <splash density="port-ldpi" src="www/res/splash/screen-ldpi-portrait.9.png" />
-    <splash density="port-mdpi" src="www/res/splash/screen-mdpi-portrait.9.png" />
-    <splash density="port-xhdpi" src="www/res/splash/screen-xhdpi-portrait.9.png" />
-    <splash density="port-xxhdpi" src="www/res/splash/screen-xxhdpi-portrait.9.png" />
-    <splash density="port-xxxhdpi" src="www/res/splash/screen-xxxhdpi-portrait.9.png" />
+    <icon density="ldpi" src="res/android/icons/ldpi.png" />
+    <icon density="mdpi" src="res/android/icons/mdpi.png" />
+    <icon density="hdpi" src="res/android/icons/hdpi.png" />
+    <icon density="xhdpi" src="res/android/icons/xhdpi.png" />
+    <icon density="xxhdpi" src="res/android/icons/xxhdpi.png" />
+    <icon density="xxxhdpi" src="res/android/icons/xxxhdpi.png" />
+    <splash density="port-hdpi" src="res/android/splash/screen-hdpi-portrait.9.png" />
+    <splash density="port-ldpi" src="res/android/splash/screen-ldpi-portrait.9.png" />
+    <splash density="port-mdpi" src="res/android/splash/screen-mdpi-portrait.9.png" />
+    <splash density="port-xhdpi" src="res/android/splash/screen-xhdpi-portrait.9.png" />
+    <splash density="port-xxhdpi" src="res/andriod/splash/screen-xxhdpi-portrait.9.png" />
+    <splash density="port-xxxhdpi" src="res/android/splash/screen-xxxhdpi-portrait.9.png" />
     <name>Velopark</name>
     <description>
         VeloPark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
@@ -49,6 +49,8 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="http://aparg.com/*" launch-external="yes" />
     <preference name="SplashScreen" value="screen" />
     <preference name="SplashScreenDelay" value="10000" />
     <preference name="Orientation" value="portrait" />
