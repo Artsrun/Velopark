@@ -173,6 +173,9 @@ a.vote{
 .add_edit_page label{
     text-transform: uppercase;
 }
+.add_edit_page td{
+	vertical-align:top;
+}
 .tabl th{
     padding:5px 0;
 }
