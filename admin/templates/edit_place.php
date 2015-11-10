@@ -34,6 +34,11 @@
                 <td>Longitude</td>
                 <td><input class="head-text" type="text" name="longitude" value="<?= htmlspecialchars($get_place['longitude']) ?>" /></td>
             </tr>
+			<tr>
+                <td>Map</td>
+                <td><img src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=450x250&maptype=roadmap&markers=color:green%7Clabel:G%7C<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>&key=<?=MAP_API_KEY?>" /></td>
+            </tr>
+			
             <tr>
                 <td>Type</td>
                 <td>

@@ -19,12 +19,24 @@
             <tr>
                 <td><b>Description</b> - <?= $get_place['description'] ?></td>
             </tr>
+			<tr>
+                <td><b>Latitude</b> - <?= htmlspecialchars($get_place['latitude']) ?></td>                
+            </tr>
+            <tr>
+                <td><b>Longitude</b> - <?= htmlspecialchars($get_place['longitude']) ?></td>                
+            </tr>
+			<tr>
+                <td><img src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=450x250&maptype=roadmap&markers=color:green%7Clabel:G%7C<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>&key=<?=MAP_API_KEY?>" /></td>                
+            </tr>
+			<tr>
+                <td><b>Type</b> - <span class='upper'><?= htmlspecialchars($get_place['type']) ?></span></td>                
+            </tr>			
             <tr>
                 <td>
                     <?php if ($get_place['image']): ?>
                         <a href="../uploads/<?= $get_place['id'] ?>.jpg" class="swipebox">
-                            <img src="../uploads/<?= $get_place['id'] ?>.jpg" alt="" height="150" width="150" style="border-radius:3px;">
-                        </a>
+							<img src="../uploads/<?= $get_place['id'] ?>.jpg" alt="" height="150" width="150" style="border-radius:3px;">
+						</a>
                     <?php else: ?>
                         <img src = "templates/images/no_image.jpg" style="height: 150px; width:150px; border-radius: 3px">
                     <?php endif; ?>
