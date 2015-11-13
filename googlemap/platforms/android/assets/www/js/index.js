@@ -2,7 +2,8 @@
 var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = 'test_user';
+    device.uuid = 'test_user_hjbjhb';
+    device.platform = 'android';
 }
 
 var app = {
@@ -29,7 +30,7 @@ var app = {
     geolocationOptions: {
         enableHighAccuracy: true,
         timeout: 3000,
-        maximumAge: 100
+        maximumAge: 0
     },
     mapOptions: {
         zoom: 14,
@@ -75,7 +76,7 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function () {
         app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
-
+        $('body').addClass(device.platform.toLowerCase());
         if (DEBUG) {
             app.onlineStart = true;
             app.googleMapEmbed();
@@ -249,7 +250,7 @@ var app = {
             this.noConnection();
             return false;
         }
-        $('.error_msg').remove();
+        $('.error_msg').removeClass('show');
         $('#add_places .error').removeClass('error');
 
         var error = false;
@@ -279,11 +280,9 @@ var app = {
         }
 
         if (error) {
-            $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required fields</span>');
+            $('.error_msg').addClass('show');
             setTimeout(function () {
-                fadeOut('.error_msg', function () {
-                    $('.error_msg').remove();
-                });
+                $('.error_msg').removeClass('show');
             }, 2000);
         } else {
             var options = new FileUploadOptions();
@@ -356,7 +355,7 @@ var app = {
                     output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
                 output += "<div style='height:" + map_size.height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
-                output += "<div class='new_place_icon_wrap'><a src='img/add_place.png' class='new_place_icon accept' data-value='1'></a><a src='img/new_place.png' class='new_place_icon decline' data-value='0'></a></div>";
+                output += "<div class='new_place_icon_wrap'><a  href='javascript:void(0);' class='new_place_icon accept' data-value='1'></a><a href='javascript:void(0);' class='new_place_icon decline' data-value='0'></a></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
 
@@ -390,18 +389,15 @@ var app = {
                 if (res.status == 'success') {
                     localStorage.setItem("count", parseInt(localStorage.getItem("count")) - 1);
                     var $blockEl = $('[data-id="' + voteData['place_id'] + '"]');
-                    var blockHeight = $blockEl.height();
-
+                    $blockEl.css('height', $blockEl.height());
                     $blockEl.addClass('swipe');
-                    $blockEl[0].offsetHeight;
-                    $blockEl.addClass('swipeLeft');
-
 
                     setTimeout(function () {
-                        $blockEl.css('height', blockHeight);
+                        $blockEl.removeClass('loading').empty();
                         $blockEl.addClass('hideHeight');
-                        $blockEl[0].offsetHeight;
+                        //$blockEl[0].offsetHeight;
                         $blockEl.css('height', 0);
+                        $blockEl.css('margin', 0);
                     }, 250);
 
                     setTimeout(function () {
@@ -483,19 +479,11 @@ var app = {
             success: function (res) {
                 if (res.status == 'success') {
                     /* no updates on server */
-                    if (app.getLocalVersion() == res.data) {
-                        app.selectPlaces(app.defaultType, false);
-                    } else { /* get updates from server and insert to local db */
+                    if (app.getLocalVersion() != res.data) {
+                        /* get updates from server and insert to local db */
                         app.updateDB(res.data);
                     }
-                } else {
-                    // try to load local data
-                    app.selectPlaces(app.defaultType, false);
                 }
-            },
-            error: function (r) {
-                // try to load local data
-                app.selectPlaces(app.defaultType, false);
             }
         });
     },
@@ -526,17 +514,12 @@ var app = {
                             }
 
                         }
+                        if (app.getLocalVersion() == '0') {
+                            app.selectPlaces(app.defaultType, false);
+                        }
                         localStorage.setItem("version", version);
-                        app.selectPlaces(app.defaultType, false);
                     });
-                } else {
-                    // update issue load local data without updating version, next time again will try to load updates
-                    app.selectPlaces(app.defaultType, false);
                 }
-            },
-            error: function (err) {
-                // update issue load local data without updating version, next time again will try to load updates
-                app.selectPlaces(app.defaultType, false);
             }
         });
     },
@@ -567,11 +550,13 @@ var app = {
         }
 
         app.onPositionError = function (error) {
-            app.positionStatus = false;
-//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-//            app.map.setCenter(erLatlng);
-            navigator.geolocation.clearWatch(app.positionWatchId);
-            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            alert(error.message);
+            //if(device.platform.toLowerCase() == 'android'){		//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+            setTimeout(function () {		//            app.map.setCenter(erLatlng);
+                navigator.geolocation.clearWatch(app.positionWatchId);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            }, 3000);
+            //}
         }
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
@@ -608,7 +593,6 @@ var app = {
         }
         /*nav functionality*/
         if (this.firstLoad == true) {
-            $("nav").css("marginTop", 0 - 1.5 * $("nav").height());
             this.firstLoad = false;
             $(".arr-wrapper").on('click', function () {
                 if ($(this).hasClass('arr_back')) {
@@ -704,11 +688,10 @@ var app = {
             });
 
             $(document).on("click", "#new_places .new_place_icon_wrap .new_place_icon", function () {
-                var that = this;
-                var div_wrapper = $(that).closest(".vot_wrap");
+                var div_wrapper = $(this).closest(".vot_wrap");
                 app.voteForPlace({
                     device_id: device.uuid,
-                    vote: $(that).attr("data-value"),
+                    vote: $(this).attr("data-value"),
                     place_id: $(div_wrapper).data("id")
                 });
             });
@@ -740,6 +723,9 @@ var app = {
         }
         if (app.onlineStart == true) {
             app.initMap();
+
+            /* select places if exist */
+            app.selectPlaces(app.defaultType, false);
 
             /* will check db version if anything new will call updateDB function; */
             app.checkDBVersion();
@@ -787,13 +773,13 @@ var app = {
                             app.goToPage('main');
                         }
                     }
-                }, "", ["Camera", "Gallery", "Close"]);
+                }, "Choose", ["Camera", "Gallery", "Close"]);
     },
     googleMapEmbed: function () {
         $("#map-canvas").html("");
         var script_tag = document.createElement('script');
         script_tag.setAttribute("type", "text/javascript");
-        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=" + this.gMapApiKey + "&callback=app.start");
+        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3&key=" + this.gMapApiKey + "&language=en&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
     selectPlaces: function (type, animation) {
@@ -821,8 +807,13 @@ var app = {
         $(".controls").removeClass("transition");
     },
     drawGroupMarkers: function (places, type, animation) {
+
+        if (places.length == 0)
+            return;
+
         $('img[data-type="' + type + '"]').addClass('active');
         $('header .green-menu .arr').addClass('visible');
+
         for (var k = 0; k < places.length; k++) {
             var place = places.item(k);
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
@@ -944,7 +935,7 @@ function addMarker(map, icon, pos, index, opacity, type) {
         map: map,
         position: pos,
         animation: google.maps.Animation.DROP,
-        optimized: false,
+        optimized: true,
         draggable: false,
         icon: image,
         opacity: opacity,
@@ -1040,6 +1031,7 @@ function atachInfoWindow(marker) {
         var index = this.index;
         var type = this.type;
         var dataParking = app.data[type].places.item(index);
+        $(".footer-image img").attr("src", "");
         if (dataParking.image != "") {
             $(".footer-image").attr("src", "data:image/jpg;base64," + dataParking.image);
             $(".foot-link").attr("href", app.uploadsURL + dataParking.server_id + ".jpg");
@@ -1049,7 +1041,7 @@ function atachInfoWindow(marker) {
             $(".foot-link").removeAttr("href");
             $(".foot-link").attr("ontouchstart", "return false;");
         }
-        $('footer').slideDown(200);
+        $(".footer-image img").css('border', 'none');
 
         $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
 

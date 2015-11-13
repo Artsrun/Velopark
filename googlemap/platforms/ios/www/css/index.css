@@ -45,29 +45,10 @@ body {
 body input, body textarea {
     font-family:"CenturyGothicRegular"
 }
-
-body input, body input[type=text], body textarea{
-    /* Remove First */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
 img{
     padding:0;
     margin:0;
 }
-/* ios styles */
-body.ios #swipebox-close{
-    top:20px;
-}
-
-/*body.ios header{
-    padding-top: 20px;
-    background:#2ecc71;
-}*/
-/* end ios */
-
 .container {
     width:100%;
     margin:0 auto;
@@ -119,7 +100,7 @@ header{
     position: fixed;
     width: 100%;
     top: 0;
-    z-index: 100000000;
+    z-index: 1000;
 }
 
 header .green-menu{
@@ -137,7 +118,6 @@ header .green-menu{
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
 }
-
 
 header .logo{
     position: absolute;
@@ -175,7 +155,6 @@ header .green-menu .arr{
     background-position: center center;
     background-size:contain;
     -webkit-transition: transform 200ms ease-in-out,opacity 200ms ease-in-out;
-    -webkit-transition: -webkit-transform 200ms ease-in-out,opacity 200ms ease-in-out;
     -moz-transition: transform 200ms ease-in-out;
     -ms-transition: transform 200ms ease-in-out;
     -o-transition: transform 200ms ease-in-out;
@@ -363,7 +342,6 @@ ul.menu_list img{
     overflow-x:hidden;
     overflow-y:auto;
     position: relative;
-    -webkit-overflow-scrolling: touch;
 }
 
 #map-canvas{
@@ -389,8 +367,7 @@ ul.menu_list img{
 .controls{
     width: 100%;
     margin-bottom: 0%;
-    -webkit-transition: transform 0.2s;
-    -webkit-transition: -webkit-transform 0.2s;
+    -webkit-transition: transform 0.2s; 
     transition: transform 0.2s;
     position: fixed;
     bottom:0;
@@ -427,8 +404,8 @@ footer{
     width:10%;
     top: 0;
     margin-top:0;
-    /*-webkit-transition: margin-top 0.2s;
-    transition: margin-top 0.2s;*/
+    -webkit-transition: margin-top 0.2s; 
+    transition: margin-top 0.2s;
 }
 footer .footer-info{
     display: inline-block;
@@ -468,7 +445,7 @@ footer .footer-info p.count{
     margin: auto;
     border-radius: 3px;
     max-width: 150px;
-    /*overflow:hidden;*/
+    overflow:hidden;
     float:right;
     margin: 0 0 2% 5%;
 }
@@ -476,9 +453,6 @@ footer .footer-info p.count{
 footer .footer-image{
     width: 100%;
     border-radius: 3px;
-}
-body.ios footer .footer-image{
-    border:none;
 }
 
 /* new places */
@@ -1122,7 +1096,6 @@ a.infoMail:active{
     color:#2ecc71;
 }
 
-
 @media only screen and (min-width: 320px) {
 
     .menu li a {
@@ -1511,3 +1484,20 @@ a.infoMail:active{
 
 
 }
+
+/* google map */
+.gm-rev > span a {
+    display: none !important;
+}
+
+.gm-style-iw .view-link {
+    display: none !important;
+}
+
+.gm-wsv label.gm-sv-label{
+    display: none !important;
+}
+.gm-basicinfo .gm-website{
+    display: none !important; 
+}
+.gm-wsv{pointer-events:none;}
