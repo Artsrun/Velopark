@@ -3,7 +3,6 @@ var DEBUG = false;
 if (DEBUG) {
     device = {};
     device.uuid = 'test_user';
-    device.platform = 'iOS';
 }
 
 var app = {
@@ -38,7 +37,9 @@ var app = {
         zoomControl: false,
         mapTypeControl: false,
         scaleControl: false,
-        streetViewControl: false
+        streetViewControl: false,
+        disableDefaultUI:true,
+        clickToGo:false
     },
     getLocalVersion: function () {
         if (localStorage.getItem("version")) {
@@ -77,8 +78,6 @@ var app = {
     onDeviceReady: function () {
         app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
 
-        $('body').addClass( device.platform.toLowerCase() );
-        
         if (DEBUG) {
             app.onlineStart = true;
             app.googleMapEmbed();
@@ -359,7 +358,7 @@ var app = {
                     output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
                 output += "<div style='height:" + map_size.height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
-                output += "<div class='new_place_icon_wrap'><a  href='javascript:void(0);' class='new_place_icon accept' data-value='1'></a><a href=;javascript:void(0);; class='new_place_icon decline' data-value='0'></a></div>";
+                output += "<div class='new_place_icon_wrap'><a src='img/add_place.png' class='new_place_icon accept' data-value='1'></a><a src='img/new_place.png' class='new_place_icon decline' data-value='0'></a></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
 
@@ -571,11 +570,10 @@ var app = {
 
         app.onPositionError = function (error) {
             app.positionStatus = false;
-            //if(device.platform.toLowerCase() == 'android'){
-               setTimeout(function(){
-                    navigator.geolocation.clearWatch(app.positionWatchId);
-                    app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);},3000);
-            //}
+//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+//            app.map.setCenter(erLatlng);
+            navigator.geolocation.clearWatch(app.positionWatchId);
+            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
         }
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
@@ -708,10 +706,11 @@ var app = {
             });
 
             $(document).on("click", "#new_places .new_place_icon_wrap .new_place_icon", function () {
-                var div_wrapper = $(this).closest(".vot_wrap");
+                var that = this;
+                var div_wrapper = $(that).closest(".vot_wrap");
                 app.voteForPlace({
                     device_id: device.uuid,
-                    vote: $(this).attr("data-value"),
+                    vote: $(that).attr("data-value"),
                     place_id: $(div_wrapper).data("id")
                 });
             });
@@ -796,7 +795,7 @@ var app = {
         $("#map-canvas").html("");
         var script_tag = document.createElement('script');
         script_tag.setAttribute("type", "text/javascript");
-        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=" + this.gMapApiKey + "&language=en&callback=app.start");
+        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=" + this.gMapApiKey + "&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
     selectPlaces: function (type, animation) {
@@ -947,7 +946,7 @@ function addMarker(map, icon, pos, index, opacity, type) {
         map: map,
         position: pos,
         animation: google.maps.Animation.DROP,
-        optimized: false,
+        optimized: true,
         draggable: false,
         icon: image,
         opacity: opacity,
@@ -1043,7 +1042,6 @@ function atachInfoWindow(marker) {
         var index = this.index;
         var type = this.type;
         var dataParking = app.data[type].places.item(index);
-        $(".footer-image img").attr("src","");
         if (dataParking.image != "") {
             $(".footer-image").attr("src", "data:image/jpg;base64," + dataParking.image);
             $(".foot-link").attr("href", app.uploadsURL + dataParking.server_id + ".jpg");
@@ -1053,7 +1051,6 @@ function atachInfoWindow(marker) {
             $(".foot-link").removeAttr("href");
             $(".foot-link").attr("ontouchstart", "return false;");
         }
-         $(".footer-image img").css('border','none');
         $('footer').slideDown(200);
 
         $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();

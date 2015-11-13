@@ -13,20 +13,18 @@
         <script type="text/javascript" src="js/jquery.swipebox.js"></script>
         <script type="text/javascript" src="js/functions.js"></script> 
         <script type="text/javascript" src="js/index.js"></script>
-
         <title>Velopark</title>
     </head>
     <body data-active="main">
 
         <div class="container overflow_hide" >
             <header>
+                <div class="ios-statusbar-fix"></div>
                 <div class="green-menu add_places shadow">
                     <a class="backg-cubs menu_btn"></a>
                     <span class="new_notification"></span>
                     <div class="logo"></div>
-                    <div class="arr-wrapper arr arr_down">
-                        <!--  <img src="img/arr_down.png" class="arr" id="arr_down" alt=""> -->
-                    </div>
+                    <div class="arr-wrapper arr arr_down"></div>
                 </div>
                 <ul class="menu shadow">
                     <li data-page="add_places"> <a class="addpl">Add</a></li>
@@ -59,14 +57,14 @@
                     <div id="map-canvas" data-tap-disabled="false"></div>                    
                 </div>
                 <div class="controls">
-                    <img src="img/gps_icon1.png" class="gps1" alt="">
-                    <footer>
+                    <img src="img/gps_icon.png" class="gps1" alt="" />                   
+                    <footer class="shadow-up">
                         <img src="img/i_icon.png" id="info" alt="">
                         <div class="footer-wrap">
 
                             <div class="footer-info">
                                 <div>
-                                    <a class="foot-link swipebox" href="" onclick="return false;"><img class="footer-image" src="" alt=""></a>
+                                    <a class="foot-link swipebox" href="" onclick="return false;"><img class="footer-image" src="img/foot_icon_parking.png" alt=""></a>
                                     <p class="label">Name</p>
                                     <p class="name"></p>
                                     <p class="label">Address</p>
@@ -132,6 +130,7 @@
                         </div>
                         <div class="add_place_icon_wrapper">
                             <img src="img/add_place.png" class="add_place_icon" alt="">
+                            <span class="error_msg">Please check required fields</span>
                         </div>
                     </div>
                 </div>
@@ -152,8 +151,18 @@
                             Start riding with <strong>Velopark!</strong>
                             <br/><br/>
                             <br/>
-                            For any suggestions write to: <a href="mailto:info@velopark.am" class="infoMail">info@velopark.am</a> 
-                            <a class="poweredBy" href="http://aparg.com"><img src="img/aparg.png"/></a>
+                            For any suggestions contact us.
+                            <br/>
+                            <br/>
+                            <span class="contacts">
+                                Email: <strong>info@velopark.am</strong>
+                                <br />
+                                Website: <strong>www.velopark.am</strong>
+                                <br />
+                                Developer website: <strong>www.aparg.com</strong>
+                                <br />
+                                <span class="poweredBy" ><img src="img/aparg.png"/></span>
+                            </span>
                         </p>
                     </div>
                 </div>
