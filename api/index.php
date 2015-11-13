@@ -139,10 +139,7 @@ function add_vote($link) {
 					}
 					$votes_count = $votes[0]["votes_yes"] + $votes[0]["votes_no"];
 					$precent_yes = $votes[0]["votes_yes"] * 100 / $votes_count;
-					if ($votes[0]["status"] == "1" && $precent_yes < 75) {
-						$link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
-						$link->query("UPDATE places SET status = '0', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-					} else if ($votes[0]["status"] == "0" && $precent_yes >= 75 && $votes[0]["votes_yes"] >= 10) {
+					if ($votes[0]["status"] == "0" && $precent_yes >= 75 && $votes[0]["votes_yes"] >= 10) {
 						$link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
 						$link->query("UPDATE places SET status = '1', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
 					}					

@@ -342,7 +342,7 @@ ul.menu_list li{
     margin: 0;
     padding: 0;
     width: 23%;
-
+    vertical-align: middle;
 }
 ul.menu_list img{
     display: block;
@@ -404,7 +404,7 @@ ul.menu_list img{
     margin-top: -70px;
     margin-right: 12px;
     cursor: pointer;
-    width: 14%;
+    width: 15%;
     max-width: 130px;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -1050,7 +1050,16 @@ body.offline #add_places .wrapper, body.offline #new_places .wrapper{
     font-size: 16px;
 }
 
-.vot_wrap{
+/*.vot_wrap{//arshak
+    -webkit-transition:  transform 0.2s;
+    -webkit-transition: -webkit-transform 0.2s;
+    transition:  transform 0.2s;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}*/
+.vot_transition{//arsen
     -webkit-transition:  transform 0.2s;
     -webkit-transition: -webkit-transform 0.2s;
     transition:  transform 0.2s;
@@ -1116,8 +1125,8 @@ input.error, textarea.error{
 }
 
 .hideHeight{
-    -webkit-transition: height 0.4s linear, margin 0.4s linear;
-    transition: height 0.4s linear, margin 0.4s linear;
+    -webkit-transition: height 0.2s linear, margin 0.2s linear;
+    transition: height 0.2s linear, margin 0.2s linear;
     margin: 0;
 }
 

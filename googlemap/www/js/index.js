@@ -1,5 +1,5 @@
 /* MAIN APP CLASS */
-var DEBUG = false;
+var DEBUG = true;
 if (DEBUG) {
     device = {};
     device.uuid = 'test_user_hjbjhb';
@@ -388,25 +388,30 @@ var app = {
             success: function (res) {
                 if (res.status == 'success') {
                     localStorage.setItem("count", parseInt(localStorage.getItem("count")) - 1);
-                    var $blockEl = $('[data-id="' + voteData['place_id'] + '"]');                    
-                    $blockEl.css('height', $blockEl.height());
+                    var $blockEl = $('[data-id="' + voteData['place_id'] + '"]'); 
+                    var curHeight = $blockEl.outerHeight(true);//arsen
+//                    $blockEl.css('height', $blockEl.outerHeight());//arshak
+                    $('.vot_wrap').addClass('vot_transition');//arsen
                     $blockEl.addClass('swipe');
                     
                     setTimeout(function () {
-                        $blockEl.removeClass('loading').empty();
-                        $blockEl.addClass('hideHeight');
-                        //$blockEl[0].offsetHeight;
-                        $blockEl.css('height', 0);
-                        $blockEl.css('margin', 0);
+//                        $blockEl.removeClass('loading').empty();//arshak
+//                        $blockEl.addClass('hideHeight');//arshak
+//                        //$blockEl[0].offsetHeight;
+//                        $blockEl.css('height', 0);//arshak
+//                        $blockEl.css('margin', 0);//arshak
+                          $blockEl.nextAll().css('transform','translateY(-'+curHeight+'px)').css('-webkit-transform','translateY(-'+curHeight+'px)');//arsen
                     }, 250);
 
                     setTimeout(function () {
+                        $('.vot_wrap').removeClass('vot_transition');//arsen
+                        $blockEl.nextAll().removeAttr('style');//arsen
                         $blockEl.remove();
                         $('#new_places .wrapper').trigger('scroll');
                         if ($("#new_places .wrapper .content .vot_wrap").length == 0) {
                             $("#new_places .wrapper .content").html("<p class='no_place_text'>Nothing to review</p>");
                         }
-                    }, 600);
+                    }, 500);
                 } else {
                     removeLoader('[data-id="' + voteData['place_id'] + '"]');
                     app.notification('Oops', 'Something went wrong', 'Close', null);
@@ -550,7 +555,7 @@ var app = {
         }
 
         app.onPositionError = function (error) {
-            alert(error.message);
+            //alert(error.message);
             //if(device.platform.toLowerCase() == 'android'){		//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
             setTimeout(function () {		//            app.map.setCenter(erLatlng);
                 navigator.geolocation.clearWatch(app.positionWatchId);
