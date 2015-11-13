@@ -276,10 +276,10 @@ function vote_place($place_id, $link) {
         $votes = $result->fetch_assoc();
         $votes_count = $votes["votes_yes"] + $votes["votes_no"];
         $precent_yes = $votes["votes_yes"] * 100 / $votes_count;
-        if ($votes["status"] == "1" && $precent_yes < 70) {
+        if ($votes["status"] == "1" && $precent_yes < 75) {
             $link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
             $link->query("UPDATE places SET status = '0', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-        } else if ($votes["status"] == "0" && $precent_yes >= 70 && $votes["votes_yes"] >= 5) {
+        } else if ($votes["status"] == "0" && $precent_yes >= 75 && $votes["votes_yes"] >= 10) {
             $link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
             $link->query("UPDATE places SET status = '1', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
         }
