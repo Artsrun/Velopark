@@ -103,8 +103,8 @@ function add_place($link) {
 			move_uploaded_file($_FILES["file"]["tmp_name"], "../uploads/" . $id . ".jpg");
 			$query_vote = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $id . ", '" . $unique_id . "', '2') ";
 			$result = $link->query($query_vote);			
-		}
-		$status = 'success';
+			$status = 'success';
+		}		
 	}
 	
 	echo json_encode([
@@ -139,15 +139,12 @@ function add_vote($link) {
 					}
 					$votes_count = $votes[0]["votes_yes"] + $votes[0]["votes_no"];
 					$precent_yes = $votes[0]["votes_yes"] * 100 / $votes_count;
-					if ($votes[0]["status"] == "1" && $precent_yes < 70) {
-						$link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
-						$link->query("UPDATE places SET status = '0', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-					} else if ($votes[0]["status"] == "0" && $precent_yes >= 70 && $votes[0]["votes_yes"] >= 5) {
+					if ($votes[0]["status"] == "0" && $precent_yes >= 75 && $votes[0]["votes_yes"] >= 10) {
 						$link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
 						$link->query("UPDATE places SET status = '1', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-					}					
-				}
-				$status = 'success';
+					}			
+					$status = 'success';					
+				}				
 			}
 		}		
 	}

@@ -8,7 +8,7 @@ function clear_admin($var, $link) {
 }
 
 function places($link, $start_pos, $perpage) {
-    $query = "SELECT * FROM places WHERE status<>'2' ORDER BY id DESC LIMIT $start_pos, $perpage";
+    $query = "SELECT * FROM places ORDER BY id DESC LIMIT $start_pos, $perpage";
     $places = array();
     $result = $link->query($query);
     while ($row = $result->fetch_assoc()) {
@@ -29,7 +29,7 @@ function get_place($place_id, $link) {
 }
 
 function count_places($link) {
-    $query = "SELECT COUNT(id) FROM places WHERE status<>'2'";
+    $query = "SELECT COUNT(id) FROM places";
     $res = $link->query($query);
     $count_places = $res->fetch_row();
     $res->free();
@@ -37,6 +37,12 @@ function count_places($link) {
 }
 
 function edit_place($place_id, $link) {
+	$status = get_status($place_id, $link);
+	if($status == '2'){
+		$_SESSION['edit_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
+        return false;
+	}
+	
     $name = trim($_POST['name']);
     $address = trim($_POST['address']);
     $description = trim($_POST['description']);
@@ -104,15 +110,14 @@ function edit_place($place_id, $link) {
         if ($link->affected_rows > 0) {
             if (file_exists("temp/tmp.jpg")) {
                 rename("temp/tmp.jpg", "../uploads/" . $place_id . ".jpg");
-            }
-            $status = get_status($place_id, $link);
-            if ($status == "1") {
-                $query_version = "UPDATE options SET CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
-                $vers = $link->query($query_version);
-                if ($link->affected_rows > 0) {
-                    $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-                }
-            }
+            }            
+            
+            $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+            $vers = $link->query($query_version);				
+            if ($link->affected_rows > 0) {
+                $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+            }            
+			
             $_SESSION['answer'] = "<div class='success'>Place has been updated!</div>";
             return true;
         } else {
@@ -201,8 +206,12 @@ function add_place($link) {
             $data = file_get_contents($path);
             $base64 = base64_encode($data);
         }
-        $query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "', 0, '1', 0)";
-        $res = $link->query($query);
+		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+        $vers = $link->query($query_version);				
+        if ($link->affected_rows > 0) {
+			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "', (SELECT value FROM options WHERE name='version'), '1', 0)";
+			$res = $link->query($query);
+		}        
         if ($link->affected_rows > 0) {
             if (file_exists("temp/tmp.jpg")) {
                 rename("temp/tmp.jpg", "../uploads/" . $link->insert_id . ".jpg");
@@ -220,54 +229,51 @@ function add_place($link) {
 }
 
 function delete_place($place_id, $link) {
-    $status = get_status($place_id, $link);
-    $query = "UPDATE places SET status='2' WHERE id = $place_id";
-    $result = $link->query($query);
-    if ($link->affected_rows > 0) {
-        $_SESSION['answer'] = "<div class='success'>Place has been deleted!</div>";
-        $query = "UPDATE places SET status='2' WHERE id = $place_id";
-        if ($status == "1") {
-            $query_version = "UPDATE options SET CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
-            $link->query($query_version);
-            if ($link->affected_rows > 0) {
-                $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-            }
-        }
-    }
+	    
+	$query = "UPDATE places SET status='2' WHERE id = $place_id";
+	$result = $link->query($query);
+	if ($link->affected_rows > 0) {
+		$_SESSION['answer'] = "<div class='success'>Place has been deleted!</div>";        
+		
+		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+		$link->query($query_version);
+		if ($link->affected_rows > 0) {
+			$link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+		}		
+	}	
 }
 
 
 function confirm_place($place_id, $link) {
-	
-    $status = get_status($place_id, $link);
+	    
     $query = "UPDATE places SET status='1' WHERE id = $place_id";
     $result = $link->query($query);
     if ($link->affected_rows > 0) {
         $_SESSION['answer'] = "<div class='success'>Place has been approved!</div>";
-        $query = "UPDATE places SET status='1' WHERE id = $place_id";
-        if ($status == "0") {
-            $query_version = "UPDATE options SET CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
-            $link->query($query_version);
-            if ($link->affected_rows > 0) {
-                $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-            }
-        }
+		
+        $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+        $link->query($query_version);
+        if ($link->affected_rows > 0) {
+            $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+        }        
     }
 }
 
 function vote_place($place_id, $link) {
+	$status = get_status($place_id, $link);
+	if($status == '2'){
+		$_SESSION['vote_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
+        return false;
+	}
+	
     $votes = array();
-    $vote = trim($_POST['vote']);
-    $status = get_status($place_id, $link);
+    $vote = trim($_POST['vote']);    
     $query = "";
     if ($vote == "yes") {
         $query = "UPDATE places SET votes_yes = votes_yes + 1 WHERE id=" . $place_id;
     } else if ($vote == "no") {
         $query = "UPDATE places SET votes_no = votes_no + 1 WHERE id=" . $place_id;
-    } else {
-        $_SESSION['vote_place']['res'] = "<div class='error'>Error!</div>";
-        return false;
-    }
+    } 
     $link->query($query);
     if ($link->affected_rows > 0) {
         $_SESSION['answer'] = "<div class='success'>Your vote has been saved!</div>";
@@ -276,10 +282,7 @@ function vote_place($place_id, $link) {
         $votes = $result->fetch_assoc();
         $votes_count = $votes["votes_yes"] + $votes["votes_no"];
         $precent_yes = $votes["votes_yes"] * 100 / $votes_count;
-        if ($votes["status"] == "1" && $precent_yes < 70) {
-            $link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
-            $link->query("UPDATE places SET status = '0', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-        } else if ($votes["status"] == "0" && $precent_yes >= 70 && $votes["votes_yes"] >= 5) {
+        if ($precent_yes >= 75 && $votes["votes_yes"] >= 10) {
             $link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
             $link->query("UPDATE places SET status = '1', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
         }
