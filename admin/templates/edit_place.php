@@ -12,17 +12,21 @@
     <form action="" method="post">
 
         <table class="add_edit_page" cellspacing="0" cellpadding="0">
-            <tr>
-                <td class="add-edit-txt">Status</td>
+			<tr>
+				<td class="add-edit-txt">Status</td>
                 <td>
-                    <?php if ($get_place['status'] == "1"): ?>
-                        <span class="green upper"> comfirmed</span>
-                    <?php elseif ($get_place['status'] == "0"): ?>
-                        <span class="red upper"> uncomfirmed</span>                    
-                    <?php elseif ($get_place['status'] == "2"): ?>
-                        <span class="red upper"> <b>deleted</b></span>
+					<?php if ($get_place['status'] == "1"): ?>
+                       <span class="green upper"> comfirmed</span>
+                    <?php elseif($get_place['status'] == "0"): ?>
+                       <span class="red upper"> uncomfirmed</span>                    
+					<?php elseif($get_place['status'] == "2"): ?>
+                       <span class="red upper"> <b>deleted</b></span>
                     <?php endif; ?>
-                </td>					
+				</td>					
+			</tr>
+			<tr>
+                <td class="add-edit-txt">Date</td>
+                <td><?php echo $get_place['date']; ?></td>
             </tr>
             <tr>
                 <td class="add-edit-txt">Name</td>
@@ -35,8 +39,8 @@
             <tr>
                 <td class="add-edit-txt">Description</td>
                 <td>
-                    <textarea class="head-text" name="description" ><?= htmlspecialchars($get_place['description']) ?></textarea>
-                </td>
+				<textarea class="head-text" name="description" ><?= htmlspecialchars($get_place['description']) ?></textarea>
+				</td>
             </tr>
             <tr>
                 <td>Latitude</td>
@@ -46,11 +50,11 @@
                 <td>Longitude</td>
                 <td><input class="head-text" type="text" name="longitude" value="<?= htmlspecialchars($get_place['longitude']) ?>" /></td>
             </tr>
-            <tr>
+			<tr>
                 <td>Map</td>
-                <td><img src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=450x250&maptype=roadmap&markers=color:green%7Clabel:G%7C<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>&key=<?= MAP_API_KEY ?>" /></td>
+                <td><img src="https://maps.googleapis.com/maps/api/staticmap?zoom=18&size=450x250&maptype=roadmap&markers=color:green%7Clabel:G%7C<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>&key=<?=MAP_API_KEY?>" /></td>
             </tr>
-
+			
             <tr>
                 <td>Type</td>
                 <td>
