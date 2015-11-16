@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <!-- Base application theme is the default theme. -->
-<style name="Theme" parent="android:style/Theme" />
+<style name="Theme" parent="android:style/Theme.Material" />
 
 <color name="custom_theme_color">#2ecc71</color>
 <color name="custom_theme_color_dark">#1F8E4E</color>

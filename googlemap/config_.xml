@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="am.velopark.velopark" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Velopark</name>
+    <description>
+        VeloPark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+    </description>
+    <author email="info@aparg.com" href="http://aparg.com">
+        Aparg
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+	<!-- Allow tel: links to open the dialer -->
+    <allow-intent href="mailto:*" />
+	<!-- Allow links to example.com to open in a browser -->
+    <allow-intent href="http://aparg.com/*" />
+    <platform name="android">
+        <icon src="www/res/icon/ldpi.png" density="ldpi" />
+        <icon src="www/res/icon/mdpi.png" density="mdpi" />
+        <icon src="www/res/icon/hdpi.png" density="hdpi" />
+        <icon src="www/res/icon/xhdpi.png" density="xhdpi" />
+        <icon src="www/res/icon/xxhdpi.png" density="xxhdpi" />
+        <icon src="www/res/icon/xxxhdpi.png" density="xxxhdpi" />
+    </platform>
+    <platform name="android">
+        <splash src="www/res/splash/screen-hdpi-portrait.9.png" density="port-hdpi"/>
+        <splash src="www/res/splash/screen-ldpi-portrait.9.png" density="port-ldpi"/>
+        <splash src="www/res/splash/screen-mdpi-portrait.9.png" density="port-mdpi"/>
+        <splash src="www/res/splash/screen-xhdpi-portrait.9.png" density="port-xhdpi"/>
+        <splash src="www/res/splash/screen-xxhdpi-portrait.9.png" density="port-xxhdpi"/> >
+		<splash src="www/res/splash/screen-xxxhdpi-portrait.9.png" density="port-xxxhdpi"/>
+    </platform>
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="10000" />
+	<preference name="Orientation" value="portrait" />
+</widget>

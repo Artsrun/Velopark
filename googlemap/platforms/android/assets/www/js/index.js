@@ -2,7 +2,8 @@
 var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = 'test_user_sd';
+    device.uuid = 'test_user_hjbjhb';
+    device.platform = 'android';
 }
 
 var app = {
@@ -29,7 +30,7 @@ var app = {
     geolocationOptions: {
         enableHighAccuracy: true,
         timeout: 3000,
-        maximumAge: 100
+        maximumAge: 0
     },
     mapOptions: {
         zoom: 14,
@@ -75,7 +76,7 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function () {
         app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
-
+        $('body').addClass(device.platform.toLowerCase());
         if (DEBUG) {
             app.onlineStart = true;
             app.googleMapEmbed();
@@ -210,7 +211,7 @@ var app = {
                     app.showPlacesForVote(res.data);
                 } else {
                     if (app.getActivePage() === 'new_places') {
-                        app.notification('Loading problem', 'Places loading error', 'Close', function () {
+                        app.notification('Oops', 'Something went wrong', 'Close', function () {
                             app.goToPage('main');
                         });
                     }
@@ -219,7 +220,7 @@ var app = {
             error: function (err) {
                 $("#new_places .wrapper .loader").remove();
                 if (app.getActivePage() === 'new_places') {
-                    app.notification('Loading problem', 'Places loading error', 'Close', function () {
+                    app.notification('Oops', 'Something went wrong', 'Close', function () {
                         app.goToPage('main');
                     });
                 }
@@ -249,7 +250,7 @@ var app = {
             this.noConnection();
             return false;
         }
-        $('.error_msg').remove();
+        $('.error_msg').removeClass('show');
         $('#add_places .error').removeClass('error');
 
         var error = false;
@@ -273,12 +274,15 @@ var app = {
             error = true;
         }
 
+        if ($(".add-address").val().length > 100) {
+            $(".add-address").addClass('error');
+            error = true;
+        }
+
         if (error) {
-            $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required/invalid fields</span>');
+            $('.error_msg').addClass('show');
             setTimeout(function () {
-                fadeOut('.error_msg', function () {
-                    $('.error_msg').remove();
-                });
+                $('.error_msg').removeClass('show');
             }, 2000);
         } else {
             var options = new FileUploadOptions();
@@ -312,7 +316,7 @@ var app = {
                     function () {
                         removeLoader('#add_places');
                         if (app.getActivePage() === 'add_places') {
-                            app.notification('Adding problem', 'Please, try later', 'Close', null);
+                            app.notification('Oops', 'Something went wrong', 'Close', null);
                         }
                     }, options);
         }
@@ -320,10 +324,10 @@ var app = {
     showPlacesForVote: function (places) {
         $("#new_places .wrapper .content").empty();
 
-        var map_widtհ = parseInt($("#new_places .wrapper").outerWidth(true));
+        var map_width = parseInt($("#new_places .wrapper").outerWidth(true));
         var map_size = {
-            width: map_widtհ,
-            height: parseInt(map_widtհ / 2)
+            width: map_width,
+            height: parseInt(map_width / 2)
         }
         if (places.length) {
             for (var i = 0; i < places.length; i++) {
@@ -351,16 +355,15 @@ var app = {
                     output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
                 output += "<div style='height:" + map_size.height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
-                output += "<div class='new_place_icon_wrap'><a src='img/add_place.png' class='new_place_icon accept' data-value='1'></a><a src='img/new_place.png' class='new_place_icon decline' data-value='0'></a></div>";
+                output += "<div class='new_place_icon_wrap'><a  href='javascript:void(0);' class='new_place_icon accept' data-value='1'></a><a href='javascript:void(0);' class='new_place_icon decline' data-value='0'></a></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
 
                 app.activateSwipebox('#vot_' + places[i].server_id + ' .swipebox_places:not(".noimage")');
-                app.activateRippleButton('#vot_' + places[i].server_id + ' .new_place_icon');
             }
             $('#new_places .wrapper').trigger('scroll');
         } else {
-            $("#new_places .wrapper .content ").html("<p class='no_place_text'>There is no place to vote.</p>");
+            $("#new_places .wrapper .content ").html("<p class='no_place_text'>Nothing to review</p>");
         }
     },
     voteForPlace: function (voteData) {
@@ -386,33 +389,32 @@ var app = {
                 if (res.status == 'success') {
                     localStorage.setItem("count", parseInt(localStorage.getItem("count")) - 1);
                     var $blockEl = $('[data-id="' + voteData['place_id'] + '"]');
-                    var blockHeight = $blockEl.height();
-
+                    $blockEl.css('height', $blockEl.height());
                     $blockEl.addClass('swipe');
-                    $blockEl[0].offsetHeight;
-                    $blockEl.addClass('swipeLeft');
 
-
-                    $blockEl.css('height', blockHeight);
-                    $blockEl.addClass('hideHeight');
-                    $blockEl[0].offsetHeight;
-                    $blockEl.css('height', 0);
+                    setTimeout(function () {
+                        $blockEl.removeClass('loading').empty();
+                        $blockEl.addClass('hideHeight');
+                        //$blockEl[0].offsetHeight;
+                        $blockEl.css('height', 0);
+                        $blockEl.css('margin', 0);
+                    }, 250);
 
                     setTimeout(function () {
                         $blockEl.remove();
                         $('#new_places .wrapper').trigger('scroll');
                         if ($("#new_places .wrapper .content .vot_wrap").length == 0) {
-                            $("#new_places .wrapper .content").html("<p class='no_place_text'>There is no place to vote.</p>");
+                            $("#new_places .wrapper .content").html("<p class='no_place_text'>Nothing to review</p>");
                         }
                     }, 600);
                 } else {
                     removeLoader('[data-id="' + voteData['place_id'] + '"]');
-                    app.notification('Vote problem', 'Please, try later', 'Close', null);
+                    app.notification('Oops', 'Something went wrong', 'Close', null);
                 }
             },
             error: function (error) {
                 removeLoader('[data-id="' + voteData['place_id'] + '"]');
-                app.notification('Vote problem', 'Please, try later', 'Close', null);
+                app.notification('Oops', 'Something went wrong', 'Close', null);
             }
         });
     },
@@ -422,8 +424,10 @@ var app = {
     },
     onResume: function () {
         setTimeout(function () {
-            navigator.geolocation.clearWatch(app.positionWatchId);
-            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            if (app.getActivePage() == 'main') {
+                navigator.geolocation.clearWatch(app.positionWatchId);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            }
         }, 100);
     },
     getNewPlacesCount: function () {
@@ -475,19 +479,11 @@ var app = {
             success: function (res) {
                 if (res.status == 'success') {
                     /* no updates on server */
-                    if (app.getLocalVersion() == res.data) {
-                        app.selectPlaces(app.defaultType, false);
-                    } else { /* get updates from server and insert to local db */
+                    if (app.getLocalVersion() != res.data) {
+                        /* get updates from server and insert to local db */
                         app.updateDB(res.data);
                     }
-                } else {
-                    // try to load local data
-                    app.selectPlaces(app.defaultType, false);
                 }
-            },
-            error: function (r) {
-                // try to load local data
-                app.selectPlaces(app.defaultType, false);
             }
         });
     },
@@ -518,17 +514,12 @@ var app = {
                             }
 
                         }
+                        if (app.getLocalVersion() == '0') {
+                            app.selectPlaces(app.defaultType, false);
+                        }
                         localStorage.setItem("version", version);
-                        app.selectPlaces(app.defaultType, false);
                     });
-                } else {
-                    // update issue load local data without updating version, next time again will try to load updates
-                    app.selectPlaces(app.defaultType, false);
                 }
-            },
-            error: function (err) {
-                // update issue load local data without updating version, next time again will try to load updates
-                app.selectPlaces(app.defaultType, false);
             }
         });
     },
@@ -559,15 +550,17 @@ var app = {
         }
 
         app.onPositionError = function (error) {
-            app.positionStatus = false;
-//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-//            app.map.setCenter(erLatlng);
-            navigator.geolocation.clearWatch(app.positionWatchId);
-            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            alert(error.message);
+            //if(device.platform.toLowerCase() == 'android'){		//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+            setTimeout(function () {		//            app.map.setCenter(erLatlng);
+                navigator.geolocation.clearWatch(app.positionWatchId);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            }, 3000);
+            //}
         }
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-        
+
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
         /* hide splashscreen when map loaded */
@@ -600,7 +593,6 @@ var app = {
         }
         /*nav functionality*/
         if (this.firstLoad == true) {
-            $("nav").css("marginTop", 0 - 1.5 * $("nav").height());
             this.firstLoad = false;
             $(".arr-wrapper").on('click', function () {
                 if ($(this).hasClass('arr_back')) {
@@ -696,11 +688,10 @@ var app = {
             });
 
             $(document).on("click", "#new_places .new_place_icon_wrap .new_place_icon", function () {
-                var that = this;
-                var div_wrapper = $(that).closest(".vot_wrap");
+                var div_wrapper = $(this).closest(".vot_wrap");
                 app.voteForPlace({
                     device_id: device.uuid,
-                    vote: $(that).attr("data-value"),
+                    vote: $(this).attr("data-value"),
                     place_id: $(div_wrapper).data("id")
                 });
             });
@@ -733,6 +724,9 @@ var app = {
         if (app.onlineStart == true) {
             app.initMap();
 
+            /* select places if exist */
+            app.selectPlaces(app.defaultType, false);
+
             /* will check db version if anything new will call updateDB function; */
             app.checkDBVersion();
 
@@ -749,52 +743,6 @@ var app = {
             }
         });
     },
-    activateRippleButton: function (selector) {
-        $(selector).addClass('ripple-effect');
-        $(selector + ':not(".ripple-activated")').on('mousedown', function (e) {
-            if ($(this).hasClass('removing'))
-                return true;
-
-            var $clicked = $(this);
-            $clicked.addClass('clicked');
-
-            //gets the clicked coordinates
-            var offset = $clicked.offset();
-            var relativeX, relativeY, circleK;
-
-
-            relativeX = $clicked.width() / 2;
-            relativeY = $clicked.height() / 2;
-            circleK = 1.2;
-
-
-            var width = $clicked.width();
-
-
-            $clicked.find('.ripple').remove();
-            $clicked.append('<div class="ripple"></div>');
-
-            var $ripple = $clicked.find('.ripple');
-
-            //puts the ripple in the clicked coordinates without animation
-            $ripple.addClass("notransition");
-            $ripple.css({"top": relativeY, "left": relativeX});
-            $ripple[0].offsetHeight;
-            $ripple.removeClass("notransition");
-
-
-            $ripple.css({"width": width * circleK, "height": width * circleK, "margin-left": -width * circleK / 2, "margin-top": -width * circleK / 2});
-
-            setTimeout(function () {
-                $ripple.addClass('ripple-entered');
-                setTimeout(function () {
-                    $ripple.remove();
-                }, 800);
-            }, 300);
-
-        });
-        $(selector).addClass('ripple-activated');
-    },
     setLocationHash: function (hash) {
         location.hash = hash;
     },
@@ -802,7 +750,7 @@ var app = {
         if (typeof samePage == 'undefined') {
             samePage = false;
         }
-        navigator.notification.confirm("Take a picture or select fromgallery",
+        navigator.notification.confirm("Use camera or select from gallery",
                 function confirmCamera(buttonIndex) {
                     if (buttonIndex == 1) {
                         navigator.camera.getPicture(function (imageURI) {
@@ -825,13 +773,13 @@ var app = {
                             app.goToPage('main');
                         }
                     }
-                }, "", ["Camera", "Gallery", "Close"]);
+                }, "Choose", ["Camera", "Gallery", "Close"]);
     },
     googleMapEmbed: function () {
         $("#map-canvas").html("");
         var script_tag = document.createElement('script');
         script_tag.setAttribute("type", "text/javascript");
-        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=" + this.gMapApiKey + "&callback=app.start");
+        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3&key=" + this.gMapApiKey + "&language=en&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
     selectPlaces: function (type, animation) {
@@ -859,8 +807,13 @@ var app = {
         $(".controls").removeClass("transition");
     },
     drawGroupMarkers: function (places, type, animation) {
+
+        if (places.length == 0)
+            return;
+
         $('img[data-type="' + type + '"]').addClass('active');
         $('header .green-menu .arr').addClass('visible');
+
         for (var k = 0; k < places.length; k++) {
             var place = places.item(k);
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
@@ -982,7 +935,7 @@ function addMarker(map, icon, pos, index, opacity, type) {
         map: map,
         position: pos,
         animation: google.maps.Animation.DROP,
-        optimized: false,
+        optimized: true,
         draggable: false,
         icon: image,
         opacity: opacity,
@@ -1078,6 +1031,7 @@ function atachInfoWindow(marker) {
         var index = this.index;
         var type = this.type;
         var dataParking = app.data[type].places.item(index);
+        $(".footer-image img").attr("src", "");
         if (dataParking.image != "") {
             $(".footer-image").attr("src", "data:image/jpg;base64," + dataParking.image);
             $(".foot-link").attr("href", app.uploadsURL + dataParking.server_id + ".jpg");
@@ -1087,7 +1041,7 @@ function atachInfoWindow(marker) {
             $(".foot-link").removeAttr("href");
             $(".foot-link").attr("ontouchstart", "return false;");
         }
-        $('footer').slideDown(200);
+        $(".footer-image img").css('border', 'none');
 
         $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
 
