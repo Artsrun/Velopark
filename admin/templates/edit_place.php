@@ -12,6 +12,22 @@
     <form action="" method="post">
 
         <table class="add_edit_page" cellspacing="0" cellpadding="0">
+			<tr>
+				<td class="add-edit-txt">Status</td>
+                <td>
+					<?php if ($get_place['status'] == "1"): ?>
+                       <span class="green upper"> comfirmed</span>
+                    <?php elseif($get_place['status'] == "0"): ?>
+                       <span class="red upper"> uncomfirmed</span>                    
+					<?php elseif($get_place['status'] == "2"): ?>
+                       <span class="red upper"> <b>deleted</b></span>
+                    <?php endif; ?>
+				</td>					
+			</tr>
+			<tr>
+                <td class="add-edit-txt">Date</td>
+                <td><?php echo $get_place['date']; ?></td>
+            </tr>
             <tr>
                 <td class="add-edit-txt">Name</td>
                 <td><input class="head-text" type="text" name="name" value="<?= htmlspecialchars($get_place['name']) ?>" /></td>

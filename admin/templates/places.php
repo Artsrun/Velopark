@@ -46,7 +46,9 @@
                 <?php if ($item['status'] == "1"): ?>
                        <span class="green upper"> comfirmed</span>
                     <?php elseif($item['status'] == "0"): ?>
-                       <span class="red upper"> uncomfirmed</span>
+                       <span class="red upper"> uncomfirmed</span>                    
+					<?php elseif($item['status'] == "2"): ?>
+                       <span class="red upper"> <b>deleted</b></span>
                     <?php endif; ?>
                 </td>
                 <td class='upper'>

@@ -131,6 +131,7 @@ body{
     border-radius: 3px;
     border: none;
     text-transform:uppercase;
+	cursor:pointer;
 }
 textarea.head-text{	
 	height: 100px;
