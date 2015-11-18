@@ -41,11 +41,21 @@ var app = {
         scaleControl: false,
         streetViewControl: false
     },
+    markerOptions: {
+        places: {
+            w: 28,
+            h: 44
+        },
+        me: {
+            w: 15,
+            h: 15
+        }
+    },
     getLocalVersion: function () {
         if (localStorage.getItem("version")) {
             return localStorage.getItem("version");
         } else {
-            return '0';
+            return 0;
         }
 
     },
@@ -112,9 +122,9 @@ var app = {
             app.onlineStatus = 'online';
             /* add class to body for further usage */
 
-            $('body').removeClass('offline');
-            $('body').removeClass('offlineMap');
-            $('body').addClass('online');
+            $('html').removeClass('offline');
+            $('html').removeClass('offlineMap');
+            $('html').addClass('online');
 
             if (app.getActivePage() == 'new_places') {
                 app.getNewPlaces();
@@ -134,8 +144,8 @@ var app = {
         if (app.onlineStatus != 'offline') {
             app.onlineStatus = 'offline';
             /* add class to body for further usage */
-            $('body').removeClass('online');
-            $('body').addClass('offline');
+            $('html').removeClass('online');
+            $('html').addClass('offline');
         }
     },
     // Update DOM on a Received Event
@@ -519,7 +529,7 @@ var app = {
                 if (res.status == 'success') {
                     var response = res.data;
                     app.db.transaction(function (tx) {
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS places(server_id integer PRIMARY KEY unique,latitude float, longitude float, name text, address varchar, description text, image text, type varchar, status varchar)', []);
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS places(server_id integer PRIMARY KEY unique,latitude REAL, longitude REAL, name text, address varchar, description text, image text, type varchar, status varchar)', []);
                         for (var i = 0; i < response.length; i++) {
                             if (response[i].status === "1") {
                                 tx.executeSql("UPDATE places SET latitude=?, longitude=?, name=?, address=?, description=?, image=?, type=?, status=? WHERE server_id=?", [response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status, response[i].id], null, null);
@@ -527,10 +537,9 @@ var app = {
                             } else {
                                 tx.executeSql("DELETE FROM places WHERE server_id=?", [response[i].id], null, null);
                             }
-
                         }
-                        if (app.getLocalVersion() == '0') {
-                            app.selectPlaces(app.defaultType, false);
+                        if (app.getLocalVersion() == 0) {
+                            app.selectPlaces(app.defaultType);
                         }
                         localStorage.setItem("version", version);
                     });
@@ -566,7 +575,7 @@ var app = {
                 app.map.setCenter(myLatlng);
                 var image = {
                     url: "img/marcer_main.png",
-                    scaledSize: new google.maps.Size(15, 15)
+                    scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
                 };
                 mainMarker = addMarker(app.map, image, myLatlng);
             }
@@ -592,9 +601,18 @@ var app = {
             if (navigator.splashscreen) {
                 navigator.splashscreen.hide();
             }
+            /* select places if exist */
+            if (app.getLocalVersion() != 0) {
+                app.selectPlaces(app.defaultType);
+            }
+
         });
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
+            if (app.activeMarker) {
+                app.activeMarker.setAnimation(null);
+                app.activeMarker = null;
+            }
             $(".controls").removeClass("transition");
         });
         /* gps button functionality */
@@ -613,7 +631,7 @@ var app = {
     },
     start: function (onlineMap) {
         if (typeof onlineMap != 'undefined') {
-            $('body').addClass('offlineMap');
+            $('html').addClass('offlineMap');
         }
         /*nav functionality*/
         if (this.firstLoad == true) {
@@ -753,9 +771,6 @@ var app = {
         if (app.onlineStart == true) {
             app.initMap();
 
-            /* select places if exist */
-            app.selectPlaces(app.defaultType, false);
-
             /* will check db version if anything new will call updateDB function; */
             app.checkDBVersion();
 
@@ -788,7 +803,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.CAMERA, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.CAMERA, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else if (buttonIndex == 2) {
                         navigator.camera.getPicture(function (imageURI) {
                             setTimeout(function () {
@@ -796,7 +811,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else {
                         if (samePage == false) {
                             app.goToPage('main');
@@ -811,14 +826,11 @@ var app = {
         script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3&key=" + this.gMapApiKey + "&language=en&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
-    selectPlaces: function (type, animation) {
+    selectPlaces: function (type) {
         if (typeof type == 'undefined') {
             type = 'parking';
         }
-        if (typeof animation == 'undefined') {
-            animation = true;
-        }
-        var query = query = "SELECT server_id, latitude, longitude  FROM places WHERE status='1' AND type='" + type + "'";
+        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE status='1' AND type='" + type + "'";
         app.db.transaction(function (tx) {
             tx.executeSql(query, [], function (tx, results) {
                 app.data[type] = {
@@ -826,47 +838,79 @@ var app = {
                 };
                 app.data.status = 'ready';
                 /* show markesr on map by type*/
-                app.drawGroupMarkers(results.rows, type, animation);
+                app.drawGroupMarkers(results.rows, type);
             });
-        }, function (err) {
-            console.log(err)
+        }, function () {
+            console.log('error')
+            app.data.status = 'error';
         });
     },
     clearPlaces: function (type) {
         app.data[type] = null;
+        if (app.activeMarker) {
+            app.activeMarker.setAnimation(null)
+            app.activeMarker = null;
+        }
         $(".controls").removeClass("transition");
     },
-    drawGroupMarkers: function (places, type, animation) {
+    drawGroupMarkers: function (places, type) {
 
-        if (places.length == 0)
+        /* if there is no matched places do nothing */
+        if (places.length == 0) {
             return;
+        }
 
         $('img[data-type="' + type + '"]').addClass('active');
         $('header .green-menu .arr').addClass('visible');
 
         var image = {
             url: "img/marker_" + type + ".png",
-            scaledSize: new google.maps.Size(28, 44)
+            scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
         };
         for (var k = 0; k < places.length; k++) {
             var place = places.item(k);
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
-            var opacity = 0;
-            if (!animation) {
-                opacity = 1;
-            }
+            var marker = addMarker(app.map, image, myLatlng, place.server_id, place.type);
 
-            var marker = addMarker(app.map, image, myLatlng, place.server_id, opacity, type);
-
-            if (animation) {
-                setMarkerOpacity(marker, 1, places.length);
-            } else {
-                marker.setAnimation(null);
-            }
-
-            app.data[type].markers[k] = marker;
-            atachInfoWindow(marker);
+            app.data[place.type].markers[k] = marker;
+            app.atachInfoWindow(marker);
         }
+    },
+    atachInfoWindow: function (marker) {
+        marker.addListener('click', function () {
+            if (app.activeMarker) {
+                app.activeMarker.setAnimation(null);
+            }
+            app.activeMarker = this;
+            this.setAnimation(google.maps.Animation.BOUNCE);
+
+            app.getPlaceFromDB(this.server_id, function (data) {
+//                $(".footer-image img").attr("src", "");
+                if (data.image) {
+                    $(".footer-image").attr("src", "data:image/jpg;base64," + data.image);
+                    $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
+                    $(".foot-link").removeAttr("ontouchstart");
+                } else {
+                    $(".footer-image").attr("src", "img/foot_icon_" + data.type + ".png");
+                    $(".foot-link").removeAttr("href");
+                    $(".foot-link").attr("ontouchstart", "return false;");
+                }
+                $(".footer-image img").css('border', 'none');
+
+                $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
+
+                $("footer .footer-info p.name").text(data.name);
+                $("footer .footer-info p.address").text(data.address);
+                if (data.description) {
+                    $("footer .footer-info .label.fordesc").show();
+                    $("footer .footer-info p.desc").text(data.description);
+                } else {
+                    $("footer .footer-info .label.fordesc").hide();
+                    $("footer .footer-info p.desc").text('');
+                }
+                $('.controls').addClass("transition");
+            });
+        });
     },
     cameraSuccess: function (imageURI, fromGallery) {
 
@@ -961,29 +1005,20 @@ function elementInViewport(el) {
 }
 
 
-function addMarker(map, image, pos, index, opacity, type) {
-    if (typeof opacity == 'undefined') {
-        opacity = 1;
-    }
-
+function addMarker(map, image, pos, id, type) {
     var marker = new google.maps.Marker({
         map: map,
         position: pos,
-        animation: google.maps.Animation.DROP,
         optimized: true,
         draggable: false,
         icon: image,
-        opacity: opacity,
-        index: index,
+        opacity: 1,
+        server_id: id || null,
         type: type || null
     });
     return marker;
 }
-function setMarkerOpacity(marker, value, length) {
-    window.setTimeout(function () {
-        marker.setOpacity(value);
-    }, 100);
-}
+
 function removeMarker(marker) {
     marker.setMap(null);
 }
@@ -1003,7 +1038,7 @@ function newPlace(center, setAddress) {
 
     var image = {
         url: "img/marker.png",
-        scaledSize: new google.maps.Size(28, 44)
+        scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
     };
     var new_marker = new google.maps.Marker({
         map: new_map,
@@ -1060,40 +1095,6 @@ function removeLoader(selector) {
         $(selector).removeClass('loading');
     }, 200);
 }
-
-function atachInfoWindow(marker) {
-    marker.addListener('click', function () {
-        var server_id = this.index;
-        app.getPlaceFromDB(server_id, function (data) {
-            $(".footer-image img").attr("src", "");
-            if (data.image != "") {
-                $(".footer-image").attr("src", "data:image/jpg;base64," + data.image);
-                $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
-                $(".foot-link").removeAttr("ontouchstart");
-            } else {
-                $(".footer-image").attr("src", "img/foot_icon_" + data.type + ".png");
-                $(".foot-link").removeAttr("href");
-                $(".foot-link").attr("ontouchstart", "return false;");
-            }
-            $(".footer-image img").css('border', 'none');
-
-            $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
-
-
-            $("footer .footer-info p.name").text(data.name);
-            $("footer .footer-info p.address").text(data.address);
-            if (data.description) {
-                $("footer .footer-info .label.fordesc").show();
-            } else {
-                $("footer .footer-info .label.fordesc").hide();
-            }
-            $("footer .footer-info p.desc").text(data.description);
-            $('.controls').addClass("transition");
-        });
-
-    });
-}
-
 
 function fadeIn(selector, callback) {
     $(selector).addClass('fadeInStart');
