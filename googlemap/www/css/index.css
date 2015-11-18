@@ -179,12 +179,12 @@ header .green-menu .arr{
     background-repeat: no-repeat;
     background-position: center center;
     background-size:contain;
-    -webkit-transition: transform 200ms ease-in-out,opacity 200ms ease-in-out;
-    -webkit-transition: -webkit-transform 200ms ease-in-out,opacity 200ms ease-in-out;
-    -moz-transition: transform 200ms ease-in-out;
-    -ms-transition: transform 200ms ease-in-out;
-    -o-transition: transform 200ms ease-in-out;
-    transition: transform 200ms ease-in-out, opacity 200ms ease-in-out;
+    -webkit-transition: transform 200ms linear,opacity 200ms linear;
+    -webkit-transition: -webkit-transform 200ms linear,opacity 200ms linear;
+    -moz-transition: transform 200ms linear;
+    -ms-transition: transform 200ms linear;
+    -o-transition: transform 200ms linear;
+    transition: transform 200ms linear, opacity 200ms linear;
 }
 
 .arr_down{
@@ -244,9 +244,9 @@ nav{
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
     margin-top: -2px;
-    -webkit-transition: transform 0.2s;
-    -webkit-transition: -webkit-transform 0.2s;
-    transition: transform 0.2s;
+    -webkit-transition: transform 0.2s linear;
+    -webkit-transition: -webkit-transform 0.2s linear;
+    transition: transform 0.2s linear;
 }
 nav.nav_down{
     /*    margin-top: -50%;*/
@@ -328,8 +328,8 @@ header.new_not .new_notification{
 }
 
 /*.nav_down, .menu_down{
-    -webkit-transition: all 200ms ;
-    transition: all 200ms ;
+    -webkit-transition: all 200ms linear;
+    transition: all 200ms linear;
 }*/
 
 nav ul{
@@ -357,8 +357,8 @@ ul.menu_list img{
 }
 
 .menu_list img.active{
-    transition:border 0.2s;
-    -webkit-transition: border 0.2s;
+    transition:border 0.2s linear;
+    -webkit-transition: border 0.2s linear;
 }
 #icon_park.active{
     border: 2px solid #d35400 !important; 
@@ -698,8 +698,8 @@ html.ios footer .footer-image{
     border-radius: 50%;
     border: 2px solid transparent;
     padding: 2px;
-    transition:border 0.2s;
-    -webkit-transition: border 0.2s;
+    transition:border 0.2s linear;
+    -webkit-transition: border 0.2s linear;
 }
 
 .add_img_icon_park{
@@ -977,8 +977,8 @@ textarea {
 }
 .place_map img{
     /*    height:180px;*/
-    transition:opacity 0.5s;
-    -webkit-transition: opacity 0.5s;
+    transition:opacity 0.5s linear;
+    -webkit-transition: opacity 0.5s linear;
     width: 100%;
 }
 
@@ -1081,18 +1081,39 @@ html.offline #add_places .wrapper, html.offline #new_places .wrapper{
     font-size: 16px;
 }
 
-.vot_transition{
-    -webkit-transition:  transform 0.2s;
-    -webkit-transition: -webkit-transform 0.2s;
-    transition:  transform 0.2s;
+/*.swipe_trans{
+    -webkit-transition:  transform 0.2s linear;
+    -webkit-transition: -webkit-transform 0.2s linear;
+    transition:  transform 0.2s linear;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}*/
+.up_trans{
+    -webkit-transition:  transform 0.2s linear 0.18s;
+    -webkit-transition: -webkit-transform 0.2s linear 0.18s;
+    transition:  transform 0.2s linear 0.18s;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
 }
 .swipe{
+    -webkit-transition:  transform 0.2s linear;
+    -webkit-transition: -webkit-transform 0.2s linear;
+    transition:  transform 0.2s linear;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
     -webkit-transform: translateX(110%); 
     transform:  translateX(110%);
+}
+.hideHeight{
+    -webkit-transition: height 0.2s linear, margin 0.2s linear;
+    transition: height 0.2s linear, margin 0.2s linear;
+    margin: 0;
 }
 
 .loading{
@@ -1112,8 +1133,8 @@ html.offline #add_places .wrapper, html.offline #new_places .wrapper{
     background-position: center center;
     background-repeat: no-repeat;
     background-size:15%;
-    transition:opacity 0.4s;
-    -webkit-transition: opacity 0.4s;
+    transition:opacity 0.4s linear;
+    -webkit-transition: opacity 0.4s linear;
     z-index: 100;
 }
 .loading.visibility:after{
@@ -1134,8 +1155,8 @@ input.error, textarea.error{
     font-size: 12px;
     color: #e74c3c;
     opacity: 0;
-    -webkit-transition: opacity 0.2s;
-    transition: opacity 0.2s;
+    -webkit-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
@@ -1146,23 +1167,17 @@ input.error, textarea.error{
     opacity: 1;
 }
 
-.hideHeight{
-    -webkit-transition: height 0.2s linear, margin 0.2s linear;
-    transition: height 0.2s linear, margin 0.2s linear;
-    margin: 0;
-}
-
 .fadeInStart{
     display:block;
     opacity:0;
-    -webkit-transition: opacity 0.3s;
-    transition: opacity 0.3s;
+    -webkit-transition: opacity 0.3s linear;
+    transition: opacity 0.3s linear;
 }
 
 .fadeOutStart{
     opacity:1;
-    -webkit-transition: opacity 0.3s;
-    transition: opacity 0.3s;
+    -webkit-transition: opacity 0.3s linear;
+    transition: opacity 0.3s linear;
     display:block;
 }
 .fadeOutComplete{
