@@ -24,6 +24,7 @@
 
 html{
     height:100%;
+    background:#ffffff;
 }
 
 @font-face {
@@ -68,16 +69,16 @@ strong,b{
     font-weight: bold;
 }
 /* ios styles */
-body.ios #swipebox-close{
+html.ios #swipebox-close{
     top:20px;
 }
-body.ios .ios-statusbar-fix{
+html.ios .ios-statusbar-fix{
     display: block;
 }
-body.ios header{
+html.ios header{
     padding-top:20px;
 }
-body.ios .menu{
+html.ios .menu{
     top:30px;
 }
 .container {
@@ -136,8 +137,10 @@ header .green-menu{
     padding-top: 16%;
     position: relative;
     z-index: 10001;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+    /*    -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;*/
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
 
 
@@ -182,8 +185,29 @@ header .green-menu .arr{
     -ms-transition: transform 200ms ease-in-out;
     -o-transition: transform 200ms ease-in-out;
     transition: transform 200ms ease-in-out, opacity 200ms ease-in-out;
+}
 
-} 
+.arr_down{
+    -moz-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+.arr_up.arr_back{
+    -moz-transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+}
+.arr_down.arr_back{
+    -moz-transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    -ms-transform: rotate(270deg);
+    transform: rotate(270deg);
+}
 header .green-menu .backg-cubs{
     width:22px;
     background-image:url(../img/backg-cubs.png);
@@ -206,34 +230,13 @@ body[data-active="main"] header .green-menu .arr.visible{
     opacity:1;
 }
 
-.arr_down{
-    -moz-transform: rotate(180deg);
-    -webkit-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
 
-}
-.arr_up.arr_back{
-    -moz-transform: rotate(-90deg);
-    -webkit-transform: rotate(-90deg);
-    -o-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    transform: rotate(-90deg);
-}
-.arr_down.arr_back{
-    -moz-transform: rotate(270deg);
-    -webkit-transform: rotate(270deg);
-    -o-transform: rotate(270deg);
-    -ms-transform: rotate(270deg);
-    transform: rotate(270deg);
-}
 nav{
     width: 100%;
     padding-top: 3%;
     padding-bottom: 2%;
     position: absolute;
-    background-color: white;
+    background-color: #ffffff;
     z-index: 10000;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -252,7 +255,7 @@ nav.nav_down{
 
 .menu{
     color: #777777;
-    background-color: white;
+    background-color: #ffffff;
     position:absolute;
     margin: auto;
     left: 9px;
@@ -262,6 +265,7 @@ nav.nav_down{
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     z-index: 9999999;
+    -webkit-border-radius:3px;
     border-radius: 3px;
     overflow: hidden;
     /* 
@@ -303,7 +307,7 @@ box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3
     background-image: url(../img/note.png);
     background-size: contain;
     background-repeat: no-repeat;
-    color: white;
+    color: #ffffff;
     text-align: center;
     font-size: 12px;
     display: none;
@@ -350,6 +354,7 @@ ul.menu_list img{
     max-width: 100%;
     width: 68%;
     margin: 0 auto;
+    -webkit-border-radius:50%;
     border-radius: 50%;
     padding:2px;
     border:2px solid transparent;
@@ -385,7 +390,30 @@ ul.menu_list img{
     -webkit-overflow-scrolling: touch;
 }
 
-.wrapper::-webkit-scrollbar {
+html.oldAndroid header{
+    position:absolute;
+}
+html.oldAndroid {
+    height: auto; 
+}
+html.oldAndroid[data-active="main"], html.oldAndroid.fullHeight[data-active="new_places"]{
+    height: 100%;
+    overflow: hidden;
+}
+
+html.oldAndroid[data-active="main"] .container, html.oldAndroid[data-active="main"] .wrapper{
+    height: 100%;
+}
+
+html.oldAndroid[data-active="about"] header, html.oldAndroid[data-active="new_places"] header{
+    position:fixed;
+}
+html.oldAndroid .arr.arr_back{
+    background-image:url(../img/arr_back.png);
+    -webkit-transform: rotate(0);
+    transform: rotate(0);
+}
+::-webkit-scrollbar {
     -webkit-appearance: none;
 }
 
@@ -418,7 +446,7 @@ ul.menu_list img{
     -webkit-transition: transform 0.2s linear;
     -webkit-transition: -webkit-transform 0.2s linear;
     transition: transform 0.2s linear;    
-    position: fixed;
+    position: absolute;
     /*bottom:0;*/
     left:0;
     /*    -webkit-transform: translate(0,100%); 
@@ -446,7 +474,7 @@ ul.menu_list img{
 
 }
 .controls.transition{
-     -webkit-transition: transform 0.2s linear 0.05s;
+    -webkit-transition: transform 0.2s linear 0.05s;
     -webkit-transition: -webkit-transform 0.2s linear 0.05s;
     transition: transform 0.2s linear 0.05s;
     -webkit-transform: translate(0,-100%);
@@ -510,6 +538,7 @@ footer .footer-info p.count{
 .foot-link.swipebox{
     width: 20%;
     margin: auto;
+    -webkit-border-radius:3px;
     border-radius: 3px;
     max-width: 150px;
     /*overflow:hidden;*/
@@ -519,9 +548,10 @@ footer .footer-info p.count{
 
 footer .footer-image{
     width: 100%;
+    -webkit-border-radius:3px;
     border-radius: 3px;
 }
-body.ios footer .footer-image{
+html.ios footer .footer-image{
     border:none;
 }
 
@@ -542,19 +572,9 @@ body.ios footer .footer-image{
     /*    border-bottom: 1px solid #dddddd;*/
 }
 
-.overlay{
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: white;
-    opacity: 0.5;
-    display: none;
-}
-
 .vot_img{
     width: 100%;
+    -webkit-border-radius:5px;
     border-radius: 5px;
     max-width: 150px;
     max-height: 150px;
@@ -566,6 +586,7 @@ body.ios footer .footer-image{
 }
 
 .place_map img{
+    -webkit-border-radius:3px;
     border-radius: 3px;
 }
 
@@ -596,6 +617,7 @@ body.ios footer .footer-image{
     width: 100%;
     margin: 5% 0;
     height: 250px;
+    -webkit-border-radius:3px;
     border-radius: 3px;
     background-color: #EEEEEE;
 }
@@ -612,6 +634,7 @@ body.ios footer .footer-image{
 .add-src{
     width: 30%;
     float: left;
+    -webkit-border-radius:5px;
     border-radius: 5px;
     margin: 5% 0 8px 0;
     display: block;
@@ -626,6 +649,7 @@ body.ios footer .footer-image{
     margin-top: 8px;
     color: #555555;
     font-size: 12px;
+    -webkit-border-radius:2px;
     border-radius: 2px;
     border: 1px solid #ddd;
     padding: 0 2%;
@@ -673,6 +697,7 @@ body.ios footer .footer-image{
 .add_img_icon{
     width: 17%;
     margin-left:5%;
+    -webkit-border-radius:50%;
     border-radius: 50%;
     border: 2px solid transparent;
     padding: 2px;
@@ -689,6 +714,7 @@ body.ios footer .footer-image{
     width: 94.5%;
     height: 100px;
     outline:none;
+    -webkit-border-radius:2px;
     border-radius: 2px;
     border: 1px solid #ddd;
     padding: 2%;
@@ -716,10 +742,11 @@ body.ios footer .footer-image{
     width: 98%;
     margin-bottom: 20px;
     padding: 7px 0;
+    -webkit-border-radius:3px;
     border-radius: 3px;
     outline: none;
     background-color: #2ecc71;
-    color: white;
+    color: #ffffff;
     border: none;
     cursor: pointer;
 }
@@ -732,9 +759,10 @@ body.ios footer .footer-image{
 
 .button{
     display: block;
+    -webkit-border-radius:3px;
     border-radius: 3px;
     background-color: #2ecc71;
-    color: white;
+    color: #ffffff;
     margin: 30px auto;
     border: none;
     outline: none;
@@ -967,6 +995,7 @@ a.swipebox_places{
     width: 30%;
     max-width: 150px;
     max-height: 150px;
+    -webkit-border-radius:5px;
     border-radius: 5px;
     overflow:hidden;
     float: left;
@@ -1036,7 +1065,7 @@ body.offline #add_places .wrapper:after, body.offline #new_places .wrapper:after
     margin-left: -15%;
 }
 
-body.offlineMap[data-active="main"] .arr {
+html[data-active="main"] body.offlineMap .arr {
     display:none;
 }
 /*body.offlineMap #main .wrapper:after{
@@ -1596,6 +1625,12 @@ a.infoMail:active{
 }
 .gm-wsv{pointer-events:none;}
 
-#map-canvas{
+/*#map-canvas{
     -webkit-overflow-scrolling: touch;
+}*/
+
+/* old android fix */
+.oldAndroid  .add_img_icon, .oldAndroid ul.menu_list img{
+    -webkit-border-radius:9999px;
+    border-radius: 9999px;
 }
