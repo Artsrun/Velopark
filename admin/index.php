@@ -49,7 +49,7 @@ switch ($view) {
         $get_place = get_place($place_id, $link);
         if ($_POST) {
             if (edit_place($place_id, $link))
-                redirect('?view=places');
+                redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
             else
                 redirect();
         }else {
@@ -77,14 +77,14 @@ switch ($view) {
     case("delete_place"):
         $place_id = abs((int) $_GET['place_id']);
         delete_place($place_id, $link);
-        redirect('?view=places');
+        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
 
         break;
 		
 	case("confirm_place"):
 	    $place_id = abs((int) $_GET['place_id']);
         confirm_place($place_id, $link);
-        redirect('?view=places');
+        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
 
         break;
 
@@ -93,7 +93,7 @@ switch ($view) {
         $get_place = get_place($place_id, $link);
         if ($_POST) {
             if (vote_place($place_id, $link))
-                redirect('?view=places');
+                redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
             else
                 redirect();
         }

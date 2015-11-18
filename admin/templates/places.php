@@ -8,6 +8,7 @@
     }
     ?>
     <a href="?view=add_place" class="add">add place</a>
+	<?php if($pages_count > 1) pagination($page, $pages_count); ?>
     <table class="tabl" cellspacing="1">
         <tr>
             <th class="str_action">№</th>
@@ -59,10 +60,10 @@
                     <?php endif; ?> </b>
                 </td>
                 <td>
-					<a href="?view=edit_place&amp;place_id=<?= $item['id'] ?>" class="edit">edit</a><br>
-					<a href="?view=delete_place&amp;place_id=<?= $item['id'] ?>" class="del" onclick="return confirm('are you sure?');">delete</a><br>
-					<a href="?view=vote_place&amp;place_id=<?= $item['id'] ?>" class="vote">vote</a><br>
-					<a href="?view=confirm_place&amp;place_id=<?= $item['id'] ?>" class="confirm"><b>confirm<b></a>
+					<a href="?view=edit_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="edit">edit</a><br>
+					<a href="?view=delete_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="del" onclick="return confirm('are you sure?');">delete</a><br>
+					<a href="?view=vote_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="vote">vote</a><br>
+					<a href="?view=confirm_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="confirm"><b>confirm<b></a>
 				</td>
             </tr>
             <?php $i++; ?>
