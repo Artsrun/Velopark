@@ -159,7 +159,9 @@ var app = {
             $('.page').removeClass('active');
         }
         /* hide menu */
-        fadeOut('.menu');
+        fadeOut('.menu', function () {
+            $(".menu").removeClass('active');
+        });
 
 
         /* reset to default state */
@@ -653,11 +655,13 @@ var app = {
                 $(".arr-wrapper").addClass("arr_down");
                 return false;
             });
-            $(document).on("click", function () {
-                if ($('.menu').hasClass('active')) {
-                    fadeOut('.menu', function () {
-                        $(".menu").removeClass('active');
-                    });
+            $(document).on("click touchend", function (e) {
+                if (!$(e.target).hasClass('menu') && $(e.target).parents('.menu').length == 0) {
+                    if ($('.menu').hasClass('active')) {
+                        fadeOut('.menu', function () {
+                            $(".menu").removeClass('active');
+                        });
+                    }
                 }
             });
 
@@ -730,10 +734,10 @@ var app = {
             } else {
                 app.pageScrollTarget = '#new_places .wrapper';
             }
-            var scrollFix = -1 ;
+            var scrollFix = -1;
             $(app.pageScrollTarget).scroll(function () {
-                
-                if(scrollFix == $(app.pageScrollTarget).scrollTop()){
+
+                if (scrollFix == $(app.pageScrollTarget).scrollTop()) {
                     return false;
                 }
                 scrollFix = $(app.pageScrollTarget).scrollTop();
@@ -786,6 +790,10 @@ var app = {
         if (typeof samePage == 'undefined') {
             samePage = false;
         }
+        var gallerySource = Camera.DestinationType.NATIVE_URI;
+        if (device.platform.toLowerCase() == 'ios') {
+            gallerySource = Camera.DestinationType.FILE_URI;
+        }
         navigator.notification.confirm("Use camera or select from gallery",
                 function confirmCamera(buttonIndex) {
                     if (buttonIndex == 1) {
@@ -803,7 +811,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: gallerySource, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else {
                         if (samePage == false) {
                             app.goToPage('main');
@@ -877,7 +885,7 @@ var app = {
             app.activeMarker = this;
 
             app.getPlaceFromDB(this.server_id, function (data) {
-//                $(".footer-image img").attr("src", "");
+                //                $(".footer-image img").attr("src", "");
                 if (data.image) {
                     $(".footer-image").attr("src", "data:image/jpg;base64," + data.image);
                     $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
@@ -927,6 +935,7 @@ var app = {
 
         $(".add-image").attr("src", imageURI);
         $(".add-src").attr("href", imageURI);
+        $(".add-address").val('');
         $(".add-src").css("background-image", "url(" + imageURI + ")");
 
         if (fromGallery) {
@@ -1120,6 +1129,7 @@ function fadeIn(selector, callback) {
         }, 300);
     }
 }
+
 
 function fadeOut(selector, callback) {
     $(selector).addClass('fadeOutStart');

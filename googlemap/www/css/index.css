@@ -815,8 +815,11 @@ html.ios footer .footer-image{
     right: 0;
 }
 
-#new_places .wrapper, #add_places .wrapper, #about .wrapper{
+#new_places, #add_places, #about{
     padding-top: 16%;
+}
+html.ios #new_places, html.ios #add_places, html.ios  #about{
+    margin-top:20px;
 }
 
 .vot_img_icon_wrap{
@@ -983,7 +986,7 @@ a.swipebox_places{
     position: relative;
     display: inline-block;
     width: 30%;
-    max-width: 50px;
+    max-width: 150px;
     -webkit-border-radius:5px;
     border-radius: 5px;
     overflow:hidden;
@@ -1015,7 +1018,7 @@ a.swipebox_places:after{
     left: 5px;
     width: 35%;
     height: 35%;
-    max-width: 150px;
+    max-width: 50px;
 }
 
 .vot_wrap .hr {
