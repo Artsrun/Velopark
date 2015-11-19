@@ -730,7 +730,13 @@ var app = {
             } else {
                 app.pageScrollTarget = '#new_places .wrapper';
             }
+            var scrollFix = -1 ;
             $(app.pageScrollTarget).scroll(function () {
+                
+                if(scrollFix == $(app.pageScrollTarget).scrollTop()){
+                    return false;
+                }
+                scrollFix = $(app.pageScrollTarget).scrollTop();
                 clearTimeout(scrollTimer);
                 if (app.getActivePage() != 'new_places') {
                     return true;
@@ -738,7 +744,6 @@ var app = {
                 scrollTimer = setTimeout(function () {
                     var allVoteElements = $('.vot_wrap:not(".loaded")');
                     allVoteElements.each(function () {
-                        console.log(elementInViewport($(this)[0]))
                         if (elementInViewport($(this)[0])) {
                             $(this).addClass('loaded');
                             var $mapContainer = $(this).find('.place_map[data-src]');

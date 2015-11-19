@@ -730,7 +730,13 @@ var app = {
             } else {
                 app.pageScrollTarget = '#new_places .wrapper';
             }
+            var lastPosition;
             $(app.pageScrollTarget).scroll(function () {
+                
+                if(lastPosition == $(app.pageScrollTarget).scrollTop()){
+                    return false;
+                }
+                lastPosition = $(app.pageScrollTarget).scrollTop();
                 clearTimeout(scrollTimer);
                 if (app.getActivePage() != 'new_places') {
                     return true;
@@ -738,7 +744,6 @@ var app = {
                 scrollTimer = setTimeout(function () {
                     var allVoteElements = $('.vot_wrap:not(".loaded")');
                     allVoteElements.each(function () {
-                        console.log(elementInViewport($(this)[0]))
                         if (elementInViewport($(this)[0])) {
                             $(this).addClass('loaded');
                             var $mapContainer = $(this).find('.place_map[data-src]');
@@ -790,7 +795,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.CAMERA, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.CAMERA, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else if (buttonIndex == 2) {
                         navigator.camera.getPicture(function (imageURI) {
                             setTimeout(function () {

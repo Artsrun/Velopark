@@ -589,9 +589,9 @@ html.ios footer .footer-image{
     border-radius: 3px;
 }
 
-.place_map .gmnoprint a{
+/*.place_map .gmnoprint a{
     display:none !important;
-}
+}*/
 
 .radio{
     display: inline-block;
@@ -967,7 +967,10 @@ html.ios footer .footer-image{
 textarea {
     resize: none !important;
 }
-
+.wrapper{
+/*    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;*/
+}
 .place_map {
     /*    height:180px;*/
     background-image:url(../img/ajax_loader.gif);
@@ -977,6 +980,11 @@ textarea {
     overflow:hidden;
     width:100%;
     margin: 15px auto;
+/*        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+*/      
+/*-webkit-transform-style: preserve-3d;
+        transform-style: preserve-3d;*/
 
 }
 .place_map img{
@@ -1263,10 +1271,7 @@ a.infoMail:active{
         color: #555555;
     }
 
-    .wrapper h1{
-        text-align: left;
-        color: #2ecc71;
-        
+    .wrapper h1{        
         font-size: 25px;
         line-height: 25px;
         font-weight: normal;
@@ -1332,7 +1337,7 @@ a.infoMail:active{
     .wrapper h1{
         text-align: left;
         color: #2ecc71;
-       
+
         font-size: 27px;
         font-weight: normal;
         line-height: 27px;
@@ -1412,7 +1417,7 @@ a.infoMail:active{
     .wrapper h1{
         text-align: left;
         color: #2ecc71;
-        
+
         font-size: 34px;
         line-height: 34px;
         font-weight: normal;
@@ -1483,7 +1488,7 @@ a.infoMail:active{
     .wrapper h1{
         text-align: left;
         color: #2ecc71;
-        
+
         font-size: 44px;
         line-height: 44px;
         font-weight: normal;
@@ -1536,7 +1541,7 @@ a.infoMail:active{
     .wrapper h1{
         text-align: left;
         color: #2ecc71;
-       
+
         font-size: 54px;
         line-height: 54px;
         font-weight: normal;
@@ -1626,10 +1631,6 @@ a.infoMail:active{
     display: none !important; 
 }
 .gm-wsv{pointer-events:none;}
-
-#map-canvas{
-    -webkit-overflow-scrolling: touch;
-}
 
 /* old android fix */
 .oldAndroid  .add_img_icon, .oldAndroid ul.menu_list img{
