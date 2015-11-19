@@ -517,7 +517,7 @@ footer .footer-info{
 }
 
 footer .footer-info p.desc{
-    /*    font-size: 4.5em;*/
+
     margin: 0;
     display: block;
     overflow: hidden;
@@ -526,13 +526,6 @@ footer .footer-info p.desc{
 
 }
 
-footer .footer-info p.count{
-    font-size:2.7em;
-    margin-top:10%;
-    line-height: 2;
-    color:transparent;
-
-}
 
 .foot-link.swipebox{
     width: 20%;
@@ -1223,15 +1216,12 @@ a.infoMail:active{
     }
 
     footer .footer-info p{
-        /*        font-size: 1.5em;*/
-        font-size: 2em;
+
+        font-size: 14px;
         margin-bottom: 0;
     }
 
-    /*    footer .footer-info p.name{
-            font-size: 2em;
-            margin:0;
-        }*/
+
 
     .add-name, .add-address {
         height: 22px;
@@ -1368,15 +1358,10 @@ a.infoMail:active{
         font-size: 30px;
     }
     footer .footer-info p{
-        /*        font-size: 2.1em;*/
-        font-size: 3em;
+
+        font-size: 21px;
         margin:0;
     }
-    /*
-        footer .footer-info p.name{
-            font-size: 3em;
-            margin:0;
-        }*/
 
     .add-name, .add-address{
         height: 30px;
@@ -1479,6 +1464,7 @@ a.infoMail:active{
 
     .wrapper h1{
         text-align: left;
+        color: #2ecc71;        
         color: #2ecc71;
 
         font-size: 44px;
@@ -1520,20 +1506,15 @@ a.infoMail:active{
     }
 
     footer .footer-info p{
-        /*        font-size: 2em;*/
-        font-size: 3.5em;
+
+        font-size: 24px;
         margin:0;
     }
-    /*
-        footer .footer-info p.name{
-            font-size: 3.5em;
-            margin:0;
-        }*/
+
 
     .wrapper h1{
         text-align: left;
-        color: #2ecc71;
-
+        color: #2ecc71;        
         font-size: 54px;
         line-height: 54px;
         font-weight: normal;
@@ -1593,15 +1574,10 @@ a.infoMail:active{
 @media only screen and (min-width: 992px) {
 
     footer .footer-info p{
-        /*        font-size: 2.7em;*/
-        font-size: 3.5em;
+
+        font-size: 24px;
         margin:0;
     }
-    /*
-        footer .footer-info p.name{
-            font-size: 4.5em;
-            margin:0;
-        }*/
 
 
 }
@@ -1623,6 +1599,10 @@ a.infoMail:active{
     display: none !important; 
 }
 .gm-wsv{pointer-events:none;}
+
+/*#map-canvas{
+    -webkit-overflow-scrolling: touch;
+}*/
 
 /* old android fix */
 .oldAndroid  .add_img_icon, .oldAndroid ul.menu_list img{
