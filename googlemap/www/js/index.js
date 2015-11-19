@@ -413,7 +413,7 @@ var app = {
                     $('.vot_wrap').addClass('vot_transition');
                     $blockEl.addClass('swipe');
                     $blockEl.nextAll().addClass('up_trans').css('transform', 'translateY(-' + curHeight + 'px)').css('-webkit-transform', 'translateY(-' + curHeight + 'px)');
-                    
+
                     setTimeout(function () {
                         //$('.vot_wrap').removeClass('up_trans');
                         $blockEl.nextAll().removeAttr('style').removeClass('up_trans');
@@ -600,11 +600,7 @@ var app = {
         });
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
-            if (app.activeMarker) {
-                app.activeMarker.setAnimation(null);
-                app.activeMarker = null;
-            }
-            $(".controls").removeClass("transition");
+            app.closeInfoWindow();
         });
         /* gps button functionality */
         $(".gps1").off("click.gps");
@@ -794,7 +790,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.CAMERA, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.CAMERA, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else if (buttonIndex == 2) {
                         navigator.camera.getPicture(function (imageURI) {
                             setTimeout(function () {
@@ -838,11 +834,7 @@ var app = {
     },
     clearPlaces: function (type) {
         app.data[type] = null;
-        if (app.activeMarker) {
-            app.activeMarker.setAnimation(null)
-            app.activeMarker = null;
-        }
-        $(".controls").removeClass("transition");
+        app.closeInfoWindow();
     },
     drawGroupMarkers: function (places, type) {
 
@@ -864,16 +856,20 @@ var app = {
             var marker = addMarker(app.map, image, myLatlng, place.server_id, place.type);
 
             app.data[place.type].markers[k] = marker;
-            app.atachInfoWindow(marker);
+            app.attachInfoWindow(marker);
         }
     },
-    atachInfoWindow: function (marker) {
+    attachInfoWindow: function (marker) {
         marker.addListener('click', function () {
+            if (app.activeMarker && app.activeMarker.server_id == this.server_id) {
+                app.closeInfoWindow();
+                return;
+            }
+
             if (app.activeMarker) {
                 app.activeMarker.setAnimation(null);
             }
             app.activeMarker = this;
-            this.setAnimation(google.maps.Animation.BOUNCE);
 
             app.getPlaceFromDB(this.server_id, function (data) {
 //                $(".footer-image img").attr("src", "");
@@ -899,9 +895,26 @@ var app = {
                     $("footer .footer-info .label.fordesc").hide();
                     $("footer .footer-info p.desc").text('');
                 }
-                $('.controls').addClass("transition");
+                if ($('.controls').hasClass('transition')) {
+                    app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                } else {
+                    $('.controls').addClass("transition");
+                    setTimeout(function () {
+                        app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                    }, 250);
+                }
             });
         });
+    },
+    closeInfoWindow: function () {
+        if (app.activeMarker) {
+            app.activeMarker.setAnimation(null)
+            app.activeMarker = null;
+        }
+        setTimeout(function () {
+            $(".controls").removeClass("transition");
+        }, 50);
+
     },
     cameraSuccess: function (imageURI, fromGallery) {
 
