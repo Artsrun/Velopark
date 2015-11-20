@@ -68,6 +68,9 @@ img{
 strong,b{
     font-weight: bold;
 }
+.displayBLock{
+    display:block !important;
+}
 /* ios styles */
 html.ios #swipebox-close{
     top:20px;
@@ -98,9 +101,9 @@ html.ios .menu{
     z-index: -1;
 }
 .page.active{
-    display:block !important;
+    display:block;
 }
-
+/* ios statusbar fix*/
 .ios-statusbar-fix{
     height: 25px;
     background: #2ecc71 ;
@@ -110,7 +113,16 @@ html.ios .menu{
     width: 100%;
     display:none;
 }
-/*#new_places, #add_places, #about */
+
+html.ios .content{
+    margin-bottom: 20px;
+}
+
+html.ios #new_places .wrapper, html.ios #add_places .wrapper, html.ios  #about .wrapper{
+    margin-top:20px;
+}
+/* ios statusbar fix*/
+
 .page{
     width:100%;
     margin:0 auto;
@@ -187,26 +199,25 @@ header .green-menu .arr{
     -o-transition: transform 200ms linear;
     transition: transform 200ms linear, opacity 200ms linear;
 }
+html[data-active="main"] header .green-menu .arr{
+    display:none;
+    opacity: 0;
+}
+
+html[data-active="main"] header .green-menu .arr.visible{
+    opacity:1;
+}
 
 .arr_down{
-    -moz-transform: rotateZ(180deg);
     -webkit-transform: rotateZ(180deg);
-    -o-transform: rotateZ(180deg);
-    -ms-transform: rotateZ(180deg);
     transform: rotateZ(180deg);
 }
 .arr_up.arr_back{
-    -moz-transform: rotateZ(-90deg);
     -webkit-transform: rotateZ(-90deg);
-    -o-transform: rotateZ(-90deg);
-    -ms-transform: rotateZ(-90deg);
     transform: rotateZ(-90deg);
 }
 .arr_down.arr_back{
-    -moz-transform: rotateZ(270deg);
     -webkit-transform: rotateZ(270deg);
-    -o-transform: rotateZ(270deg);
-    -ms-transform: rotateZ(270deg);
     transform: rotateZ(270deg);
 }
 header .green-menu .backg-cubs{
@@ -222,15 +233,6 @@ header .green-menu .backg-cubs{
 }
 header .logo {
     left:12%;
-}
-
-
-body[data-active="main"] header .green-menu .arr{
-    opacity:0;
-}
-
-body[data-active="main"] header .green-menu .arr.visible{
-    opacity:1;
 }
 
 
@@ -317,8 +319,6 @@ box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3
     position: absolute;
     left: 6%;
     top: 19%;
-    min-width: 7px;
-    min-height: 7px;
     max-width: 40px;
     max-height: 40px;
 }
@@ -410,8 +410,10 @@ html.oldAndroid[data-active="main"] .container, html.oldAndroid[data-active="mai
 }*/
 html.oldAndroid .arr.arr_back{
     background-image:url(../img/arr_back.png);
-    -webkit-transform: rotateZ(0);
-    transform: rotateZ(0);
+}
+html.oldAndroid .arr.arr_back.correct_back_fix{
+    -webkit-transform: rotateZ(360deg);
+    transform: rotateZ(360deg);
 }
 .wrapper::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -439,6 +441,13 @@ html.oldAndroid .arr.arr_back{
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
+    display:none;
+    opacity:0;
+    -webkit-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;   
+}
+.gps1.visible{
+    opacity: 1;
 }
 
 .controls{
@@ -818,9 +827,7 @@ html.ios footer .footer-image{
 #new_places, #add_places, #about{
     padding-top: 16%;
 }
-html.ios #new_places, html.ios #add_places, html.ios  #about{
-    margin-top:20px;
-}
+
 
 .vot_img_icon_wrap{
     width: 100%;
@@ -865,8 +872,6 @@ html.ios #new_places, html.ios #add_places, html.ios  #about{
     width: 17%;
     margin: 0 10%;
     padding-top: 17%;
-    min-height: 50px;
-    min-width: 50px;
 
     max-height: 150px;
     max-width: 150px;
@@ -947,7 +952,7 @@ html.ios #new_places, html.ios #add_places, html.ios  #about{
 
 .content{
     padding-bottom: 20%;
-    margin-top:30px;
+    padding-top:4%;
 }
 
 .shadow{
@@ -1028,7 +1033,10 @@ a.swipebox_places:after{
     background: #DDDDDD;
     /*    margin: 0 -1000px;
         width: 2000px;	*/
-    margin: 0 -4.5%;
+    margin: 0 -4%;
+}
+.vot_wrap:last-child  .hr{
+    display:none;
 }
 
 .vot_wrap p.cont {
@@ -1051,8 +1059,8 @@ html.offline #add_places .wrapper:after, html.offline #new_places .wrapper:after
     max-height: 326px;
     background-position: center center;
     margin: 0 auto;
-    position: absolute;
-    top: 45%;
+    position: fixed;
+    top: 40%;
     left: 50%;
     margin-top: -150px;
     margin-left: -15%;
@@ -1197,7 +1205,7 @@ input.error, textarea.error{
     max-width: 200px;
     margin: 0 auto;
     margin-top: 80px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 .poweredBy img {
     width:100%;
@@ -1245,7 +1253,7 @@ a.infoMail:active{
 
 
 
-    #add_places h2{
+    #add_places h2, .error_msg{
         font-size: 12px;
     }
 
@@ -1315,7 +1323,7 @@ a.infoMail:active{
         color: #555555;
     }
 
-    #add_places h2{
+    #add_places h2, .error_msg{
         font-size: 14px;
     }
 
@@ -1389,7 +1397,7 @@ a.infoMail:active{
         margin-bottom: 14px;
     }
 
-    #add_places h2{
+    #add_places h2, .error_msg{
         font-size: 14px;
     }
 
@@ -1457,11 +1465,7 @@ a.infoMail:active{
         color: #555555;
     }
 
-    #add_places h2{
-        font-size: 17px;
-    }
-
-    #add_places h2{
+    #add_places h2, .error_msg{
         font-size: 17px;
     }
 
@@ -1568,7 +1572,7 @@ a.infoMail:active{
         color: #555555;
     }
 
-    #add_places h2{
+    #add_places h2, .error_msg{
         font-size: 21px;
     }
 

@@ -30,7 +30,7 @@ var app = {
     },
     geolocationOptions: {
         enableHighAccuracy: true,
-        timeout: 3000,
+        timeout: 5000,
         maximumAge: 0
     },
     mapOptions: {
@@ -75,6 +75,7 @@ var app = {
     bindEvents: function () {
         if (DEBUG) {
             app.onDeviceReady();
+            this.onLine();
         } else {
             document.addEventListener("deviceready", this.onDeviceReady, false);
         }
@@ -86,16 +87,29 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function () {
+        /* hide splashscreen manually */
+        setTimeout(function () {
+            if (navigator.splashscreen) {
+                navigator.splashscreen.hide();
+            }
+        }, 10000);
+
         app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
         $('html').addClass(device.platform.toLowerCase());
-        if (device.platform.toLowerCase() == 'android' && parseInt(device.version) <= 3) {
+
+        if (device.platform.toLowerCase() == 'android' && parseInt(device.version) < 3) {
             $('html').addClass('oldAndroid');
         }
         if (DEBUG) {
             app.onlineStart = true;
+            app.onlineStatus = 'online';
+            $('html').addClass('online');
             app.googleMapEmbed();
         } else {
             if (navigator.connection && navigator.connection.type != "none") {
+                app.onlineStatus = 'online';
+                $('html').addClass('online');
+
                 app.onlineStart = true;
                 app.googleMapEmbed();
             } else {
@@ -123,7 +137,7 @@ var app = {
             /* add class to body for further usage */
 
             $('html').removeClass('offline');
-            $('html').removeClass('offlineMap');
+//            $('html').removeClass('offlineMap');
             $('html').addClass('online');
 
             if (app.getActivePage() == 'new_places') {
@@ -177,11 +191,9 @@ var app = {
             if (!app.positionStatus) {
                 this.onResume();
             }
-            //$(".gps1, footer").show();
             $(".arr-wrapper").removeClass('arr_back');
         } else {
             this.onPause();
-            //$(".gps1, footer").hide();
             $(".arr-wrapper").addClass('arr_back');
         }
 
@@ -195,10 +207,11 @@ var app = {
         /* hide other pages */
         $('.page').addClass('hidden');
         /* show correct page */
+        app.scrollFix = -1;
         $('#' + pageId).removeClass('hidden').addClass('active');
         $('html').attr('data-active', pageId);
         app.setLocationHash(pageId);
-        window.scrollTo(0, 0)
+        window.scrollTo(0, 0);
         return true;
     },
     getActivePage: function () {
@@ -571,6 +584,9 @@ var app = {
                     scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
                 };
                 mainMarker = addMarker(app.map, image, myLatlng);
+                $('.gps1').addClass('displayBLock');
+                $('.gps1')[0].offsetHeight;
+                $('.gps1').addClass('visible');
             }
             mainMarker.setPosition(myLatlng);
             mainMarker.setAnimation(null);
@@ -581,7 +597,7 @@ var app = {
             setTimeout(function () {		//            app.map.setCenter(erLatlng);
                 navigator.geolocation.clearWatch(app.positionWatchId);
                 app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
-            }, 3000);
+            }, 5000);
             //}
         }
 
@@ -620,7 +636,11 @@ var app = {
     },
     start: function (onlineMap) {
         if (typeof onlineMap != 'undefined') {
+            $('html').removeClass('onlineMap');
             $('html').addClass('offlineMap');
+        } else {
+            $('html').removeClass('offlineMap');
+            $('html').addClass('onlineMap');
         }
         /*nav functionality*/
         if (this.firstLoad == true) {
@@ -679,6 +699,7 @@ var app = {
 
             $('.swipebox_add').on('click', function () {
                 app.openCameraDialog(true);
+                return false; /* test */
             });
 
             $(".menu li").on("click", function () {
@@ -734,13 +755,12 @@ var app = {
             } else {
                 app.pageScrollTarget = '#new_places .wrapper';
             }
-            var scrollFix = -1;
             $(app.pageScrollTarget).scroll(function () {
 
-                if (scrollFix == $(app.pageScrollTarget).scrollTop()) {
+                if (app.scrollFix == $(app.pageScrollTarget).scrollTop()) {
                     return false;
                 }
-                scrollFix = $(app.pageScrollTarget).scrollTop();
+                app.scrollFix = $(app.pageScrollTarget).scrollTop();
                 clearTimeout(scrollTimer);
                 if (app.getActivePage() != 'new_places') {
                     return true;
@@ -818,6 +838,7 @@ var app = {
                         }
                     }
                 }, "Choose", ["Camera", "Gallery", "Close"]);
+        return false; /* test */
     },
     googleMapEmbed: function () {
         $("#map-canvas").html("");
@@ -857,7 +878,12 @@ var app = {
         }
 
         $('img[data-type="' + type + '"]').addClass('active');
-        $('header .green-menu .arr').addClass('visible');
+        if (!$('header .green-menu .arr').hasClass('visible')) {
+            $('header .green-menu .arr').addClass('displayBLock');
+            $('header .green-menu .arr')[0].offsetHeight;
+            $('header .green-menu .arr').addClass('visible');
+        }
+
 
         var image = {
             url: "img/marker_" + type + ".png",

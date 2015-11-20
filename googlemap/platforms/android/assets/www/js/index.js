@@ -3,8 +3,8 @@ var DEBUG = false;
 if (DEBUG) {
     device = {};
     device.uuid = '546546';
-    device.platform = 'android';
-    device.version = '2.3.1';
+    device.platform = 'ios';
+    device.version = '5.3.1';
 }
 
 var app = {
@@ -30,7 +30,7 @@ var app = {
     },
     geolocationOptions: {
         enableHighAccuracy: true,
-        timeout: 3000,
+        timeout: 5000,
         maximumAge: 0
     },
     mapOptions: {
@@ -75,6 +75,7 @@ var app = {
     bindEvents: function () {
         if (DEBUG) {
             app.onDeviceReady();
+            this.onLine();
         } else {
             document.addEventListener("deviceready", this.onDeviceReady, false);
         }
@@ -86,16 +87,29 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function () {
+        /* hide splashscreen manually */
+        setTimeout(function () {
+            if (navigator.splashscreen) {
+                navigator.splashscreen.hide();
+            }
+        }, 10000);
+
         app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
         $('html').addClass(device.platform.toLowerCase());
-        if (device.platform.toLowerCase() == 'android' && parseInt(device.version) <= 3) {
+
+        if (device.platform.toLowerCase() == 'android' && parseInt(device.version) < 3) {
             $('html').addClass('oldAndroid');
         }
         if (DEBUG) {
             app.onlineStart = true;
+            app.onlineStatus = 'online';
+            $('html').addClass('online');
             app.googleMapEmbed();
         } else {
             if (navigator.connection && navigator.connection.type != "none") {
+                app.onlineStatus = 'online';
+                $('html').addClass('online');
+
                 app.onlineStart = true;
                 app.googleMapEmbed();
             } else {
@@ -123,7 +137,7 @@ var app = {
             /* add class to body for further usage */
 
             $('html').removeClass('offline');
-            $('html').removeClass('offlineMap');
+//            $('html').removeClass('offlineMap');
             $('html').addClass('online');
 
             if (app.getActivePage() == 'new_places') {
@@ -159,7 +173,9 @@ var app = {
             $('.page').removeClass('active');
         }
         /* hide menu */
-        fadeOut('.menu');
+        fadeOut('.menu', function () {
+            $(".menu").removeClass('active');
+        });
 
 
         /* reset to default state */
@@ -196,7 +212,7 @@ var app = {
         $('#' + pageId).removeClass('hidden').addClass('active');
         $('html').attr('data-active', pageId);
         app.setLocationHash(pageId);
-        window.scrollTo(0, 0)
+        window.scrollTo(0, 0);
         return true;
     },
     getActivePage: function () {
@@ -569,6 +585,7 @@ var app = {
                     scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
                 };
                 mainMarker = addMarker(app.map, image, myLatlng);
+                $('.gps1').addClass('visible');
             }
             mainMarker.setPosition(myLatlng);
             mainMarker.setAnimation(null);
@@ -579,7 +596,7 @@ var app = {
             setTimeout(function () {		//            app.map.setCenter(erLatlng);
                 navigator.geolocation.clearWatch(app.positionWatchId);
                 app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
-            }, 3000);
+            }, 5000);
             //}
         }
 
@@ -618,7 +635,11 @@ var app = {
     },
     start: function (onlineMap) {
         if (typeof onlineMap != 'undefined') {
+            $('html').removeClass('onlineMap');
             $('html').addClass('offlineMap');
+        } else {
+            $('html').removeClass('offlineMap');
+            $('html').addClass('onlineMap');
         }
         /*nav functionality*/
         if (this.firstLoad == true) {
@@ -653,11 +674,13 @@ var app = {
                 $(".arr-wrapper").addClass("arr_down");
                 return false;
             });
-            $(document).on("click", function () {
-                if ($('.menu').hasClass('active')) {
-                    fadeOut('.menu', function () {
-                        $(".menu").removeClass('active');
-                    });
+            $(document).on("click touchend", function (e) {
+                if (!$(e.target).hasClass('menu') && $(e.target).parents('.menu').length == 0) {
+                    if ($('.menu').hasClass('active')) {
+                        fadeOut('.menu', function () {
+                            $(".menu").removeClass('active');
+                        });
+                    }
                 }
             });
 
@@ -730,13 +753,13 @@ var app = {
             } else {
                 app.pageScrollTarget = '#new_places .wrapper';
             }
-            var lastPosition;
+            var scrollFix = -1;
             $(app.pageScrollTarget).scroll(function () {
-                
-                if(lastPosition == $(app.pageScrollTarget).scrollTop()){
+
+                if (scrollFix == $(app.pageScrollTarget).scrollTop()) {
                     return false;
                 }
-                lastPosition = $(app.pageScrollTarget).scrollTop();
+                scrollFix = $(app.pageScrollTarget).scrollTop();
                 clearTimeout(scrollTimer);
                 if (app.getActivePage() != 'new_places') {
                     return true;
@@ -786,6 +809,10 @@ var app = {
         if (typeof samePage == 'undefined') {
             samePage = false;
         }
+        var gallerySource = Camera.DestinationType.NATIVE_URI;
+        if (device.platform.toLowerCase() == 'ios') {
+            gallerySource = Camera.DestinationType.FILE_URI;
+        }
         navigator.notification.confirm("Use camera or select from gallery",
                 function confirmCamera(buttonIndex) {
                     if (buttonIndex == 1) {
@@ -803,7 +830,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: gallerySource, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else {
                         if (samePage == false) {
                             app.goToPage('main');
@@ -877,7 +904,7 @@ var app = {
             app.activeMarker = this;
 
             app.getPlaceFromDB(this.server_id, function (data) {
-//                $(".footer-image img").attr("src", "");
+                //                $(".footer-image img").attr("src", "");
                 if (data.image) {
                     $(".footer-image").attr("src", "data:image/jpg;base64," + data.image);
                     $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
@@ -927,6 +954,7 @@ var app = {
 
         $(".add-image").attr("src", imageURI);
         $(".add-src").attr("href", imageURI);
+        $(".add-address").val('');
         $(".add-src").css("background-image", "url(" + imageURI + ")");
 
         if (fromGallery) {
@@ -1120,6 +1148,7 @@ function fadeIn(selector, callback) {
         }, 300);
     }
 }
+
 
 function fadeOut(selector, callback) {
     $(selector).addClass('fadeOutStart');
