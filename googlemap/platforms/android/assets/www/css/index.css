@@ -68,6 +68,9 @@ img{
 strong,b{
     font-weight: bold;
 }
+.displayBLock{
+    display:block !important;
+}
 /* ios styles */
 html.ios #swipebox-close{
     top:20px;
@@ -198,31 +201,23 @@ header .green-menu .arr{
 }
 html[data-active="main"] header .green-menu .arr{
     display:none;
+    opacity: 0;
 }
 
 html[data-active="main"] header .green-menu .arr.visible{
-    display:block;
+    opacity:1;
 }
 
 .arr_down{
-    -moz-transform: rotateZ(180deg);
     -webkit-transform: rotateZ(180deg);
-    -o-transform: rotateZ(180deg);
-    -ms-transform: rotateZ(180deg);
     transform: rotateZ(180deg);
 }
 .arr_up.arr_back{
-    -moz-transform: rotateZ(-90deg);
     -webkit-transform: rotateZ(-90deg);
-    -o-transform: rotateZ(-90deg);
-    -ms-transform: rotateZ(-90deg);
     transform: rotateZ(-90deg);
 }
 .arr_down.arr_back{
-    -moz-transform: rotateZ(270deg);
     -webkit-transform: rotateZ(270deg);
-    -o-transform: rotateZ(270deg);
-    -ms-transform: rotateZ(270deg);
     transform: rotateZ(270deg);
 }
 header .green-menu .backg-cubs{
@@ -415,8 +410,10 @@ html.oldAndroid[data-active="main"] .container, html.oldAndroid[data-active="mai
 }*/
 html.oldAndroid .arr.arr_back{
     background-image:url(../img/arr_back.png);
-    -webkit-transform: rotateZ(0);
-    transform: rotateZ(0);
+}
+html.oldAndroid .arr.arr_back.correct_back_fix{
+    -webkit-transform: rotateZ(360deg);
+    transform: rotateZ(360deg);
 }
 .wrapper::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -445,9 +442,12 @@ html.oldAndroid .arr.arr_back{
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
     display:none;
+    opacity:0;
+    -webkit-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;   
 }
 .gps1.visible{
-    display:block;
+    opacity: 1;
 }
 
 .controls{

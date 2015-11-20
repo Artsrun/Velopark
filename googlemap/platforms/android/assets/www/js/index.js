@@ -3,8 +3,8 @@ var DEBUG = false;
 if (DEBUG) {
     device = {};
     device.uuid = '546546';
-    device.platform = 'ios';
-    device.version = '5.3.1';
+    device.platform = 'android';
+    device.version = '2.3.1';
 }
 
 var app = {
@@ -191,11 +191,9 @@ var app = {
             if (!app.positionStatus) {
                 this.onResume();
             }
-            //$(".gps1, footer").show();
             $(".arr-wrapper").removeClass('arr_back');
         } else {
             this.onPause();
-            //$(".gps1, footer").hide();
             $(".arr-wrapper").addClass('arr_back');
         }
 
@@ -209,6 +207,7 @@ var app = {
         /* hide other pages */
         $('.page').addClass('hidden');
         /* show correct page */
+        app.scrollFix = -1;
         $('#' + pageId).removeClass('hidden').addClass('active');
         $('html').attr('data-active', pageId);
         app.setLocationHash(pageId);
@@ -585,6 +584,8 @@ var app = {
                     scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
                 };
                 mainMarker = addMarker(app.map, image, myLatlng);
+                $('.gps1').addClass('displayBLock');
+                $('.gps1')[0].offsetHeight;
                 $('.gps1').addClass('visible');
             }
             mainMarker.setPosition(myLatlng);
@@ -698,6 +699,7 @@ var app = {
 
             $('.swipebox_add').on('click', function () {
                 app.openCameraDialog(true);
+                return false; /* test */
             });
 
             $(".menu li").on("click", function () {
@@ -753,13 +755,12 @@ var app = {
             } else {
                 app.pageScrollTarget = '#new_places .wrapper';
             }
-            var scrollFix = -1;
             $(app.pageScrollTarget).scroll(function () {
 
-                if (scrollFix == $(app.pageScrollTarget).scrollTop()) {
+                if (app.scrollFix == $(app.pageScrollTarget).scrollTop()) {
                     return false;
                 }
-                scrollFix = $(app.pageScrollTarget).scrollTop();
+                app.scrollFix = $(app.pageScrollTarget).scrollTop();
                 clearTimeout(scrollTimer);
                 if (app.getActivePage() != 'new_places') {
                     return true;
@@ -837,6 +838,7 @@ var app = {
                         }
                     }
                 }, "Choose", ["Camera", "Gallery", "Close"]);
+        return false; /* test */
     },
     googleMapEmbed: function () {
         $("#map-canvas").html("");
@@ -876,7 +878,12 @@ var app = {
         }
 
         $('img[data-type="' + type + '"]').addClass('active');
-        $('header .green-menu .arr').addClass('visible');
+        if (!$('header .green-menu .arr').hasClass('visible')) {
+            $('header .green-menu .arr').addClass('displayBLock');
+            $('header .green-menu .arr')[0].offsetHeight;
+            $('header .green-menu .arr').addClass('visible');
+        }
+
 
         var image = {
             url: "img/marker_" + type + ".png",

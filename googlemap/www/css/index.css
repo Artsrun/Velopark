@@ -410,8 +410,6 @@ html.oldAndroid[data-active="main"] .container, html.oldAndroid[data-active="mai
 }*/
 html.oldAndroid .arr.arr_back{
     background-image:url(../img/arr_back.png);
-}
-html.oldAndroid .arr.arr_back.correct_back_fix{
     -webkit-transform: rotateZ(360deg);
     transform: rotateZ(360deg);
 }
@@ -574,13 +572,13 @@ html.ios footer .footer-image{
     /*    border-bottom: 1px solid #dddddd;*/
 }
 
-.vot_img{
+/*.vot_img{
     width: 100%;
     -webkit-border-radius:5px;
     border-radius: 5px;
     max-width: 150px;
     max-height: 150px;
-}
+}*/
 
 .place_map{
     margin-left: 4%;
@@ -624,17 +622,19 @@ html.ios footer .footer-image{
     background-color: #EEEEEE;
 }
 
-.add-image{
+/*.add-image{
     width: auto;
     height: auto;
     max-height: 100%;
     max-width: 100%;
     margin: 0 auto;
     display: none;
-}
+}*/
 
 .add-src{
     width: 30%;
+    padding-top: 30%;
+    max-width: 150px;
     float: left;
     -webkit-border-radius:5px;
     border-radius: 5px;
@@ -642,6 +642,13 @@ html.ios footer .footer-image{
     display: block;
     background-size: cover;
     background-repeat: no-repeat;
+    background-position: center center;
+}
+.add-src.chooseLoader{
+    background-image: url(../img/ajax_loader.gif) !important;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 25%;
 }
 
 .add-name, .add-address{
@@ -991,6 +998,7 @@ a.swipebox_places{
     position: relative;
     display: inline-block;
     width: 30%;
+    padding-top:30%;
     max-width: 150px;
     -webkit-border-radius:5px;
     border-radius: 5px;
@@ -998,6 +1006,9 @@ a.swipebox_places{
     float: left;
     margin-right: 5%;
     margin-bottom: 2%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
 a.swipebox_places.parking:after{

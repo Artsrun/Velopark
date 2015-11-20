@@ -4,7 +4,7 @@ if (DEBUG) {
     device = {};
     device.uuid = '546546';
     device.platform = 'android';
-    device.version = '2.3.1';
+    device.version = '5.3.1';
 }
 
 var app = {
@@ -162,10 +162,6 @@ var app = {
             $('html').addClass('offline');
         }
     },
-    // Update DOM on a Received Event
-    receivedEvent: function (id) {
-        console.log(id);
-    },
     goToPage: function (pageId) {
         if ($('#' + pageId).hasClass('active')) {
             return false;
@@ -179,8 +175,9 @@ var app = {
 
 
         /* reset to default state */
-        $('#add_places input, #add_places textarea').val('');
-        $("#add_places .add-src").css("background-image", "none");
+        $('#add_places input, #add_places textarea ,#add_places .add-image').val('');
+        $("#add_places .add-src").css('background-image', 'none');
+        $("#add_places .add-src").addClass('chooseLoader');
         $("#add-map").html("");
         $(".radio-wrap .add_img_icon").removeClass("add_img_icon_park");
         $(".radio-wrap .add_img_icon").removeClass("active_icon");
@@ -267,7 +264,7 @@ var app = {
             };
         }
         if (DEBUG) {
-            alert(text)
+            alert(text);
         } else {
             navigator.notification.alert(text, callback, title, button);
         }
@@ -276,7 +273,6 @@ var app = {
         if (typeof txt == 'undefined') {
             txt = 'There is no internet connection';
         }
-        console.log(txt);
     },
     addNewPlace: function (options) {
 
@@ -335,7 +331,7 @@ var app = {
             params.action = "add_place";
             options.params = params;
 
-            var image = $(".add-image").attr("src");
+            var image = $(".add-image").val();
             var ft = new FileTransfer();
 
             addLoader('#add_places');
@@ -366,21 +362,11 @@ var app = {
         if (places.length) {
             for (var i = 0; i < places.length; i++) {
                 var output = "<div class='vot_wrap' id='vot_" + places[i].server_id + "' data-id='" + places[i].server_id + "' >";
-
                 output += "<div class='vot_img_icon_wrap'>";
                 if (places[i].image) {
-                    output += "<a class='swipebox_places " + places[i].type + "' rel='" + i + "' href='" + app.uploadsURL + places[i].server_id + ".jpg' onclick='return false;'><img class='vot_img' src='data:image/jpg;base64," + places[i].image + "' alt='' /></a>";
+                    output += "<a style='background-image:url(data:image/jpg;base64," + places[i].image + ")' class='swipebox_places " + places[i].type + "' rel='" + i + "' href='" + app.uploadsURL + places[i].server_id + ".jpg' onclick='return false;'></a>";
                 } else {
-                    output += "<a class='swipebox_places noimage' ontouch='return false;'>";
-                    if (places[i].type == "parking") {
-                        output += "<img class='vot_img' src='img/foot_icon_parking.png' />";
-                    } else if (places[i].type == "rent") {
-                        output += "<img class='vot_img' src='img/foot_icon_rent.png' />";
-                    } else if (places[i].type == "shop") {
-                        output += "<img class='vot_img' src='img/foot_icon_shop.png' />";
-                    } else if (places[i].type == "parts") {
-                        output += "<img class='vot_img' src='img/foot_icon_parts.png' />";
-                    }
+                    output += "<a style='background-image:url(img/foot_icon_" + places[i].type + ".png)'  class='swipebox_places noimage' ontouch='return false;'>";
                     output += "</a>";
                 }
                 output += "<p>Name</p><p class='cont'>" + places[i].name + "</p><p>Address</p><p class='cont'>" + places[i].address + "</p>";
@@ -585,20 +571,20 @@ var app = {
                 };
                 mainMarker = addMarker(app.map, image, myLatlng);
                 $('.gps1').addClass('displayBLock');
-                $('.gps1')[0].offsetHeight;
-                $('.gps1').addClass('visible');
+                setTimeout(function () {
+                    $('.gps1').addClass('visible');
+                }, 0);
+
             }
             mainMarker.setPosition(myLatlng);
             mainMarker.setAnimation(null);
         }
 
         app.onPositionError = function (error) {
-            //if(device.platform.toLowerCase() == 'android'){		//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-            setTimeout(function () {		//            app.map.setCenter(erLatlng);
+            setTimeout(function () {
                 navigator.geolocation.clearWatch(app.positionWatchId);
                 app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
             }, 5000);
-            //}
         }
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
@@ -699,7 +685,7 @@ var app = {
 
             $('.swipebox_add').on('click', function () {
                 app.openCameraDialog(true);
-                return false; /* test */
+                return false;
             });
 
             $(".menu li").on("click", function () {
@@ -838,7 +824,7 @@ var app = {
                         }
                     }
                 }, "Choose", ["Camera", "Gallery", "Close"]);
-        return false; /* test */
+        return false;
     },
     googleMapEmbed: function () {
         $("#map-canvas").html("");
@@ -862,7 +848,6 @@ var app = {
                 app.drawGroupMarkers(results.rows, type);
             });
         }, function () {
-            console.log('error')
             app.data.status = 'error';
         });
     },
@@ -880,8 +865,10 @@ var app = {
         $('img[data-type="' + type + '"]').addClass('active');
         if (!$('header .green-menu .arr').hasClass('visible')) {
             $('header .green-menu .arr').addClass('displayBLock');
-            $('header .green-menu .arr')[0].offsetHeight;
-            $('header .green-menu .arr').addClass('visible');
+            setTimeout(function () {
+                $('header .green-menu .arr').addClass('visible');
+            }, 0);
+
         }
 
 
@@ -959,9 +946,10 @@ var app = {
 
         /* set image and activate default type */
 
-        $(".add-image").attr("src", imageURI);
+        $(".add-image").val(imageURI);
         $(".add-src").attr("href", imageURI);
         $(".add-address").val('');
+        $(".add-src").removeClass('chooseLoader');
         $(".add-src").css("background-image", "url(" + imageURI + ")");
 
         if (fromGallery) {
@@ -1068,7 +1056,7 @@ function removeMarker(marker) {
 }
 
 function newPlace(center, setAddress) {
-    $('.add-src').height($('.add-src').width());
+    //$('.add-src').height($('.add-src').width());
     var options = {
         center: center,
         zoom: 18,
@@ -1129,8 +1117,9 @@ function newPlace(center, setAddress) {
 
 function addLoader(selector) {
     $(selector).addClass('loading');
-    $(selector)[0].offsetHeight;
-    $(selector).addClass('visibility');
+    setTimeout(function () {
+        $(selector).addClass('visibility');
+    }, 0);
 }
 
 function removeLoader(selector) {
@@ -1146,8 +1135,9 @@ function fadeIn(selector, callback) {
     $(selector).removeClass('fadeOut');
     $(selector).removeClass('fadeOutStart');
 
-    $(selector)[0].offsetHeight;
-    $(selector).addClass('fadeIn');
+    setTimeout(function () {
+        $(selector).addClass('fadeIn');
+    }, 0);
 
     if (typeof callback == 'function') {
         setTimeout(function () {
@@ -1161,8 +1151,9 @@ function fadeOut(selector, callback) {
     $(selector).addClass('fadeOutStart');
     $(selector).removeClass('fadeInStart');
     $(selector).removeClass('fadeIn');
-    $(selector)[0].offsetHeight;
-    $(selector).addClass('fadeOut');
+    setTimeout(function () {
+        $(selector).addClass('fadeOut');
+    }, 0);
     setTimeout(function () {
         $(selector).addClass('fadeOutComplete');
         if (typeof callback == 'function') {
