@@ -543,13 +543,14 @@ footer .footer-info p.desc{
     /*overflow:hidden;*/
     float:right;
     margin: 0 0 0 5%;
+    background-position: center center;
+    background-image: url(../img/foot_icon_parking.png);
+    background-size: cover;
+    padding-top: 20%;
+    display:inline-block;
 }
 
-footer .footer-image{
-    width: 100%;
-    -webkit-border-radius:3px;
-    border-radius: 3px;
-}
+
 html.ios footer .footer-image{
     border:none;
 }
