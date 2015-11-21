@@ -177,7 +177,7 @@ var app = {
         /* reset to default state */
         $('#add_places input, #add_places textarea ,#add_places .add-image').val('');
         $("#add_places .add-src").css('background-image', 'none');
-        $("#add_places .add-src").addClass('chooseLoader');
+        $("#add_places .add-src").addClass('chooseLoader').removeClass('chooseImageDone');
         $("#add-map").html("");
         $(".radio-wrap .add_img_icon").removeClass("add_img_icon_park");
         $(".radio-wrap .add_img_icon").removeClass("active_icon");
@@ -951,7 +951,7 @@ var app = {
         $(".add-image").val(imageURI);
         $(".add-src").attr("href", imageURI);
         $(".add-address").val('');
-        $(".add-src").removeClass('chooseLoader');
+        $(".add-src").removeClass('chooseLoader').addClass('chooseImageDone');
         $(".add-src").css("background-image", "url(" + imageURI + ")");
 
         if (fromGallery) {
