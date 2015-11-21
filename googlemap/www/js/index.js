@@ -796,10 +796,6 @@ var app = {
         if (typeof samePage == 'undefined') {
             samePage = false;
         }
-        var gallerySource = Camera.DestinationType.NATIVE_URI;
-        if (device.platform.toLowerCase() == 'ios') {
-            gallerySource = Camera.DestinationType.FILE_URI;
-        }
         navigator.notification.confirm("Use camera or select from gallery",
                 function confirmCamera(buttonIndex) {
                     if (buttonIndex == 1) {
@@ -817,7 +813,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: gallerySource, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else {
                         if (samePage == false) {
                             app.goToPage('main');
