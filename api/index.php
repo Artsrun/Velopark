@@ -27,6 +27,15 @@ function get_places($link) {
 	]);
 }
 
+function add_stats($link){
+
+	$platform = $link->real_escape_string(trim($_POST['platform']));
+    $device_id = $link->real_escape_string(trim($_POST['device_id']));
+	$query = "INSERT INTO stats (`platform`, `device_id`) VALUES ('" . $platform . "', '" . $device_id . "')";
+	$result = $link->query($query);
+	return ($result!=false)?true:false;
+}
+
 function get_version($link) {
     $query = "SELECT * FROM options WHERE name='version' LIMIT 1";
 	$status = 'failed';
@@ -38,7 +47,7 @@ function get_version($link) {
 		$status = 'success';
         $result->free();
     }
-
+	add_stats($link);
 	echo json_encode([
 		'status'=>$status,
 		'data'=>$version
@@ -73,7 +82,41 @@ function get_votes($link) {
 		'data'=>$places
 	]);
 }
+function image_flip($imgsrc, $mode) {
 
+    $width = imagesx($imgsrc);
+    $height = imagesy($imgsrc);
+    $src_x = 0;
+    $src_y = 0;
+    $src_width = $width;
+    $src_height = $height;
+    switch ($mode) {
+        case 'vertical':
+            $src_y = $height - 1;
+            $src_height = -$height;
+            break;
+
+        case 'horizontal':
+            $src_x = $width - 1;
+            $src_width = -$width;
+            break;
+
+        case 'both':
+            $src_x = $width - 1;
+            $src_y = $height - 1;
+            $src_width = -$width;
+            $src_height = -$height;
+            break;
+
+        default:
+            return $imgsrc;
+    }
+    $imgdest = imagecreatetruecolor($width, $height);
+    if (imagecopyresampled($imgdest, $imgsrc, 0, 0, $src_x, $src_y, $width, $height, $src_width, $src_height)) {
+        return $imgdest;
+    }
+    return $imgsrc;
+}
 function add_place($link) {
     $unique_id = $_POST['device_id'];
 	$status = 'failed';
@@ -83,7 +126,40 @@ function add_place($link) {
     $desc = $link->real_escape_string(trim($_POST['desc']));
     $address = $link->real_escape_string(trim($_POST['address']));
     $type = $link->real_escape_string(trim($_POST['type']));
+	
     $image = imagecreatefromjpeg($_FILES["file"]["tmp_name"]);
+	
+	$exif = exif_read_data($_FILES["file"]["tmp_name"]);
+
+    if (!empty($exif['Orientation'])) {
+        switch ($exif['Orientation']) {
+            case 2:
+				$image = image_flip($image,'horizontal');
+                break;
+			case 3:
+                $image = imagerotate($image, 180, 0);
+                break;
+			case 4:
+				$image = image_flip($image,'vertical');
+                break;
+			case 5:
+				$image = image_flip($image,'vertical');
+				$image = imagerotate($image, -90, 0);
+                break;
+            case 6:
+				$image = imagerotate($image, -90, 0);
+                break;
+			case 7:
+				$image = image_flip($image,'horizontal');
+				$image = imagerotate($image, -90, 0);
+                break;
+            case 8:
+                $image = imagerotate($image, 90, 0);
+                break;
+        }
+    }
+	
+	imagejpeg($image, $_FILES["file"]["tmp_name"]);
     list($width, $height) = getimagesize($_FILES["file"]["tmp_name"]);    
 	$size = ($width<$height)?$width:$height;	
 	$x = ($width>$height)?($width-$height)/2:0;

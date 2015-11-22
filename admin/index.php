@@ -98,7 +98,9 @@ switch ($view) {
                 redirect();
         }
         break;
-
+	case("stats"):
+		$stats = get_stats($link);
+		break;
     default:
         $view = 'places';
         $perpage = 10;

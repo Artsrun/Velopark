@@ -9,7 +9,7 @@
     <script type="text/javascript" src="templates/js/ajaxupload.js"></script>    
     <script type="text/javascript" src="templates/js/jquery.swipebox.min.js"></script>
 	<script type="text/javascript" src="templates/js/workscripts.js"></script>
-    <title>Places</title>
+    <title>Velopark</title>
     </head>
 
     <body>
