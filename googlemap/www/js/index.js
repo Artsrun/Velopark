@@ -897,10 +897,8 @@ var app = {
             app.activeMarker = this;
 
             app.getPlaceFromDB(this.server_id, function (data) {
-                //                $(".footer-image img").attr("src", "");
                 if (data.image) {
-                    //$(".footer-image").attr("src", "data:image/jpg;base64," + data.image);
-                    $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image);
+                    $(".foot-link").css('background', "url(data:image/jpg;base64," + data.image+") no-repeat");
                     $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
                     $(".foot-link").removeAttr("ontouchstart");
                 } else {
