@@ -896,14 +896,14 @@ var app = {
             }
             app.activeMarker = this;
 
-            app.getPlaceFromDB(this.server_id, function (data) {
+            app.getPlaceFromDB(this.server_id, function (data) { 
                 if (data.image) {
-                    $(".foot-link").css('background', "url(data:image/jpg;base64," + data.image+") no-repeat");
+                    $(".foot-link").css('background', "transparent  url(data:image/jpg;base64," + data.image+") no-repeat scroll center");
                     $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
                     $(".foot-link").removeAttr("ontouchstart");
                 } else {
                     //$(".footer-image").attr("src", "img/foot_icon_" + data.type + ".png");
-                    $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png");
+                    $(".foot-link").css('background', "transparent url(img/foot_icon_" + data.type + ".png) no-repeat scroll center");
                     $(".foot-link").removeAttr("href");
                     $(".foot-link").attr("ontouchstart", "return false;");
                 }
