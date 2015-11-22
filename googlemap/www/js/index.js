@@ -2,7 +2,7 @@
 var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = '546546';
+    device.uuid = '5465sdfsdf46';
     device.platform = 'android';
     device.version = '5.3.1';
 }
@@ -177,7 +177,8 @@ var app = {
         /* reset to default state */
         $('#add_places input, #add_places textarea ,#add_places .add-image').val('');
         $("#add_places .add-src").css('background-image', 'none');
-        $("#add_places .add-src").addClass('chooseLoader').removeClass('chooseImageDone');
+        $("#add_places .add-src").addClass('chooseLoader');
+        $("#add_places .add-src-cont").removeClass('chooseImageDone');
         $("#add-map").html("");
         $(".radio-wrap .add_img_icon").removeClass("add_img_icon_park");
         $(".radio-wrap .add_img_icon").removeClass("active_icon");
@@ -490,7 +491,9 @@ var app = {
             url: app.apiURL,
             method: "POST",
             data: {
-                action: "get_version"
+                action: "get_version",
+                device_id: device.uuid,
+                platform: device.platform.toLowerCase()
             },
             dataType: 'json',
             success: function (res) {
@@ -683,7 +686,7 @@ var app = {
             /* activate swiepbox on footer image*/
             app.activateSwipebox('.foot-link.swipebox');
 
-            $('.swipebox_add').on('click', function () {
+            $('.add-src-cont').on('click', function () {
                 app.openCameraDialog(true);
                 return false;
             });
@@ -813,7 +816,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else {
                         if (samePage == false) {
                             app.goToPage('main');
@@ -897,12 +900,12 @@ var app = {
                 //                $(".footer-image img").attr("src", "");
                 if (data.image) {
                     //$(".footer-image").attr("src", "data:image/jpg;base64," + data.image);
-                    $(".foot-link").css('background-image',"url(data:image/jpg;base64,"+data.image);
+                    $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image);
                     $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
                     $(".foot-link").removeAttr("ontouchstart");
                 } else {
                     //$(".footer-image").attr("src", "img/foot_icon_" + data.type + ".png");
-                    $(".foot-link").css('background-image',"url(img/foot_icon_"+data.type+ ".png");
+                    $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png");
                     $(".foot-link").removeAttr("href");
                     $(".foot-link").attr("ontouchstart", "return false;");
                 }
@@ -943,21 +946,54 @@ var app = {
     cameraSuccess: function (imageURI, fromGallery) {
 
         /* set image and activate default type */
+        $(".add-src").removeClass(function (index, css) {
+            return (css.match(/(^|\s)correct_\S+/g) || []).join(' ');
+        });
 
         $(".add-image").val(imageURI);
         $(".add-src").attr("href", imageURI);
         $(".add-address").val('');
-        $(".add-src").removeClass('chooseLoader').addClass('chooseImageDone');
-        $(".add-src").css("background-image", "url(" + imageURI + ")");
 
         if (fromGallery) {
             window.resolveLocalFileSystemURI(imageURI,
                     function (entry) {
                         entry.file(function (file) {
-                            var GPSLatitude, GPSLongitude;
+                            var GPSLatitude, GPSLongitude, Orientation;
                             EXIF.getData(file, function () {
                                 GPSLatitude = EXIF.getTag(this, 'GPSLatitude');
                                 GPSLongitude = EXIF.getTag(this, 'GPSLongitude');
+                                Orientation = EXIF.getTag(this, 'Orientation');
+                                switch (Orientation) {
+                                    case 2:
+                                        // horizontal flip
+                                        $(".add-src").addClass('correct_h_flip');
+                                        break;
+                                    case 3:
+                                        // 180° rotate left
+                                        $(".add-src").addClass('correct_180_rot');
+                                        break;
+                                    case 4:
+                                        // vertical flip
+                                        $(".add-src").addClass('correct_v_flip');
+                                        break;
+                                    case 5:
+                                        // vertical flip + 90 rotate right
+                                        $(".add-src").addClass('correct_v_flip_90_rot');
+                                        break;
+                                    case 6:
+                                        // 90° rotate right
+                                        $(".add-src").addClass('correct_90_rot');
+                                        break;
+                                    case 7:
+                                        // horizontal flip + 90 rotate right
+                                        $(".add-src").addClass('correct_h_flip_90_rot');
+                                        break;
+                                    case 8:
+                                        // 90° rotate left
+                                        $(".add-src").addClass('correct_90_rot_left');
+                                        break;
+                                }
+                                setImage(imageURI);
                                 if (GPSLatitude && GPSLongitude) {
                                     var latitude = (GPSLatitude[0] + (GPSLatitude[1] / 60) + (GPSLatitude[2] / 3600)).toFixed(7);
                                     var longitude = (GPSLongitude[0] + (GPSLongitude[1] / 60) + (GPSLongitude[2] / 3600)).toFixed(7);
@@ -968,15 +1004,26 @@ var app = {
                                 }
                             });
                         }, function () {
+                            setImage(imageURI);
                             getCurrrentLocation();
                         });
                     },
-                    function (e) {
+                    function () {
+                        setImage(imageURI);
                         getCurrrentLocation();
                     }
             );
         } else {
+            setImage(imageURI);
             getCurrrentLocation(true);
+        }
+
+        function setImage(imageURI) {
+            /* image selected */
+            $(".add-src").removeClass('chooseLoader');
+            $(".add-src-cont").addClass('chooseImageDone');
+            $(".add-src").css("background-image", "url(" + imageURI + ")");
+            /* image selected */
         }
 
         function getCurrrentLocation(setMarker) {

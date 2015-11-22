@@ -543,13 +543,14 @@ footer .footer-info p.desc{
     /*overflow:hidden;*/
     float:right;
     margin: 0 0 0 5%;
+    background-position: center center;
+    background-image: url(../img/foot_icon_parking.png);
+    background-size: cover;
+    padding-top: 20%;
+    display:inline-block;
 }
 
-footer .footer-image{
-    width: 100%;
-    -webkit-border-radius:3px;
-    border-radius: 3px;
-}
+
 html.ios footer .footer-image{
     border:none;
 }
@@ -631,24 +632,50 @@ html.ios footer .footer-image{
     display: none;
 }*/
 
-.add-src{
+.add-src-cont{
     width: 30%;
-    padding-top: 30%;
     max-width: 150px;
     float: left;
     -webkit-border-radius:5px;
     border-radius: 5px;
     margin: 5% 0 8px 0;
     display: block;
+    position: relative;
+    overflow: hidden;
+}
+.add-src{
+    width:100%;
+    padding-top: 100%;
+    display: block;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+    position: relative;
+    -webkit-border-radius:5px;
+    border-radius: 5px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
 .add-src.chooseLoader{
     background-image: url(../img/ajax_loader.gif) !important;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 25%;
+}
+
+.add-src-cont.chooseImageDone:after {
+    background-image: url(../img/choose_image.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    content: '';
+    top: 5px;
+    left: 5px;
+    width: 35%;
+    height: 35%;
+    max-width: 50px;
 }
 
 .add-name, .add-address{
@@ -1626,4 +1653,41 @@ a.infoMail:active{
 .oldAndroid  .add_img_icon, .oldAndroid ul.menu_list img{
     -webkit-border-radius:9999px;
     border-radius: 9999px;
+}
+.correct_invisible{
+    opacity: 0;
+}
+.correct_h_flip{
+    -webkit-transform: scaleX(-1); 
+    transform: scaleX(-1);
+}
+
+.correct_v_flip{
+    -webkit-transform: scaleY(-1); 
+    transform: scaleY(-1);
+}
+
+.correct_180_rot{
+    -webkit-transform: rotate(180deg); 
+    transform:rotate(180deg);
+}
+
+.correct_v_flip_90_rot{
+    -webkit-transform:rotate(90deg) scaleY(-1);
+    transform:rotate(90deg) scaleY(-1);
+}
+
+.correct_90_rot{
+    -webkit-transform: rotate(90deg); 
+    transform:rotate(90deg);
+}
+
+.correct_h_flip_90_rot {
+    -webkit-transform:rotate(90deg) scaleX(-1);
+    transform:rotate(90deg) scaleX(-1);
+}
+
+.correct_90_rot_left{
+    -webkit-transform: rotate(-90deg); 
+    transform:rotate(-90deg);
 }
