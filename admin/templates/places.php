@@ -29,7 +29,7 @@
             <tr>
                 <td><?= $i ?></td>
                 <td>
-                    <a href="?view=edit_place&amp;place_id=<?= $item['id'] ?>" class="edit">
+                    <a href="?view=edit_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="edit">
                     <?php if ($item['image']): ?>
                         <img src = "data:image/jpg;base64,<?= $item['image'] ?>" style="height: 150px; width:150px; border-radius: 3px">
                     <?php else: ?>
