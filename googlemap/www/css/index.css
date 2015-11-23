@@ -1091,19 +1091,30 @@ html.offline #add_places .wrapper:after, html.offline #new_places .wrapper:after
     background-image: url(../img/no_internet.png);
     background-repeat: no-repeat;
     width: 30%;
-    height: 300px;
+    padding-top:30%;
     background-size: contain;
     max-width: 439px;
     max-height: 326px;
     background-position: center center;
     margin: 0 auto;
-    position: fixed;
+    position: absolute;
     top: 40%;
     left: 50%;
-    margin-top: -150px;
     margin-left: -15%;
+    margin-top:0;
 }
 
+html.offline #add_places .wrapper, html.offline #new_places .wrapper{
+    padding-left: 0; 
+    padding-right: 0; 
+    width: 100%;
+}
+html.offline #add_places .wrapper:after, html.offline #new_places .wrapper:after{
+    margin-top:-16%;
+}
+html.ios.offlineMap #main .wrapper:after{
+    margin-top:20px;
+}
 html.offlineMap[data-active="main"] .arr {
     display:none;
 }

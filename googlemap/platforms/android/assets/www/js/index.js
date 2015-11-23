@@ -5,6 +5,7 @@ if (DEBUG) {
     device.uuid = '5465sdfsdf46';
     device.platform = 'android';
     device.version = '5.3.1';
+    device.model = 'debug';
 }
 
 var app = {
@@ -186,17 +187,12 @@ var app = {
         $("input.error, textarea.error").removeClass('error');
 
         if (pageId == 'main') {
-            if (!app.positionStatus) {
-                this.onResume();
-            }
             $(".arr-wrapper").removeClass('arr_back');
         } else {
-            this.onPause();
             $(".arr-wrapper").addClass('arr_back');
-        }
-
-        if (pageId == 'new_places') {
-            $('header').removeClass('new_not');
+            if (pageId == 'new_places') {
+                $('header').removeClass('new_not');
+            }
         }
         /* correct menu */
         $('.menu li').removeClass("active_menu");
@@ -210,6 +206,11 @@ var app = {
         $('html').attr('data-active', pageId);
         app.setLocationHash(pageId);
         window.scrollTo(0, 0);
+        if (pageId == 'main' || pageId == 'add_places') {
+            app.gpsStart();
+        } else {
+            app.gpsStop();
+        }
         return true;
     },
     getActivePage: function () {
@@ -437,15 +438,11 @@ var app = {
         });
     },
     onPause: function () {
-        app.positionStatus = false;
-        navigator.geolocation.clearWatch(app.positionWatchId);
+        app.gpsStop();
     },
     onResume: function () {
         setTimeout(function () {
-            if (app.getActivePage() == 'main') {
-                navigator.geolocation.clearWatch(app.positionWatchId);
-                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
-            }
+            app.gpsStart();
         }, 100);
     },
     getNewPlacesCount: function () {
@@ -493,7 +490,9 @@ var app = {
             data: {
                 action: "get_version",
                 device_id: device.uuid,
-                platform: device.platform.toLowerCase()
+                platform: device.platform.toLowerCase(),
+                model: device.model,
+                version: device.version
             },
             dataType: 'json',
             success: function (res) {
@@ -552,12 +551,26 @@ var app = {
             });
         });
     },
+    gpsStart: function () {
+        if ((app.getActivePage() == 'main' || app.getActivePage() == 'add_places') && app.positionWatchId == null) {
+            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+        }
+    },
+    gpsStop: function () {
+        if (app.positionWatchId != null) {
+            navigator.geolocation.clearWatch(app.positionWatchId);
+            app.positionStatus = false;
+            app.positionWatchId = null;
+        }
+    },
     initMap: function () {
         var mainMarker = null;
         app.positionStatus = false;
+        app.positionWatchId = null;
+
         app.currentLocation = {
-            latitude: app.defaultLocation.latitude,
-            longitude: app.defaultLocation.longitude
+            latitude: null,
+            longitude: null
         };
         app.onPositionSuccess = function (position) {
             app.positionStatus = true;
@@ -584,10 +597,10 @@ var app = {
         }
 
         app.onPositionError = function (error) {
+            app.gpsStop();
             setTimeout(function () {
-                navigator.geolocation.clearWatch(app.positionWatchId);
-                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
-            }, 5000);
+                app.gpsStart();
+            }, 3000);
         }
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
@@ -612,16 +625,12 @@ var app = {
         /* gps button functionality */
         $(".gps1").off("click.gps");
         $(".gps1").on("click.gps", function (e) {
-            if (app.positionStatus == false) {
-                navigator.geolocation.clearWatch(app.positionWatchId);
-                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
-            } else {
+            if (app.currentLocation.latitude != null) {
                 app.map.panTo(new google.maps.LatLng(app.currentLocation.latitude, app.currentLocation.longitude));
             }
         });
         /* attach position watcher */
-        navigator.geolocation.clearWatch(app.positionWatchId);
-        app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+        app.gpsStart();
     },
     start: function (onlineMap) {
         if (typeof onlineMap != 'undefined') {
@@ -897,15 +906,13 @@ var app = {
             app.activeMarker = this;
 
             app.getPlaceFromDB(this.server_id, function (data) {
-                //                $(".footer-image img").attr("src", "");
                 if (data.image) {
-                    //$(".footer-image").attr("src", "data:image/jpg;base64," + data.image);
-                    $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image);
+                    $(".foot-link").css('background', "transparent  url(data:image/jpg;base64," + data.image + ") no-repeat scroll center");
                     $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
                     $(".foot-link").removeAttr("ontouchstart");
                 } else {
                     //$(".footer-image").attr("src", "img/foot_icon_" + data.type + ".png");
-                    $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png");
+                    $(".foot-link").css('background', "transparent url(img/foot_icon_" + data.type + ".png) no-repeat scroll center");
                     $(".foot-link").removeAttr("href");
                     $(".foot-link").attr("ontouchstart", "return false;");
                 }
