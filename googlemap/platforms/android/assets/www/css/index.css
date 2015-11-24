@@ -75,9 +75,7 @@ strong,b{
 html.ios #swipebox-close{
     top:20px;
 }
-html.ios .ios-statusbar-fix{
-    display: block;
-}
+
 html.ios header{
     padding-top:20px;
 }
@@ -104,15 +102,18 @@ html.ios .menu{
     display:block;
 }
 /* ios statusbar fix*/
-.ios-statusbar-fix{
+.ios header:before{
+    content:'';
     height: 25px;
     background: #2ecc71 ;
     z-index: 100000;
     position: absolute;
     top: 0px;
     width: 100%;
-    display:none;
+    display:block
+
 }
+
 
 html.ios .content{
     margin-bottom: 20px;
@@ -142,10 +143,7 @@ header{
 
 header .green-menu{
     background-color: #2ecc71;
-    background-repeat: no-repeat;
-    background-position-x: 16%;
-    background-position-y: -21%;
-    background-size: 43.5% auto;
+
     padding-top: 16%;
     position: relative;
     z-index: 10001;
@@ -158,11 +156,13 @@ header .green-menu{
 
 header .logo{
     position: absolute;
-    left: 9%;
+    left: 14%;
     bottom: 0;
-    width: 43.5%;
-    max-width:430px;
-    padding-top: 13%;
+    width: 43%;
+    /* height: 100%; */
+    /*max-width: 436px;*/
+    /*max-height: 196px;*/
+    /* padding-top: 13%; */
     z-index: 10002;
     background-image: url(../img/velopark_bg.png);
     background-size: 100% auto;
@@ -172,21 +172,19 @@ header .logo{
     -webkit-backface-visibility: hidden;
 }
 
-header .green-menu .backg-cubs{
-    position:absolute;
-    top: 27%;
-    left: 4%;
-    height:50%;
-    cursor:pointer;
+header .logo:before{
+    content:'';
+    display:block;
+    padding-top: 30%;
 }
 
 header .green-menu .arr{
     position:absolute;
-    top: 26%;
+
     right:5%;
-    width:9%;
-    padding-top: 9%;
-    max-width: 80px;
+    width:10%;
+
+    /*max-width: 80px;*/
     cursor:pointer;
     background-image:url(../img/arr_up.png);
     background-repeat: no-repeat;
@@ -198,6 +196,12 @@ header .green-menu .arr{
     -ms-transition: transform 200ms linear;
     -o-transition: transform 200ms linear;
     transition: transform 200ms linear, opacity 200ms linear;
+    bottom: 17%;
+}
+header .green-menu .arr:before{
+    content:'';
+    padding-top:100%;
+    display:block;
 }
 html[data-active="main"] header .green-menu .arr{
     display:none;
@@ -220,19 +224,24 @@ html[data-active="main"] header .green-menu .arr.visible{
     -webkit-transform: rotateZ(270deg);
     transform: rotateZ(270deg);
 }
+
 header .green-menu .backg-cubs{
-    /*    width:22px;*/
-    width: 10%;
-    max-height: 80px;
-    background-image:url(../img/backg-cubs.png);
-    left:5%;
+
+    position: absolute;
+    background-image: url(../img/backg-cubs.png);
+    left: 0;
     background-size: contain;
     background-repeat: no-repeat;
-    max-height: 88px;
-    padding: 0 2%;
+    /*max-height: 80px;*/
+    width: 8%;
+    background-position: center;
+    padding: 0 2% 0 2%;
+    bottom: 24%;
 }
-header .logo {
-    left:12%;
+header .green-menu .backg-cubs:before{
+    content:'';
+    padding-top:100%;
+    display:block;
 }
 
 
@@ -263,8 +272,8 @@ nav.nav_down{
     background-color: #ffffff;
     position:absolute;
     margin: auto;
-    left: 9px;
-    top: 9px;
+    left: 2%;
+    top: 11%;
     /* padding: 0px 12px 0px 12px; */
     display: none; 
     -webkit-backface-visibility: hidden;
@@ -307,8 +316,7 @@ box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3
 }
 
 .new_notification{
-    width: 17%;
-    height: 17%;
+    width: 3%;
     background-image: url(../img/note.png);
     background-size: contain;
     background-repeat: no-repeat;
@@ -318,9 +326,12 @@ box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3),inset 0px 1px 2px 0px rgba(0,0,0,0.3
     display: none;
     position: absolute;
     left: 6%;
-    top: 19%;
-    max-width: 40px;
-    max-height: 40px;
+    top: 18%;
+}
+.new_notification:before{
+    content:'';
+    display:block;
+    padding-top: 100%;
 }
 header.new_not .newpl {
     color: #e74c3c;
@@ -349,7 +360,7 @@ ul.menu_list li{
 ul.menu_list img{
     display: block;
     cursor: pointer;
-    max-width: 100%;
+/*    max-width: 100%;*/
     width: 68%;
     margin: 0 auto;
     -webkit-border-radius:50%;
@@ -430,11 +441,11 @@ html.oldAndroid .arr.arr_back{
 
 .gps1{
     float: right;
-    margin-top: -19%;
+    margin-top: -20%;
     margin-right: 3%;
     cursor: pointer;
-    width: 15%;
-    max-width: 130px;
+    width: 16%;
+/*    max-width: 130px; WT*/
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
@@ -476,7 +487,7 @@ html.oldAndroid .arr.arr_back{
     left: 50%;
     margin-left: -5%;
     margin-top: 0;
-    max-width: 100px;
+/*    max-width: 100px; WT*/
 
 }
 .controls.transition{
@@ -539,17 +550,20 @@ footer .footer-info p.desc{
     margin: auto;
     -webkit-border-radius:3px;
     border-radius: 3px;
-    max-width: 150px;
+/*    max-width: 150px; WT*/
     /*overflow:hidden;*/
     float:right;
     margin: 0 0 0 5%;
     background-position: center center;
     background-image: url(../img/foot_icon_parking.png);
-    background-size: cover;
-    padding-top: 20%;
+    background-size: cover;    
     display:inline-block;
 }
-
+.foot-link.swipebox:after{
+    content:'';
+    display:block;
+    padding-top:100%;
+}
 
 html.ios footer .footer-image{
     border:none;
@@ -634,10 +648,10 @@ html.ios footer .footer-image{
 
 .add-src-cont{
     width: 30%;
-    max-width: 150px;
+/*    max-width: 150px; WT*/
     float: left;
-    -webkit-border-radius:5px;
-    border-radius: 5px;
+    -webkit-border-radius:3px;
+    border-radius: 3px;
     margin: 5% 0 8px 0;
     display: block;
     position: relative;
@@ -651,8 +665,8 @@ html.ios footer .footer-image{
     background-repeat: no-repeat;
     background-position: center center;
     position: relative;
-    -webkit-border-radius:5px;
-    border-radius: 5px;
+    -webkit-border-radius:3px;
+    border-radius: 3px;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
@@ -671,11 +685,11 @@ html.ios footer .footer-image{
     background-repeat: no-repeat;
     position: absolute;
     content: '';
-    top: 5px;
-    left: 5px;
+    top: 5%;
+    left: 5%;
     width: 35%;
     height: 35%;
-    max-width: 50px;
+/*    max-width: 50px; WT*/
 }
 
 .add-name, .add-address{
@@ -685,10 +699,17 @@ html.ios footer .footer-image{
     margin-top: 8px;
     color: #555555;
     font-size: 12px;
-    -webkit-border-radius:2px;
-    border-radius: 2px;
+    -webkit-border-radius:3px;
+    border-radius: 3px;
     border: 1px solid #ddd;
     padding: 0 2%;
+}
+.add-address{
+    -webkit-transition: border 0.2s linear;
+    transition:border 0.2s linear;
+}
+.add-address.green{
+    border: 1px solid #2ECC71;
 }
 
 .add-name{
@@ -732,7 +753,7 @@ html.ios footer .footer-image{
 
 .add_img_icon{
     width: 17%;
-    max-width: 150px;
+/*    max-width: 150px; WT*/
     margin-left:5%;
     -webkit-border-radius:50%;
     border-radius: 50%;
@@ -748,11 +769,11 @@ html.ios footer .footer-image{
 
 
 .add-descript{
-    width: 94.5%;
-    height: 100px;
+    width: 95%;
+    height: 80px;
     outline:none;
-    -webkit-border-radius:2px;
-    border-radius: 2px;
+    -webkit-border-radius:3px;
+    border-radius: 3px;
     border: 1px solid #ddd;
     padding: 2%;
     color: #555555;
@@ -808,7 +829,7 @@ html.ios footer .footer-image{
 
 .add_place_icon{
     width: 17%;
-    max-width: 150px;
+/*    max-width: 150px; WT*/
 }
 
 .add_place_icon_wrapper{
@@ -871,7 +892,7 @@ html.ios footer .footer-image{
     overflow: hidden;
 }
 
-.vot_img_icon{
+/*.vot_img_icon{
     height: auto;
     width: 15%;
     max-height: 100%;
@@ -881,7 +902,7 @@ html.ios footer .footer-image{
     display: block;
     top: -3%;
     left: -3%;
-}
+}*/
 
 .vot_img_icon_wrap span{
     text-align: left;
@@ -905,10 +926,10 @@ html.ios footer .footer-image{
     display: inline-block;
     width: 17%;
     margin: 0 10%;
-    padding-top: 17%;
+/*    padding-top: 17%;*/
 
-    max-height: 150px;
-    max-width: 150px;
+/*    max-height: 150px;*/
+/*    max-width: 150px; WT*/
     position: relative;
 
     background-size:contain;
@@ -916,13 +937,13 @@ html.ios footer .footer-image{
     background-position: center;
 }
 
-.new_place_icon.accept{
+/*.new_place_icon.accept{
     background-image:url(../img/add_place.png);
 }
 
 .new_place_icon.decline{
     background-image:url(../img/new_place.png);
-}
+}*/
 
 /*.new_place_icon:after{
     position:absolute;
@@ -1025,10 +1046,10 @@ a.swipebox_places{
     position: relative;
     display: inline-block;
     width: 30%;
-    padding-top:30%;
-    max-width: 150px;
-    -webkit-border-radius:5px;
-    border-radius: 5px;
+    /*padding-top:30%;*/
+/*    max-width: 150px; WT*/
+    -webkit-border-radius:3px;
+    border-radius: 3px;
     overflow:hidden;
     float: left;
     margin-right: 5%;
@@ -1036,6 +1057,11 @@ a.swipebox_places{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+}
+a.swipebox_places:before{
+    padding-top: 100%;
+    content: '';
+    display: block;
 }
 
 a.swipebox_places.parking:after{
@@ -1057,11 +1083,11 @@ a.swipebox_places:after{
     background-repeat: no-repeat;
     position: absolute;
     content: '';
-    top: 5px;
-    left: 5px;
+    top: 5%;
+    left: 5%;
     width: 35%;
     height: 35%;
-    max-width: 50px;
+/*    max-width: 50px; WT*/
 }
 
 .vot_wrap .hr {
@@ -1091,19 +1117,30 @@ html.offline #add_places .wrapper:after, html.offline #new_places .wrapper:after
     background-image: url(../img/no_internet.png);
     background-repeat: no-repeat;
     width: 30%;
-    height: 300px;
+    padding-top:30%;
     background-size: contain;
-    max-width: 439px;
-    max-height: 326px;
+/*    max-width: 439px; WT*/
+/*    max-height: 326px;*/
     background-position: center center;
     margin: 0 auto;
-    position: fixed;
+    position: absolute;
     top: 40%;
     left: 50%;
-    margin-top: -150px;
     margin-left: -15%;
+    margin-top:0;
 }
 
+html.offline #add_places .wrapper, html.offline #new_places .wrapper{
+    padding-left: 0; 
+    padding-right: 0; 
+    width: 100%;
+}
+html.offline #add_places .wrapper:after, html.offline #new_places .wrapper:after{
+    margin-top:-16%;
+}
+html.ios.offlineMap #main .wrapper:after{
+    margin-top:20px;
+}
 html.offlineMap[data-active="main"] .arr {
     display:none;
 }
@@ -1238,9 +1275,9 @@ input.error, textarea.error{
 }
 
 .poweredBy{
-    width: 30%;
+    width: 20%;
     display: block;
-    max-width: 200px;
+/*    max-width: 200px; WT*/
     margin: 0 auto;
     margin-top: 80px;
     margin-bottom: 20px;
@@ -1257,6 +1294,12 @@ a.infoMail:active{
     color:#2ecc71;
 }
 
+html.ios.ios-keyboard-fix{
+    height: auto;
+}
+html.ios.ios-keyboard-fix header{
+    position:absolute;
+}
 
 @media only screen and (min-width: 320px) {
 
@@ -1645,9 +1688,6 @@ a.infoMail:active{
 }
 .gm-wsv{pointer-events:none;}
 
-/*#map-canvas{
-    -webkit-overflow-scrolling: touch;
-}*/
 
 /* old android fix */
 .oldAndroid  .add_img_icon, .oldAndroid ul.menu_list img{

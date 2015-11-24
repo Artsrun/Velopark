@@ -12,14 +12,13 @@
         <script type="text/javascript" src="js/jquery.swipebox.js"></script>
         <script type="text/javascript" src="js/functions.js"></script> 
         <script type="text/javascript" src="js/index.js"></script>
-<!--        <script src="http://192.168.0.105:8080/target/target-script-min.js#anonymous"></script>-->
+        <!--        <script src="http://192.168.0.105:8080/target/target-script-min.js#anonymous"></script>-->
         <title>Velopark</title>
     </head>
     <body >
 
         <div class="container overflow_hide" >
-            <header>
-                <div class="ios-statusbar-fix"></div>
+            <header>                
                 <div class="green-menu add_places shadow">
                     <a class="backg-cubs menu_btn"></a>
                     <span class="new_notification"></span>
@@ -72,7 +71,7 @@
                                     <div style="clear: both;"></div>
                                 </div>
                                 <div>
-                                    <p class="label fordesc">Description</p>
+                                    <p class="label fordesc">Notes</p>
                                     <p class="desc" ></p>
                                 </div>
                             </div>
@@ -109,12 +108,11 @@
                                 </p>
                             </div>
                         </div>
-                        <div style="clear: both;"></div>
+                        <div style="clear: both;"></div> 
                         <div class="add-radio">
-                            <h2>Description</h2>
-                            <div class="radio-wrap">
-                                <textarea class="add-descript" name="descrip" placeholder="Describe place in few words (max 250)"/></textarea>
-                            </div>
+                            <h2>Place</h2>
+                            <span class="placeholder">Drag & drop marker to make position more accurate</span>
+                            <div id="add-map"></div>
                         </div>
                         <div class="add-radio">
                             <h2>Type</h2>
@@ -125,11 +123,12 @@
                                 <img class='add_img_icon' src='img/menu_icon3.png' data-type='shop' />
                                 <img class='add_img_icon' src='img/menu_icon4.png' data-type='parts' />
                             </div>
-                        </div>
+                        </div>                        
                         <div class="add-radio">
-                            <h2>Place</h2>
-                            <span class="placeholder">Drag & drop marker to make position more accurate</span>
-                            <div id="add-map"></div>
+                            <h2>Notes</h2>
+                            <div class="radio-wrap">
+                                <textarea class="add-descript" name="descrip" placeholder="Describe place in few words (max 250)"/></textarea>
+                            </div>
                         </div>
                         <div class="add_place_icon_wrapper">
                             <img src="img/add_place.png" class="add_place_icon" alt="">
@@ -143,11 +142,11 @@
                     <h1>About</h1>
                     <div class="content">
                         <p class="about_text">
-                            Promoting healthy lifestyle and supporting  environmental protection <strong>Aparg</strong> team presents free and unique application for bike lovers in Armenia.
+                            Promoting healthy lifestyle and supporting  environmental protection the <strong>Aparg</strong> team presents a free, unique application for bike lovers.
                             <br/><br/>
-                            <strong>Velopark</strong> is an application developed for those who consider bike riding as a lifestyle or just a hobby.  It allows to detect the nearest bike parking spots in Armenia. <strong>Velopark</strong> makes also possible to view the nearest bicycle rent spots, bike maintenance centers, shops and spare parts sale centers.
+                            <strong>Velopark</strong> is an application developed for those who consider bike riding a lifestyle or just a hobby. It allows one to detect the nearest bike parking spots, rent spots, maintenance centers, shops and spare parts sellers centers.
                             <br/><br/>
-                            One of the <strong>Velopark's</strong> advantages is user friendly interface. Social nature of the app provides an opportunity to add new places with detailed information after being validated by community members.
+                            One of the <strong>Velopark's</strong> advantages is a user friendly interface. The social nature of the app allows users community members to add new places and validate information.
                             <br/><br/>
                             The application is available for both iOS and Android mobile platforms.
                             <br/><br/>

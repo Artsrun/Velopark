@@ -359,10 +359,14 @@ var app = {
     showPlacesForVote: function (places) {
         $("#new_places .wrapper .content").empty();
 
-        var map_width = parseInt($("#new_places .wrapper").outerWidth(true));
+        var wrapper_width = parseInt($("#new_places .content").outerWidth(true));
+        var wrapper_height = parseInt(wrapper_width / 2);
+
+        var map_height = (wrapper_height > 320) ? 320 : wrapper_height;
+
         var map_size = {
-            width: map_width,
-            height: parseInt(map_width / 2)
+            width: map_height * 2,
+            height: map_height
         }
         if (places.length) {
             for (var i = 0; i < places.length; i++) {
@@ -371,16 +375,15 @@ var app = {
                 if (places[i].image) {
                     output += "<a style='background-image:url(data:image/jpg;base64," + places[i].image + ")' class='swipebox_places " + places[i].type + "' rel='" + i + "' href='" + app.uploadsURL + places[i].server_id + ".jpg' onclick='return false;'></a>";
                 } else {
-                    output += "<a style='background-image:url(img/foot_icon_" + places[i].type + ".png)'  class='swipebox_places noimage' ontouch='return false;'>";
-                    output += "</a>";
+                    output += "<a style='background-image:url(img/foot_icon_" + places[i].type + ".png)'  class='swipebox_places noimage' ontouch='return false;'></a>";
                 }
                 output += "<p>Name</p><p class='cont'>" + places[i].name + "</p><p>Address</p><p class='cont'>" + places[i].address + "</p>";
                 output += "</div>";
                 if (places[i].description) {
-                    output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
+                    output += "<p>Notes</p><p class='cont'>" + places[i].description + "</p>";
                 }
-                output += "<div style='height:" + map_size.height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
-                output += "<div class='new_place_icon_wrap'><a  href='javascript:void(0);' class='new_place_icon accept' data-value='1'></a><a href='javascript:void(0);' class='new_place_icon decline' data-value='0'></a></div>";
+                output += "<div style='height:" + wrapper_height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
+                output += "<div class='new_place_icon_wrap'><img  class='new_place_icon accept' data-value='1' src='img/add_place.png' /><img  src='img/new_place.png'class='new_place_icon decline' data-value='0'/></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
 
@@ -646,6 +649,16 @@ var app = {
         /*nav functionality*/
         if (this.firstLoad == true) {
             this.firstLoad = false;
+
+            if ($('html').hasClass('ios')) {
+                $(document).on('focus', 'input, textarea', function () {
+                    $('html').addClass('ios-keyboard-fix');
+                });
+                $(document).on('blur', 'input, textarea', function () {
+                    $('html').removeClass('ios-keyboard-fix');
+                });
+            }
+
             $(".arr-wrapper").on('click', function () {
                 if ($(this).hasClass('arr_back')) {
                     app.goToPage('main');
@@ -910,12 +923,16 @@ var app = {
 
             app.getPlaceFromDB(this.server_id, function (data) {
                 if (data.image) {
-                    $(".foot-link").css('background', "transparent  url(data:image/jpg;base64," + data.image + ") no-repeat scroll center");
+//                    $(".foot-link").css('background', "transparent  url(data:image/jpg;base64," + data.image + ") no-repeat");
+                    $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image + ")");
+                    $(".foot-link").css('background-size', 'cover');
+
                     $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
                     $(".foot-link").removeAttr("ontouchstart");
                 } else {
-                    //$(".footer-image").attr("src", "img/foot_icon_" + data.type + ".png");
-                    $(".foot-link").css('background', "transparent url(img/foot_icon_" + data.type + ".png) no-repeat scroll center");
+//                    $(".foot-link").css('background', "transparent url(img/foot_icon_" + data.type + ".png) no-repeat");
+                    $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png)");
+                    $(".foot-link").css('background-size', 'cover');
                     $(".foot-link").removeAttr("href");
                     $(".foot-link").attr("ontouchstart", "return false;");
                 }
@@ -1121,6 +1138,11 @@ function newPlace(center, setAddress) {
         scaleControl: false,
         streetViewControl: false
     };
+
+    var map_width = parseInt($("#add_places .wrapper").outerWidth(true));
+    var map_height = parseInt(map_width / 2);
+    $('#add-map').css('height', map_height);
+
     var new_map = new google.maps.Map(document.getElementById('add-map'), options);
 
     var image = {
@@ -1144,6 +1166,7 @@ function newPlace(center, setAddress) {
             }
         });
     }
+    var greenTimer;
     new_marker.addListener('dragend', function (event) {
         setNewAddress(event.latLng);
     });
@@ -1162,7 +1185,12 @@ function newPlace(center, setAddress) {
 
         geocoder.geocode({'location': latLng}, function (results, status) {
             if (status === google.maps.GeocoderStatus.OK) {
+                clearTimeout(greenTimer);
                 $(".add-address").removeClass('error');
+                $(".add-address").addClass('green');
+                greenTimer = setTimeout(function () {
+                    $(".add-address").removeClass('green');
+                }, 800);
                 $(".add-address").val(results[0].formatted_address);
             }
         });
