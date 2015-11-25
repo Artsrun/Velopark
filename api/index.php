@@ -31,7 +31,9 @@ function add_stats($link){
 
 	$platform = $link->real_escape_string(trim($_POST['platform']));
     $device_id = $link->real_escape_string(trim($_POST['device_id']));
-	$query = "INSERT INTO stats (`platform`, `device_id`) VALUES ('" . $platform . "', '" . $device_id . "')";
+	$model = $link->real_escape_string(trim($_POST['model']));
+    $version = $link->real_escape_string(trim($_POST['version']));
+	$query = "INSERT INTO stats (`platform`, `device_id`, `model`, `version`) VALUES ('" . $platform . "', '" . $device_id . "', '" . $model . "', '" . $version . "')";
 	$result = $link->query($query);
 	return ($result!=false)?true:false;
 }
@@ -158,9 +160,26 @@ function add_place($link) {
                 break;
         }
     }
+   
+	$width = imagesx ($image);
+	$height = imagesy ($image);  
+
+	if($width > 800 || $height > 800){
+		if($width > $height){
+			$newWidth = 800;
+			$newHeight = ($newWidth / $width) * $height;
+		}else{
+			$newHeight = 800;	
+			$newWidth = ($newHeight / $height) * $width;			
+		}
+	  
+		$resized = imagecreatetruecolor($newWidth,$newHeight);
+		imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
+		imagejpeg($resized, $_FILES["file"]["tmp_name"]);
+	}else{
+		imagejpeg($image, $_FILES["file"]["tmp_name"]);
+	}
 	
-	imagejpeg($image, $_FILES["file"]["tmp_name"]);
-    list($width, $height) = getimagesize($_FILES["file"]["tmp_name"]);    
 	$size = ($width<$height)?$width:$height;	
 	$x = ($width>$height)?($width-$height)/2:0;
 	$y = ($width<$height)?($height-$width)/2:0;

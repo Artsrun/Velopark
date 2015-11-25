@@ -23,6 +23,14 @@ img{
 a{
     outline: none;
 }
+.file_loader{
+    width: 150px;
+    height: 150px;
+    background-image: url(images/ajax_loader.gif);
+    background-size: 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
 .place_thumb{
 	
 	border-radius:3px;
