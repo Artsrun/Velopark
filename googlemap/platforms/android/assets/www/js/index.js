@@ -181,7 +181,7 @@ var app = {
         /* reset to default state */
         $('#add_places input, #add_places textarea ,#add_places .add-image').val('');
         $("#add_places .add-src").css('background-image', 'none');
-        $("#add_places .add-src").addClass('chooseLoader');
+        $("#add_places .add-src-cont").addClass('chooseLoader');
         $("#add_places .add-src-cont").removeClass('chooseImageDone');
         $("#add-map").html("");
         $(".radio-wrap .add_img_icon").removeClass("add_img_icon_park");
@@ -235,7 +235,9 @@ var app = {
             },
             dataType: 'json',
             beforeSend: function () {
-                $('html').addClass('fullHeight');
+                if ($('html').hasClass('oldAndroid')) {
+                    $('html').addClass('fullHeight');
+                }
                 addLoader('#new_places');
                 //$("#new_places .wrapper").append("<img src='img/ajax_loader.gif' alt='' class='loader'>");
             },
@@ -390,7 +392,9 @@ var app = {
                 app.activateSwipebox('#vot_' + places[i].server_id + ' .swipebox_places:not(".noimage")');
             }
             $(app.pageScrollTarget).trigger('scroll');
-            $('html').removeClass('fullHeight');
+            if ($('html').hasClass('oldAndroid')) {
+                $('html').removeClass('fullHeight');
+            }
         } else {
             $("#new_places .wrapper .content ").html("<p class='no_place_text'>Nothing to review</p>");
         }
@@ -419,17 +423,19 @@ var app = {
                     localStorage.setItem("count", parseInt(localStorage.getItem("count")) - 1);
                     var $blockEl = $('[data-id="' + voteData['place_id'] + '"]');
                     var curHeight = $blockEl.outerHeight(true);
-                    $('.vot_wrap').addClass('vot_transition');
                     $blockEl.addClass('swipe');
                     $blockEl.nextAll().addClass('up_trans').css('transform', 'translateY(-' + curHeight + 'px)').css('-webkit-transform', 'translateY(-' + curHeight + 'px)');
 
                     setTimeout(function () {
                         //$('.vot_wrap').removeClass('up_trans');
-                        $blockEl.nextAll().removeAttr('style').removeClass('up_trans');
+                        $blockEl.nextAll().removeClass('up_trans').removeAttr('style');
                         $blockEl.remove();
                         $(app.pageScrollTarget).trigger('scroll');
                         if ($("#new_places .wrapper .content .vot_wrap").length == 0) {
                             $("#new_places .wrapper .content").html("<p class='no_place_text'>Nothing to review</p>");
+                            if ($('html').hasClass('oldAndroid')) {
+                                $('html').addClass('fullHeight');
+                            }
                         }
                     }, 400);
                 } else {
@@ -622,6 +628,8 @@ var app = {
             if (app.getLocalVersion() != 0) {
                 app.selectPlaces(app.defaultType);
             }
+            app.setLocationHash('gmapfix');
+            app.setLocationHash(app.getActivePage());
 
         });
         /* atach events to map */
@@ -767,9 +775,10 @@ var app = {
             if ($('html').hasClass('oldAndroid')) {
                 app.pageScrollTarget = window;
             } else {
-                app.pageScrollTarget = '#new_places .wrapper';
+                app.pageScrollTarget = '.wrapper';
             }
             $(app.pageScrollTarget).scroll(function () {
+                //$(".add-src").removeClass('correct_flicker');
 
                 if (app.scrollFix == $(app.pageScrollTarget).scrollTop()) {
                     return false;
@@ -972,84 +981,93 @@ var app = {
     },
     cameraSuccess: function (imageURI, fromGallery) {
 
-        /* set image and activate default type */
-        $(".add-src").removeClass(function (index, css) {
-            return (css.match(/(^|\s)correct_\S+/g) || []).join(' ');
-        });
-
         $(".add-image").val(imageURI);
-        $(".add-src").attr("href", imageURI);
         $(".add-address").val('');
 
         if (fromGallery) {
-            window.resolveLocalFileSystemURI(imageURI,
-                    function (entry) {
-                        entry.file(function (file) {
-                            var GPSLatitude, GPSLongitude, Orientation;
-                            EXIF.getData(file, function () {
-                                GPSLatitude = EXIF.getTag(this, 'GPSLatitude');
-                                GPSLongitude = EXIF.getTag(this, 'GPSLongitude');
-                                Orientation = EXIF.getTag(this, 'Orientation');
-                                switch (Orientation) {
-                                    case 2:
-                                        // horizontal flip
-                                        $(".add-src").addClass('correct_h_flip');
-                                        break;
-                                    case 3:
-                                        // 180° rotate left
-                                        $(".add-src").addClass('correct_180_rot');
-                                        break;
-                                    case 4:
-                                        // vertical flip
-                                        $(".add-src").addClass('correct_v_flip');
-                                        break;
-                                    case 5:
-                                        // vertical flip + 90 rotate right
-                                        $(".add-src").addClass('correct_v_flip_90_rot');
-                                        break;
-                                    case 6:
-                                        // 90° rotate right
-                                        $(".add-src").addClass('correct_90_rot');
-                                        break;
-                                    case 7:
-                                        // horizontal flip + 90 rotate right
-                                        $(".add-src").addClass('correct_h_flip_90_rot');
-                                        break;
-                                    case 8:
-                                        // 90° rotate left
-                                        $(".add-src").addClass('correct_90_rot_left');
-                                        break;
-                                }
+            if ($('html').hasClass('oldAndroid')) {
+                setImage(imageURI);
+                getCurrrentLocation();
+            } else {
+                window.resolveLocalFileSystemURI(imageURI,
+                        function (entry) {
+                            entry.file(function (file) {
+                                var GPSLatitude, GPSLongitude, Orientation;
+                                EXIF.getData(file, function () {
+                                    GPSLatitude = EXIF.getTag(this, 'GPSLatitude');
+                                    GPSLongitude = EXIF.getTag(this, 'GPSLongitude');
+                                    Orientation = EXIF.getTag(this, 'Orientation');
+                                    /* rotate default state */
+                                    $(".add-src").removeClass(function (index, css) {
+                                        return (css.match(/(^|\s)correct_\S+/g) || []).join(' ');
+                                    });
+                                    switch (Orientation) {
+                                        case 2:
+                                            // horizontal flip
+                                            $(".add-src").addClass('correct_h_flip');
+                                            break;
+                                        case 3:
+                                            // 180° rotate left
+                                            $(".add-src").addClass('correct_180_rot');
+                                            break;
+                                        case 4:
+                                            // vertical flip
+                                            $(".add-src").addClass('correct_v_flip');
+                                            break;
+                                        case 5:
+                                            // vertical flip + 90 rotate right
+                                            $(".add-src").addClass('correct_v_flip_90_rot');
+                                            break;
+                                        case 6:
+                                            // 90° rotate right
+                                            $(".add-src").addClass('correct_90_rot');
+                                            break;
+                                        case 7:
+                                            // horizontal flip + 90 rotate right
+                                            $(".add-src").addClass('correct_h_flip_90_rot');
+                                            break;
+                                        case 8:
+                                            // 90° rotate left
+                                            $(".add-src").addClass('correct_90_rot_left');
+                                            break;
+                                    }
+                                    setImage(imageURI, true);
+
+                                    if (GPSLatitude && GPSLongitude) {
+                                        var latitude = (GPSLatitude[0] + (GPSLatitude[1] / 60) + (GPSLatitude[2] / 3600)).toFixed(7);
+                                        var longitude = (GPSLongitude[0] + (GPSLongitude[1] / 60) + (GPSLongitude[2] / 3600)).toFixed(7);
+                                        center = new google.maps.LatLng(latitude, longitude);
+                                        newPlace(center, true);
+                                    } else {
+                                        getCurrrentLocation();
+                                    }
+                                });
+                            }, function () {
                                 setImage(imageURI);
-                                if (GPSLatitude && GPSLongitude) {
-                                    var latitude = (GPSLatitude[0] + (GPSLatitude[1] / 60) + (GPSLatitude[2] / 3600)).toFixed(7);
-                                    var longitude = (GPSLongitude[0] + (GPSLongitude[1] / 60) + (GPSLongitude[2] / 3600)).toFixed(7);
-                                    center = new google.maps.LatLng(latitude, longitude);
-                                    newPlace(center, true);
-                                } else {
-                                    getCurrrentLocation();
-                                }
+                                getCurrrentLocation();
                             });
-                        }, function () {
+                        },
+                        function () {
                             setImage(imageURI);
                             getCurrrentLocation();
-                        });
-                    },
-                    function () {
-                        setImage(imageURI);
-                        getCurrrentLocation();
-                    }
-            );
+                        }
+                );
+            }
         } else {
             setImage(imageURI);
             getCurrrentLocation(true);
         }
 
-        function setImage(imageURI) {
+        function setImage(imageURI, orientation) {
+            if (typeof orientation == 'undefined') {
+                /* rotate default state */
+                $(".add-src").removeClass(function (index, css) {
+                    return (css.match(/(^|\s)correct_\S+/g) || []).join(' ');
+                });
+            }
             /* image selected */
-            $(".add-src").removeClass('chooseLoader');
-            $(".add-src-cont").addClass('chooseImageDone');
             $(".add-src").css("background-image", "url(" + imageURI + ")");
+            $(".add-src-cont").removeClass('chooseLoader').addClass('chooseImageDone');
             /* image selected */
         }
 
@@ -1140,7 +1158,7 @@ function newPlace(center, setAddress) {
     };
 
     var map_width = parseInt($("#add_places .wrapper").outerWidth(true));
-    var map_height = parseInt(map_width / 2);
+    var map_height = parseInt(map_width * 2 / 3);
     $('#add-map').css('height', map_height);
 
     var new_map = new google.maps.Map(document.getElementById('add-map'), options);
@@ -1174,6 +1192,7 @@ function newPlace(center, setAddress) {
     google.maps.event.addListener(new_map, 'click', function (event) {
         new_marker.setPosition(event.latLng);
         setNewAddress(event.latLng);
+        $('input,textarea').trigger('blur');
     });
 
     function setNewAddress(latLng) {
