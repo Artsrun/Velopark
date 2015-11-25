@@ -775,7 +775,7 @@ var app = {
             if ($('html').hasClass('oldAndroid')) {
                 app.pageScrollTarget = window;
             } else {
-                app.pageScrollTarget = '.wrapper';
+                app.pageScrollTarget = '#new_places .wrapper';
             }
             $(app.pageScrollTarget).scroll(function () {
                 //$(".add-src").removeClass('correct_flicker');
