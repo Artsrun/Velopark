@@ -37,12 +37,12 @@ function count_places($link) {
 }
 
 function edit_place($place_id, $link) {
-    $status = get_status($place_id, $link);
-    if ($status == '2') {
-        $_SESSION['edit_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
+	$status = get_status($place_id, $link);
+	if($status == '2'){
+		$_SESSION['edit_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
         return false;
-    }
-
+	}
+	
     $name = trim($_POST['name']);
     $address = trim($_POST['address']);
     $description = trim($_POST['description']);
@@ -85,11 +85,11 @@ function edit_place($place_id, $link) {
         if (file_exists("temp/tmp.jpg")) {
             $image = imagecreatefromjpeg("temp/tmp.jpg");
             list($width, $height) = getimagesize("temp/tmp.jpg");
-            $size = ($width < $height) ? $width : $height;
-            $x = ($width > $height) ? ($width - $height) / 2 : 0;
-            $y = ($width < $height) ? ($height - $width) / 2 : 0;
-            $thumb = imagecreatetruecolor(150, 150);
-            imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);
+            $size = ($width<$height)?$width:$height;	
+			$x = ($width>$height)?($width-$height)/2:0;
+			$y = ($width<$height)?($height-$width)/2:0;
+			$thumb = imagecreatetruecolor(150, 150);
+			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
             imagejpeg($thumb, '../new.jpg');
             $path = "../new.jpg";
             $data = file_get_contents($path);
@@ -110,14 +110,14 @@ function edit_place($place_id, $link) {
         if ($link->affected_rows > 0) {
             if (file_exists("temp/tmp.jpg")) {
                 rename("temp/tmp.jpg", "../uploads/" . $place_id . ".jpg");
-            }
-
+            }            
+            
             $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
-            $vers = $link->query($query_version);
+            $vers = $link->query($query_version);				
             if ($link->affected_rows > 0) {
                 $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-            }
-
+            }            
+			
             $_SESSION['answer'] = "<div class='success'>Place has been updated!</div>";
             return true;
         } else {
@@ -195,23 +195,72 @@ function add_place($link) {
         $base64 = "";
         if (file_exists("temp/tmp.jpg")) {
             $image = imagecreatefromjpeg("temp/tmp.jpg");
-            list($width, $height) = getimagesize("temp/tmp.jpg");
-            $size = ($width < $height) ? $width : $height;
-            $x = ($width > $height) ? ($width - $height) / 2 : 0;
-            $y = ($width < $height) ? ($height - $width) / 2 : 0;
-            $thumb = imagecreatetruecolor(150, 150);
-            imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);
+            
+			$exif = exif_read_data("temp/tmp.jpg");
+
+			if (!empty($exif['Orientation'])) {
+				switch ($exif['Orientation']) {
+					case 2:
+						$image = image_flip($image,'horizontal');
+						break;
+					case 3:
+						$image = imagerotate($image, 180, 0);
+						break;
+					case 4:
+						$image = image_flip($image,'vertical');
+						break;
+					case 5:
+						$image = image_flip($image,'vertical');
+						$image = imagerotate($image, -90, 0);
+						break;
+					case 6:
+						$image = imagerotate($image, -90, 0);
+						break;
+					case 7:
+						$image = image_flip($image,'horizontal');
+						$image = imagerotate($image, -90, 0);
+						break;
+					case 8:
+						$image = imagerotate($image, 90, 0);
+						break;
+				}
+			}
+		   
+			$width = imagesx ($image);
+			$height = imagesy ($image);  
+
+			if($width > 800 || $height > 800){
+				if($width > $height){
+					$newWidth = 800;
+					$newHeight = ($newWidth / $width) * $height;
+				}else{
+					$newHeight = 800;	
+					$newWidth = ($newHeight / $height) * $width;			
+				}
+			  
+				$resized = imagecreatetruecolor($newWidth,$newHeight);
+				imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
+				imagejpeg($resized, "temp/tmp.jpg");
+			}else{
+				imagejpeg($image, "temp/tmp.jpg");
+			}
+			
+            $size = ($width<$height)?$width:$height;	
+			$x = ($width>$height)?($width-$height)/2:0;
+			$y = ($width<$height)?($height-$width)/2:0;
+			$thumb = imagecreatetruecolor(150, 150);
+			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
             imagejpeg($thumb, '../new.jpg');
             $path = "../new.jpg";
             $data = file_get_contents($path);
             $base64 = base64_encode($data);
         }
-        $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
-        $vers = $link->query($query_version);
+		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+        $vers = $link->query($query_version);				
         if ($link->affected_rows > 0) {
-            $query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "', (SELECT value FROM options WHERE name='version'), '1', 0)";
-            $res = $link->query($query);
-        }
+			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "', (SELECT value FROM options WHERE name='version'), '1', 0)";
+			$res = $link->query($query);
+		}        
         if ($link->affected_rows > 0) {
             if (file_exists("temp/tmp.jpg")) {
                 rename("temp/tmp.jpg", "../uploads/" . $link->insert_id . ".jpg");
@@ -229,50 +278,51 @@ function add_place($link) {
 }
 
 function delete_place($place_id, $link) {
-
-    $query = "UPDATE places SET status='2' WHERE id = $place_id";
-    $result = $link->query($query);
-    if ($link->affected_rows > 0) {
-        $_SESSION['answer'] = "<div class='success'>Place has been deleted!</div>";
-
-        $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
-        $link->query($query_version);
-        if ($link->affected_rows > 0) {
-            $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-        }
-    }
+	    
+	$query = "UPDATE places SET status='2' WHERE id = $place_id";
+	$result = $link->query($query);
+	if ($link->affected_rows > 0) {
+		$_SESSION['answer'] = "<div class='success'>Place has been deleted!</div>";        
+		
+		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+		$link->query($query_version);
+		if ($link->affected_rows > 0) {
+			$link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+		}		
+	}	
 }
 
-function confirm_place($place_id, $link) {
 
+function confirm_place($place_id, $link) {
+	    
     $query = "UPDATE places SET status='1' WHERE id = $place_id";
     $result = $link->query($query);
     if ($link->affected_rows > 0) {
         $_SESSION['answer'] = "<div class='success'>Place has been approved!</div>";
-
+		
         $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
         $link->query($query_version);
         if ($link->affected_rows > 0) {
             $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-        }
+        }        
     }
 }
 
 function vote_place($place_id, $link) {
-    $status = get_status($place_id, $link);
-    if ($status == '2') {
-        $_SESSION['vote_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
+	$status = get_status($place_id, $link);
+	if($status == '2'){
+		$_SESSION['vote_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
         return false;
-    }
-
+	}
+	
     $votes = array();
-    $vote = trim($_POST['vote']);
+    $vote = trim($_POST['vote']);    
     $query = "";
     if ($vote == "yes") {
         $query = "UPDATE places SET votes_yes = votes_yes + 1 WHERE id=" . $place_id;
     } else if ($vote == "no") {
         $query = "UPDATE places SET votes_no = votes_no + 1 WHERE id=" . $place_id;
-    }
+    } 
     $link->query($query);
     if ($link->affected_rows > 0) {
         $_SESSION['answer'] = "<div class='success'>Your vote has been saved!</div>";
@@ -353,33 +403,21 @@ function pagination($page, $pages_count) {
     echo '<div class="pagination">' . $startpage . $back . $page2left . $page1left . '<a class="nav_active">' . $page . '</a>' . $page1right . $page2right . $forward . $endpage . '</div>';
 }
 
-function get_stats($link) {
-
-    $android_open = "SELECT COUNT(*) AS android_open FROM stats WHERE platform='android'";
-    $ios_open = "SELECT COUNT(*) AS ios_open FROM stats WHERE platform='ios'";
-    $android_users = "SELECT count(distinct device_id) as android_users FROM stats where platform='android'";
-    $ios_users = "SELECT count(distinct device_id) as ios_users FROM stats where platform='ios'";
+function get_stats($link){
+	
+	$by_platform = "SELECT platform, count(distinct device_id) as users, COUNT(*) AS opens FROM stats WHERE `platform`!='' GROUP BY `platform`";
+	$by_model = "SELECT model, count(distinct device_id) as users, COUNT(*) AS opens FROM stats WHERE `model`!='' GROUP BY `model`";
     $stats = array();
-    $result = $link->query($android_open);
+	$result = $link->query($by_platform);
     while ($row = $result->fetch_assoc()) {
-        $stats['android_open'] = $row['android_open'];
+        $stats['by_platform'][] = $row;
     }
-    $result->free();
-    $result = $link->query($ios_open);
+	$result->free();
+	$result = $link->query($by_model);
     while ($row = $result->fetch_assoc()) {
-        $stats['ios_open'] = $row['ios_open'];
+        $stats['by_model'][] = $row;
     }
-    $result->free();
-    $result = $link->query($android_users);
-    while ($row = $result->fetch_assoc()) {
-        $stats['android_users'] = $row['android_users'];
-    }
-    $result->free();
-    $result = $link->query($ios_users);
-    while ($row = $result->fetch_assoc()) {
-        $stats['ios_users'] = $row['ios_users'];
-    }
-    $result->free();
+	$result->free();
 
     return $stats;
 }
