@@ -10,14 +10,15 @@ $(document).ready(function () {
 			name: 'change',
 			autoSubmit: true,
 			onSubmit: function (file, ext) {
-				if (!(ext && /^(jpg|jpeg)$/i.test(ext))) {
+				if (!(ext && /^(jpg|jpeg|png)$/i.test(ext))) {
 					alert('Error: invalid file extension');
 					return false;
 				}
 			},
 			onComplete: function (file, response) {
+				if(response=='error'){ return false; }
 				var rand = getRandomInt(0, 999999);
-				$(this._button).closest("tr").find("td:first-child ").html("<a href='../admin/temp/tmp.jpg?"+rand+"' class='swipebox'><div class='place_thumb' style='background-image: url(../admin/temp/tmp.jpg?"+rand+");'></div></a>");				
+				$(this._button).closest("tr").find("td:first-child ").html("<a href='../admin/"+response+"?"+rand+"' class='swipebox'><div class='place_thumb' style='background-image: url(../admin/"+response+"?"+rand+");'></div></a>");				
 				if ($(this._button).hasClass("add-image")) {
 					
 					

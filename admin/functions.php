@@ -49,30 +49,23 @@ function edit_place($place_id, $link) {
     $latitude = trim($_POST['latitude']);
     $longitude = trim($_POST['longitude']);
     $type = $_POST['type'];
-
+	$temp_file = empty(glob('temp/tmp.*'))?false:glob('temp/tmp.*')[0];
+	$image = false;
     if (empty($name)) {
         $_SESSION['edit_place']['res'] = "<div class='error'>Must be name!</div>";
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
+        array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else if (empty($latitude)) {
         $_SESSION['edit_place']['res'] = "<div class='error'>Must be latitude!</div>";
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
+        array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else if (empty($longitude)) {
         $_SESSION['edit_place']['res'] = "<div class='error'>Must be longitude!</div>";
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
+        array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else if (empty($address)) {
         $_SESSION['edit_place']['res'] = "<div class='error'>Must be address!</div>";
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
+        array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else {
         $name = clear_admin($name, $link);
@@ -82,147 +75,44 @@ function edit_place($place_id, $link) {
         $longitude = clear_admin($longitude, $link);
         $type = clear_admin($type, $link);
         $query_image = " ";
-        if (file_exists("temp/tmp.jpg")) {
-            $image = imagecreatefromjpeg("temp/tmp.jpg");
-            list($width, $height) = getimagesize("temp/tmp.jpg");
-            $size = ($width<$height)?$width:$height;	
-			$x = ($width>$height)?($width-$height)/2:0;
-			$y = ($width<$height)?($height-$width)/2:0;
-			$thumb = imagecreatetruecolor(150, 150);
-			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
-            imagejpeg($thumb, '../new.jpg');
-            $path = "../new.jpg";
-            $data = file_get_contents($path);
-            $base64 = base64_encode($data);
-            $query_image = ", image = '$base64' ";
-        }
-
-        $query = "UPDATE places SET
-                    latitude = '$latitude',
-                    longitude = '$longitude',
-                    description = '$description',
-                    name = '$name',
-                    address = '$address',
-                    type = '$type'" . $query_image . "
-                        WHERE id = $place_id";
-        $res = $link->query($query);
-
-        if ($link->affected_rows > 0) {
-            if (file_exists("temp/tmp.jpg")) {
-                rename("temp/tmp.jpg", "../uploads/" . $place_id . ".jpg");
-            }            
+		
+        if ($temp_file!=false) {
+            $ext = pathinfo($temp_file, PATHINFO_EXTENSION);
+            if($ext == 'jpg' || $ext == 'jpeg'){
+				$image = imagecreatefromjpeg($temp_file);
+			}elseif($ext == 'png'){			
+				$image = imagecreatefrompng($temp_file);
+			}
             
-            $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
-            $vers = $link->query($query_version);				
-            if ($link->affected_rows > 0) {
-                $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
-            }            
-			
-            $_SESSION['answer'] = "<div class='success'>Place has been updated!</div>";
-            return true;
-        } else {
-            $_SESSION['edit_place']['res'] = "<div class='error'>Error, or you have change nothing!</div>";
-            if (file_exists("temp/tmp.jpg")) {
-                unlink("temp/tmp.jpg");
-            }
-            return false;
-        }
-    }
-}
+			if($ext == 'jpg' || $ext == 'jpeg'){
+				$exif = exif_read_data($temp_file);
 
-function add_place($link) {
-    $name = trim($_POST['name']);
-    $address = trim($_POST['address']);
-    $description = trim($_POST['description']);
-    $latitude = trim($_POST['latitude']);
-    $longitude = trim($_POST['longitude']);
-    $type = $_POST['type'];
-    if (empty($name)) {
-        $_SESSION['add_place']['res'] = "<div class='error'>Must be name!</div>";
-        $_SESSION['add_place']['description'] = $description;
-        $_SESSION['add_place']['name'] = $name;
-        $_SESSION['add_place']['address'] = $address;
-        $_SESSION['add_place']['latitude'] = $latitude;
-        $_SESSION['add_place']['longitude'] = $longitude;
-        $_SESSION['add_place']['type'] = $type;
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
-        return false;
-    } else if (empty($address)) {
-        $_SESSION['add_place']['res'] = "<div class='error'>Must be address!</div>";
-        $_SESSION['add_place']['description'] = $description;
-        $_SESSION['add_place']['name'] = $name;
-        $_SESSION['add_place']['address'] = $address;
-        $_SESSION['add_place']['latitude'] = $latitude;
-        $_SESSION['add_place']['longitude'] = $longitude;
-        $_SESSION['add_place']['type'] = $type;
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
-        return false;
-    } else if (empty($latitude)) {
-        $_SESSION['add_place']['res'] = "<div class='error'>Must be latitude!</div>";
-        $_SESSION['add_place']['description'] = $description;
-        $_SESSION['add_place']['name'] = $name;
-        $_SESSION['add_place']['address'] = $address;
-        $_SESSION['add_place']['latitude'] = $latitude;
-        $_SESSION['add_place']['longitude'] = $longitude;
-        $_SESSION['add_place']['type'] = $type;
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
-        return false;
-    } else if (empty($longitude)) {
-        $_SESSION['add_place']['res'] = "<div class='error'>Must be longitude!</div>";
-        $_SESSION['add_place']['description'] = $description;
-        $_SESSION['add_place']['name'] = $name;
-        $_SESSION['add_place']['address'] = $address;
-        $_SESSION['add_place']['latitude'] = $latitude;
-        $_SESSION['add_place']['longitude'] = $longitude;
-        $_SESSION['add_place']['type'] = $type;
-        if (file_exists("temp/tmp.jpg")) {
-            unlink("temp/tmp.jpg");
-        }
-        return false;
-    } else {
-        $description = clear_admin($description, $link);
-        $name = clear_admin($name, $link);
-        $address = clear_admin($address, $link);
-        $latitude = clear_admin($latitude, $link);
-        $longitude = clear_admin($longitude, $link);
-        $type = clear_admin($type, $link);
-        $base64 = "";
-        if (file_exists("temp/tmp.jpg")) {
-            $image = imagecreatefromjpeg("temp/tmp.jpg");
-            
-			$exif = exif_read_data("temp/tmp.jpg");
-
-			if (!empty($exif['Orientation'])) {
-				switch ($exif['Orientation']) {
-					case 2:
-						$image = image_flip($image,'horizontal');
-						break;
-					case 3:
-						$image = imagerotate($image, 180, 0);
-						break;
-					case 4:
-						$image = image_flip($image,'vertical');
-						break;
-					case 5:
-						$image = image_flip($image,'vertical');
-						$image = imagerotate($image, -90, 0);
-						break;
-					case 6:
-						$image = imagerotate($image, -90, 0);
-						break;
-					case 7:
-						$image = image_flip($image,'horizontal');
-						$image = imagerotate($image, -90, 0);
-						break;
-					case 8:
-						$image = imagerotate($image, 90, 0);
-						break;
+				if (!empty($exif['Orientation'])) {
+					switch ($exif['Orientation']) {
+						case 2:
+							$image = image_flip($image,'horizontal');
+							break;
+						case 3:
+							$image = imagerotate($image, 180, 0);
+							break;
+						case 4:
+							$image = image_flip($image,'vertical');
+							break;
+						case 5:
+							$image = image_flip($image,'vertical');
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 6:
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 7:
+							$image = image_flip($image,'horizontal');
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 8:
+							$image = imagerotate($image, 90, 0);
+							break;
+					}
 				}
 			}
 		   
@@ -240,9 +130,9 @@ function add_place($link) {
 			  
 				$resized = imagecreatetruecolor($newWidth,$newHeight);
 				imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
-				imagejpeg($resized, "temp/tmp.jpg");
-			}else{
-				imagejpeg($image, "temp/tmp.jpg");
+				$image = $resized;
+				$width = imagesx ($image);
+				$height = imagesy ($image);  
 			}
 			
             $size = ($width<$height)?$width:$height;	
@@ -250,10 +140,174 @@ function add_place($link) {
 			$y = ($width<$height)?($height-$width)/2:0;
 			$thumb = imagecreatetruecolor(150, 150);
 			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
-            imagejpeg($thumb, '../new.jpg');
-            $path = "../new.jpg";
-            $data = file_get_contents($path);
-            $base64 = base64_encode($data);
+			ob_start(); 
+				imagejpeg($thumb); 
+				$contents = ob_get_contents(); 
+			ob_end_clean(); 
+
+			$base64 = base64_encode($contents);
+            $query_image = ", image = '$base64' ";
+        }
+
+        $query = "UPDATE places SET
+                    latitude = '$latitude',
+                    longitude = '$longitude',
+                    description = '$description',
+                    name = '$name',
+                    address = '$address',
+                    type = '$type'" . $query_image . "
+                        WHERE id = $place_id";
+        $res = $link->query($query);
+
+        if ($link->affected_rows > 0) {
+			if($image!=false){
+				imagejpeg($image, "../uploads/" . $place_id . ".jpg");	
+			}
+			array_map('unlink', glob("temp/tmp.*"));			          
+            
+            $query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+            $vers = $link->query($query_version);				
+            if ($link->affected_rows > 0) {
+                $link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+            }            
+			
+            $_SESSION['answer'] = "<div class='success'>Place has been updated!</div>";
+            return true;
+        } else {
+            $_SESSION['edit_place']['res'] = "<div class='error'>Error, or you have change nothing!</div>";
+            array_map('unlink', glob("temp/tmp.*"));
+            return false;
+        }
+    }
+}
+
+function add_place($link) {
+    $name = trim($_POST['name']);
+    $address = trim($_POST['address']);
+    $description = trim($_POST['description']);
+    $latitude = trim($_POST['latitude']);
+    $longitude = trim($_POST['longitude']);
+    $type = $_POST['type'];
+	$temp_file = empty(glob('temp/tmp.*'))?false:glob('temp/tmp.*')[0];
+	$image = false;
+    if (empty($name)) {
+        $_SESSION['add_place']['res'] = "<div class='error'>Must be name!</div>";
+        $_SESSION['add_place']['description'] = $description;
+        $_SESSION['add_place']['name'] = $name;
+        $_SESSION['add_place']['address'] = $address;
+        $_SESSION['add_place']['latitude'] = $latitude;
+        $_SESSION['add_place']['longitude'] = $longitude;
+        $_SESSION['add_place']['type'] = $type;
+        array_map('unlink', glob("temp/tmp.*"));
+        return false;
+    } else if (empty($address)) {
+        $_SESSION['add_place']['res'] = "<div class='error'>Must be address!</div>";
+        $_SESSION['add_place']['description'] = $description;
+        $_SESSION['add_place']['name'] = $name;
+        $_SESSION['add_place']['address'] = $address;
+        $_SESSION['add_place']['latitude'] = $latitude;
+        $_SESSION['add_place']['longitude'] = $longitude;
+        $_SESSION['add_place']['type'] = $type;
+        array_map('unlink', glob("temp/tmp.*"));
+        return false;
+    } else if (empty($latitude)) {
+        $_SESSION['add_place']['res'] = "<div class='error'>Must be latitude!</div>";
+        $_SESSION['add_place']['description'] = $description;
+        $_SESSION['add_place']['name'] = $name;
+        $_SESSION['add_place']['address'] = $address;
+        $_SESSION['add_place']['latitude'] = $latitude;
+        $_SESSION['add_place']['longitude'] = $longitude;
+        $_SESSION['add_place']['type'] = $type;
+        array_map('unlink', glob("temp/tmp.*"));
+        return false;
+    } else if (empty($longitude)) {
+        $_SESSION['add_place']['res'] = "<div class='error'>Must be longitude!</div>";
+        $_SESSION['add_place']['description'] = $description;
+        $_SESSION['add_place']['name'] = $name;
+        $_SESSION['add_place']['address'] = $address;
+        $_SESSION['add_place']['latitude'] = $latitude;
+        $_SESSION['add_place']['longitude'] = $longitude;
+        $_SESSION['add_place']['type'] = $type;
+        array_map('unlink', glob("temp/tmp.*"));
+        return false;
+    } else {
+        $description = clear_admin($description, $link);
+        $name = clear_admin($name, $link);
+        $address = clear_admin($address, $link);
+        $latitude = clear_admin($latitude, $link);
+        $longitude = clear_admin($longitude, $link);
+        $type = clear_admin($type, $link);
+        $base64 = "";
+        if ($temp_file!=false) {
+			$ext = pathinfo($temp_file, PATHINFO_EXTENSION);
+            if($ext == 'jpg' || $ext == 'jpeg'){
+				$image = imagecreatefromjpeg($temp_file);
+			}elseif($ext == 'png'){			
+				$image = imagecreatefrompng($temp_file);
+			}
+            
+			if($ext == 'jpg' || $ext == 'jpeg'){
+				$exif = exif_read_data($temp_file);
+
+				if (!empty($exif['Orientation'])) {
+					switch ($exif['Orientation']) {
+						case 2:
+							$image = image_flip($image,'horizontal');
+							break;
+						case 3:
+							$image = imagerotate($image, 180, 0);
+							break;
+						case 4:
+							$image = image_flip($image,'vertical');
+							break;
+						case 5:
+							$image = image_flip($image,'vertical');
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 6:
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 7:
+							$image = image_flip($image,'horizontal');
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 8:
+							$image = imagerotate($image, 90, 0);
+							break;
+					}
+				}
+			}
+		   
+			$width = imagesx ($image);
+			$height = imagesy ($image);  
+
+			if($width > 800 || $height > 800){
+				if($width > $height){
+					$newWidth = 800;
+					$newHeight = ($newWidth / $width) * $height;
+				}else{
+					$newHeight = 800;	
+					$newWidth = ($newHeight / $height) * $width;			
+				}
+			  
+				$resized = imagecreatetruecolor($newWidth,$newHeight);
+				imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
+				$image = $resized;
+				$width = imagesx ($image);
+				$height = imagesy ($image);  
+			}
+			
+            $size = ($width<$height)?$width:$height;	
+			$x = ($width>$height)?($width-$height)/2:0;
+			$y = ($width<$height)?($height-$width)/2:0;
+			$thumb = imagecreatetruecolor(150, 150);
+			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
+			ob_start(); 
+				imagejpeg($thumb); 
+				$contents = ob_get_contents(); 
+			ob_end_clean(); 
+
+			$base64 = base64_encode($contents);
         }
 		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
         $vers = $link->query($query_version);				
@@ -262,15 +316,14 @@ function add_place($link) {
 			$res = $link->query($query);
 		}        
         if ($link->affected_rows > 0) {
-            if (file_exists("temp/tmp.jpg")) {
-                rename("temp/tmp.jpg", "../uploads/" . $link->insert_id . ".jpg");
-            }
+			if($image!=false){
+				imagejpeg($image, "../uploads/" . $link->insert_id . ".jpg");	
+			}
+			array_map('unlink', glob("temp/tmp.*"));			
             $_SESSION['answer'] = "<div class='success'>Place has been created!</div>";
             return true;
         } else {
-            if (file_exists("temp/tmp.jpg")) {
-                unlink("temp/tmp.jpg");
-            }
+            
             $_SESSION['add_place']['res'] = "<div class='error'>Error!</div>";
             return false;
         }
