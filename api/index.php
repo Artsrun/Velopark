@@ -5,7 +5,8 @@ require_once '../config.php';
 $link = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 function get_places($link) {
-    $local_version = $_POST["version"];
+	
+    $local_version = $link->real_escape_string(trim($_POST["version"]));
 	$status = 'failed';
     $places = array();
     if (!$local_version) {
@@ -60,7 +61,8 @@ function get_votes($link) {
     $places = array();
     $status = 'failed';
     if ($_POST["unique_id"]) {
-        $unique_id = $_POST["unique_id"];
+		
+        $unique_id = $link->real_escape_string(trim($_POST["unique_id"]));
         $query = "SELECT id as server_id, latitude, longitude, name, address, description, image, type FROM places "
                 . "WHERE status='0' AND id NOT IN "
                 . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
@@ -120,86 +122,103 @@ function image_flip($imgsrc, $mode) {
     return $imgsrc;
 }
 function add_place($link) {
-    $unique_id = $_POST['device_id'];
-	$status = 'failed';
-    $latitude = $link->real_escape_string(trim($_POST['lat']));
-    $longitude = $link->real_escape_string(trim($_POST['long']));
-    $name = $link->real_escape_string(trim($_POST['name']));
-    $desc = $link->real_escape_string(trim($_POST['desc']));
-    $address = $link->real_escape_string(trim($_POST['address']));
-    $type = $link->real_escape_string(trim($_POST['type']));
-	
-    $image = imagecreatefromjpeg($_FILES["file"]["tmp_name"]);
-	
-	$exif = exif_read_data($_FILES["file"]["tmp_name"]);
-
-    if (!empty($exif['Orientation'])) {
-        switch ($exif['Orientation']) {
-            case 2:
-				$image = image_flip($image,'horizontal');
-                break;
-			case 3:
-                $image = imagerotate($image, 180, 0);
-                break;
-			case 4:
-				$image = image_flip($image,'vertical');
-                break;
-			case 5:
-				$image = image_flip($image,'vertical');
-				$image = imagerotate($image, -90, 0);
-                break;
-            case 6:
-				$image = imagerotate($image, -90, 0);
-                break;
-			case 7:
-				$image = image_flip($image,'horizontal');
-				$image = imagerotate($image, -90, 0);
-                break;
-            case 8:
-                $image = imagerotate($image, 90, 0);
-                break;
-        }
-    }
-   
-	$width = imagesx ($image);
-	$height = imagesy ($image);  
-
-	if($width > 800 || $height > 800){
-		if($width > $height){
-			$newWidth = 800;
-			$newHeight = ($newWidth / $width) * $height;
-		}else{
-			$newHeight = 800;	
-			$newWidth = ($newHeight / $height) * $width;			
-		}
-	  
-		$resized = imagecreatetruecolor($newWidth,$newHeight);
-		imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
-		imagejpeg($resized, $_FILES["file"]["tmp_name"]);
-	}else{
-		imagejpeg($image, $_FILES["file"]["tmp_name"]);
-	}
-	
-	$size = ($width<$height)?$width:$height;	
-	$x = ($width>$height)?($width-$height)/2:0;
-	$y = ($width<$height)?($height-$width)/2:0;
-	$thumb = imagecreatetruecolor(150, 150);
-	imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
-    imagejpeg($thumb, '../new.jpg');
-    $path = "../new.jpg";
-    $data = file_get_contents($path);
-    $base64 = base64_encode($data);
-    $query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
     
-	$result = $link->query($query);
-    if ($result != false) {
-		if ($link->affected_rows > 0) {
-			$id = $link->insert_id;
-			move_uploaded_file($_FILES["file"]["tmp_name"], "../uploads/" . $id . ".jpg");
-			$query_vote = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $id . ", '" . $unique_id . "', '2') ";
-			$result = $link->query($query_vote);			
-			$status = 'success';
-		}		
+	$status = 'failed';
+
+	$file_info = new finfo(FILEINFO_MIME_TYPE);
+	$mime_type = $file_info->buffer(file_get_contents($_FILES["file"]['tmp_name']));
+
+	if($mime_type == 'image/jpeg' || $mime_type == 'image/png'){
+		
+		$unique_id = $link->real_escape_string(trim($_POST['device_id']));
+		$latitude = $link->real_escape_string(trim($_POST['lat']));
+		$longitude = $link->real_escape_string(trim($_POST['long']));
+		$name = $link->real_escape_string(trim($_POST['name']));
+		$desc = $link->real_escape_string(trim($_POST['desc']));
+		$address = $link->real_escape_string(trim($_POST['address']));
+		$type = $link->real_escape_string(trim($_POST['type']));
+		
+		if($mime_type == 'image/jpeg'){
+			$image = imagecreatefromjpeg($_FILES["file"]["tmp_name"]);
+		}elseif($mime_type == 'image/png'){			
+			$image = imagecreatefrompng($_FILES["file"]["tmp_name"]);
+		}
+		
+		if($mime_type == 'image/jpeg'){
+			$exif = exif_read_data($_FILES["file"]["tmp_name"]);
+
+			if (!empty($exif['Orientation'])) {
+				switch ($exif['Orientation']) {
+					case 2:
+						$image = image_flip($image,'horizontal');
+						break;
+					case 3:
+						$image = imagerotate($image, 180, 0);
+						break;
+					case 4:
+						$image = image_flip($image,'vertical');
+						break;
+					case 5:
+						$image = image_flip($image,'vertical');
+						$image = imagerotate($image, -90, 0);
+						break;
+					case 6:
+						$image = imagerotate($image, -90, 0);
+						break;
+					case 7:
+						$image = image_flip($image,'horizontal');
+						$image = imagerotate($image, -90, 0);
+						break;
+					case 8:
+						$image = imagerotate($image, 90, 0);
+						break;
+				}
+			}
+		}
+   	    $width = imagesx ($image);
+		$height = imagesy ($image);  
+
+		if($width > 800 || $height > 800){
+			if($width > $height){
+				$newWidth = 800;
+				$newHeight = ($newWidth / $width) * $height;
+			}else{
+				$newHeight = 800;	
+				$newWidth = ($newHeight / $height) * $width;			
+			}
+		  
+			$resized = imagecreatetruecolor($newWidth,$newHeight);
+			imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
+			$image = $resized;
+			$width = imagesx ($image);
+			$height = imagesy ($image);  
+		}
+		
+		$size = ($width<$height)?$width:$height;	
+		$x = ($width>$height)?($width-$height)/2:0;
+		$y = ($width<$height)?($height-$width)/2:0;
+		$thumb = imagecreatetruecolor(150, 150);
+		imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
+		
+		ob_start(); 
+			imagejpeg($thumb); 
+			$contents = ob_get_contents(); 
+		ob_end_clean(); 
+
+		$base64 = base64_encode($contents);
+		
+		$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
+		
+		$result = $link->query($query);
+		if ($result != false) {
+			if ($link->affected_rows > 0) {
+				$id = $link->insert_id;
+				imagejpeg($image, "../uploads/" . $id . ".jpg");				
+				$query_vote = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $id . ", '" . $unique_id . "', '2') ";
+				$result = $link->query($query_vote);			
+				$status = 'success';
+			}		
+		}
 	}
 	
 	echo json_encode([
@@ -212,8 +231,8 @@ function add_place($link) {
 function add_vote($link) {
     $votes = array();
 	$status = 'failed';
-    $unique_id = $_POST['device_id'];
-    $place_id = abs((int) $_POST["place_id"]);
+    $unique_id = $link->real_escape_string(trim($_POST['device_id']));	
+    $place_id = abs((int) $link->real_escape_string(trim($_POST["place_id"])));
     $vote = $link->real_escape_string(trim($_POST["vote"]));
     $query = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $place_id . ", '" . $unique_id . "', '" . $vote . "')";
     $result = $link->query($query);
