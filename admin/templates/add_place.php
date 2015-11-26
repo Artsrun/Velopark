@@ -31,6 +31,12 @@
                 <td>Longitude</td>
                 <td><input class="head-text" type="text" name="longitude" value="<?php if(isset($_SESSION['add_place']['longitude'])) echo $_SESSION['add_place']['longitude']; ?>" /></td>
             </tr>
+			<tr>
+                <td>Map</td>
+                <td>	
+					<div id="google-map" style="height: 250px;width: 450px;"></div>
+				</td>
+            </tr>
             <tr>
                 <td>Type</td>
                 <td>
@@ -56,6 +62,9 @@
 <?php unset($_SESSION['add_place']); ?>
 </div> 
 </div> 
-</div> 
+</div>
+<script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=<?=MAP_API_KEY?>&callback=initMap">
+</script>
 </body>
 </html>

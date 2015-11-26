@@ -153,6 +153,33 @@ header .green-menu{
     transform-style: preserve-3d;
 }
 
+/*html.ios.ios-keyboard-fix header {
+    display:none;
+}*/
+html.ios.ios-keyboard-fix .page.active{
+    padding:0 !important;
+}
+
+.arr-ios-back{
+    display:none;
+}
+html.ios.ios-keyboard-fix  .arr-ios-back{
+    background-image:url(../img/arr_back_green.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size:contain;
+    display:block;
+   width: 10%;
+    margin-top: 5%;
+    position: absolute;
+    right: 5%;
+}
+
+.arr-ios-back:before{
+    content:'';
+    padding-top:100%;
+    display:block;
+}
 
 header .logo{
     position: absolute;
@@ -653,7 +680,7 @@ html.ios footer .footer-image{
     margin: 5% 0 8px 0;
     display: block;
     position: relative;
-/*    overflow: hidden;*/
+    /*    overflow: hidden;*/
 }
 .add-src{
     width:100%;
@@ -664,7 +691,7 @@ html.ios footer .footer-image{
     background-position: center center;
     -webkit-border-radius:3px;
     border-radius: 3px;
-   
+
 }
 .add-src-cont.chooseLoader{
     background-image: url(../img/ajax_loader.gif) !important;
@@ -1269,7 +1296,7 @@ input.error, textarea.error{
 }
 
 .poweredBy{
-    width: 20%;
+    width: 25%;
     display: block;
     /*    max-width: 200px; WT*/
     margin: 0 auto;

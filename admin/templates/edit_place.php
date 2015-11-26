@@ -52,10 +52,10 @@
             </tr>
 			<tr>
                 <td>Map</td>
-                <td>					
-					<iframe  width="450"  height="250"  frameborder="0" style="border:0"  src="https://www.google.com/maps/embed/v1/place?zoom=18&key=<?=MAP_API_KEY?>&q=<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>" allowfullscreen></iframe>					
-					<br />					
-					<a href='https://www.google.com/maps/place/<?= htmlspecialchars($get_place['latitude']) ?>+<?= htmlspecialchars($get_place['longitude']) ?>/@<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>,18z' target='_blank'>View on google maps</a>					
+                <td>	
+					<div id="google-map" style="height: 250px;width: 450px;"></div>
+					<br />
+					<a href='https://www.google.com/maps/place/<?= htmlspecialchars($get_place['latitude']) ?>+<?= htmlspecialchars($get_place['longitude']) ?>/@<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>,18z' target='_blank'>View on google maps</a>
 				</td>
             </tr>
 			
@@ -93,6 +93,9 @@
 
 </div> 
 </div> 
-</div> 
+</div>
+<script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=<?=MAP_API_KEY?>&callback=initMap">
+</script>
 </body>
 </html>

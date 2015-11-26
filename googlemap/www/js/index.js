@@ -3,7 +3,7 @@ var DEBUG = false;
 if (DEBUG) {
     device = {};
     device.uuid = '5465sdfsdf46';
-    device.platform = 'android';
+    device.platform = 'IOS';
     device.version = '5.3.1';
     device.model = 'debug';
 }
@@ -208,7 +208,14 @@ var app = {
         $('#' + pageId).removeClass('hidden').addClass('active');
         $('html').attr('data-active', pageId);
         app.setLocationHash(pageId);
-        window.scrollTo(0, 0);
+        if ($('html').hasClass('oldAndroid')) {
+            window.scrollTo(0, 0);
+        } else {
+            $('#' + pageId + ' .wrapper').animate({
+                scrollTop: 0
+            }, 0);
+        }
+
         if (pageId == 'main' || pageId == 'add_places') {
             app.gpsStart();
         } else {
@@ -324,8 +331,8 @@ var app = {
         } else {
             var options = new FileUploadOptions();
             options.fileKey = "file";
-            options.fileName = "name.jpg";
-            options.mimeType = "image/jpeg";
+            //options.fileName = "name.jpg";
+            //options.mimeType = "image/jpeg";
 
             var params = {};
             params.device_id = device.uuid;
@@ -344,15 +351,22 @@ var app = {
             addLoader('#add_places');
 
             ft.upload(image, encodeURI(app.apiURL),
-                    function () {
+                    function (data) {
                         removeLoader('#add_places');
-                        if (app.getActivePage() === 'add_places') {
-                            app.goToPage('main');
+                        var response = JSON.parse(data.response);                       
+                        if (response.status == 'success') {
+                            if (app.getActivePage() == 'add_places') {
+                                app.goToPage('main');
+                            }
+                        } else {
+                            if (app.getActivePage() == 'add_places') {
+                                app.notification('Oops', 'Something went wrong', 'Close', null);
+                            }
                         }
                     },
                     function () {
                         removeLoader('#add_places');
-                        if (app.getActivePage() === 'add_places') {
+                        if (app.getActivePage() ==  'add_places') {
                             app.notification('Oops', 'Something went wrong', 'Close', null);
                         }
                     }, options);
@@ -382,7 +396,7 @@ var app = {
                 output += "<p>Name</p><p class='cont'>" + places[i].name + "</p><p>Address</p><p class='cont'>" + places[i].address + "</p>";
                 output += "</div>";
                 if (places[i].description) {
-                    output += "<p>Notes</p><p class='cont'>" + places[i].description + "</p>";
+                    output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
                 output += "<div style='height:" + wrapper_height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
                 output += "<div class='new_place_icon_wrap'><img  class='new_place_icon accept' data-value='1' src='img/add_place.png' /><img  src='img/new_place.png'class='new_place_icon decline' data-value='0'/></div>";
@@ -660,13 +674,23 @@ var app = {
 
             if ($('html').hasClass('ios')) {
                 $(document).on('focus', 'input, textarea', function () {
+                    $('header').hide();
                     $('html').addClass('ios-keyboard-fix');
                 });
-                $(document).on('blur', 'input, textarea', function () {
-                    $('html').removeClass('ios-keyboard-fix');
+                $(document).on('blur', 'input, textarea', function (e) {
+                        $('html').removeClass('ios-keyboard-fix');
+                        $('header').show();
                 });
             }
 
+            $('.arr-ios-back').on('touchstart mousedown', function () {
+                $('header').show();
+                $('header')[0].offsetHeight;
+                $('html').removeClass('ios-keyboard-fix');
+                app.goToPage('main');
+                return false;
+            });
+            
             $(".arr-wrapper").on('click', function () {
                 if ($(this).hasClass('arr_back')) {
                     app.goToPage('main');

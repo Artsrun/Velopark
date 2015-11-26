@@ -38,7 +38,7 @@
     <splash density="port-ldpi" src="res/android/splash/screen-ldpi-portrait.9.png" />
     <splash density="port-mdpi" src="res/android/splash/screen-mdpi-portrait.9.png" />
     <splash density="port-xhdpi" src="res/android/splash/screen-xhdpi-portrait.9.png" />
-    <splash density="port-xxhdpi" src="res/andriod/splash/screen-xxhdpi-portrait.9.png" />
+    <splash density="port-xxhdpi" src="res/android/splash/screen-xxhdpi-portrait.9.png" />
     <splash density="port-xxxhdpi" src="res/android/splash/screen-xxxhdpi-portrait.9.png" />
     <name>Velopark</name>
     <description>
