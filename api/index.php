@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('UTC');
 require_once '../config.php';
 
 $link = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
@@ -125,9 +125,14 @@ function add_place($link) {
     
 	$status = 'failed';
 
-	$file_info = new finfo(FILEINFO_MIME_TYPE);
-	$mime_type = $file_info->buffer(file_get_contents($_FILES["file"]['tmp_name']));
-
+	$image_data = getimagesize($_FILES["file"]['tmp_name']);
+	$mime_type = ($image_data!=false)?$image_data['mime']:false;
+	file_put_contents('log.txt',"PLACE NAME-".$link->real_escape_string(trim($_POST['name'])).PHP_EOL, FILE_APPEND); //remove
+	file_put_contents('log.txt',"DATE-".date("Y-m-d H:i:s").PHP_EOL, FILE_APPEND); //remove
+	file_put_contents('log.txt',"FILES ARRAY-".serialize($_FILES).PHP_EOL, FILE_APPEND);//remove
+	file_put_contents('log.txt',"MIME-".$mime_type.PHP_EOL, FILE_APPEND);//remove
+	file_put_contents('log.txt',"FILE SIZE-".filesize($_FILES["file"]['tmp_name']).PHP_EOL, FILE_APPEND);//remove	
+	file_put_contents('log.txt',"INITIAL SIZE-".$image_data[3].PHP_EOL, FILE_APPEND);//remove
 	if($mime_type == 'image/jpeg' || $mime_type == 'image/png'){
 		
 		$unique_id = $link->real_escape_string(trim($_POST['device_id']));
@@ -143,11 +148,13 @@ function add_place($link) {
 		}elseif($mime_type == 'image/png'){			
 			$image = imagecreatefrompng($_FILES["file"]["tmp_name"]);
 		}
-		
+		file_put_contents('log.txt',"OPEN FILE SIZE-".imagesx ($image).'x'.imagesy ($image).PHP_EOL, FILE_APPEND);//remove
 		if($mime_type == 'image/jpeg'){
+			file_put_contents('log.txt',"ENTER ROTATE".PHP_EOL, FILE_APPEND);//remove
 			$exif = exif_read_data($_FILES["file"]["tmp_name"]);
 
 			if (!empty($exif['Orientation'])) {
+				file_put_contents('log.txt',"READ EXIF DATA".PHP_EOL, FILE_APPEND);//remove
 				switch ($exif['Orientation']) {
 					case 2:
 						$image = image_flip($image,'horizontal');
@@ -173,12 +180,14 @@ function add_place($link) {
 						$image = imagerotate($image, 90, 0);
 						break;
 				}
+				file_put_contents('log.txt','ROTATED WITH CODE-'.$exif['Orientation'].PHP_EOL, FILE_APPEND);//remove
 			}
 		}
    	    $width = imagesx ($image);
 		$height = imagesy ($image);  
 
 		if($width > 800 || $height > 800){
+			file_put_contents('log.txt','ENTER RESIZE'.PHP_EOL, FILE_APPEND);//remove
 			if($width > $height){
 				$newWidth = 800;
 				$newHeight = ($newWidth / $width) * $height;
@@ -190,6 +199,7 @@ function add_place($link) {
 			$resized = imagecreatetruecolor($newWidth,$newHeight);
 			imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
 			$image = $resized;
+			file_put_contents('log.txt','RESIZED'.PHP_EOL, FILE_APPEND);//remove
 			$width = imagesx ($image);
 			$height = imagesy ($image);  
 		}
@@ -206,17 +216,19 @@ function add_place($link) {
 		ob_end_clean(); 
 
 		$base64 = base64_encode($contents);
-		
+		file_put_contents('log.txt','THUMB CREATED'.PHP_EOL, FILE_APPEND);//remove
 		$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
 		
 		$result = $link->query($query);
 		if ($result != false) {
 			if ($link->affected_rows > 0) {
 				$id = $link->insert_id;
-				imagejpeg($image, "../uploads/" . $id . ".jpg");				
+				imagejpeg($image, "../uploads/" . $id . ".jpg");
+				file_put_contents('log.txt','BIG IMAGE CREATED'.PHP_EOL, FILE_APPEND);//remove
 				$query_vote = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $id . ", '" . $unique_id . "', '2') ";
 				$result = $link->query($query_vote);			
 				$status = 'success';
+				file_put_contents('log.txt','DONE'.PHP_EOL.'*************************************************************'.PHP_EOL, FILE_APPEND);//remove
 			}		
 		}
 	}
