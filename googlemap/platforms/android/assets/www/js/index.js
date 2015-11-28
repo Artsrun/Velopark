@@ -3,7 +3,7 @@ var DEBUG = false;
 if (DEBUG) {
     device = {};
     device.uuid = '5465sdfsdf46';
-    device.platform = 'IOS';
+    device.platform = 'ios';
     device.version = '5.3.1';
     device.model = 'debug';
 }
@@ -353,7 +353,7 @@ var app = {
             ft.upload(image, encodeURI(app.apiURL),
                     function (data) {
                         removeLoader('#add_places');
-                        var response = JSON.parse(data.response);                       
+                        var response = JSON.parse(data.response);
                         if (response.status == 'success') {
                             if (app.getActivePage() == 'add_places') {
                                 app.goToPage('main');
@@ -366,7 +366,7 @@ var app = {
                     },
                     function () {
                         removeLoader('#add_places');
-                        if (app.getActivePage() ==  'add_places') {
+                        if (app.getActivePage() == 'add_places') {
                             app.notification('Oops', 'Something went wrong', 'Close', null);
                         }
                     }, options);
@@ -399,7 +399,7 @@ var app = {
                     output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
                 output += "<div style='height:" + wrapper_height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
-                output += "<div class='new_place_icon_wrap'><img  class='new_place_icon accept' data-value='1' src='img/add_place.png' /><img  src='img/new_place.png'class='new_place_icon decline' data-value='0'/></div>";
+                output += "<div class='new_place_icon_wrap'><a href='javascript:void(0);' class='new_place_icon accept' data-value='1' ><img  src='img/add_place.png'  alt='' /></a><a href='javascript:void(0);' class='new_place_icon decline' data-value='0' ><img  src='img/new_place.png' alt='' /></a></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
 
@@ -673,24 +673,29 @@ var app = {
             this.firstLoad = false;
 
             if ($('html').hasClass('ios')) {
+                $(document).on('touchstart', function (e) {
+                    if ($(e.target).prop("tagName").toLowerCase() != 'input' && $(e.target).prop("tagName").toLowerCase() != 'textarea' && $('input,textarea').is(':focus')) {
+                        $('input,textarea').trigger('blur');
+                        return false;
+                    }
+                });
                 $(document).on('focus', 'input, textarea', function () {
                     $('header').hide();
                     $('html').addClass('ios-keyboard-fix');
                 });
                 $(document).on('blur', 'input, textarea', function (e) {
-                        $('html').removeClass('ios-keyboard-fix');
-                        $('header').show();
+                    $('html').removeClass('ios-keyboard-fix');
+                    $('header').show();
                 });
             }
 
-            $('.arr-ios-back').on('touchstart mousedown', function () {
-                $('header').show();
-                $('header')[0].offsetHeight;
-                $('html').removeClass('ios-keyboard-fix');
-                app.goToPage('main');
-                return false;
-            });
-            
+//            $('.arr-ios-back').on('click', function (e) {
+//                $('html').removeClass('ios-keyboard-fix');
+//                $('header').show();
+//                $('input,textarea').trigger('blur');
+//                return false;
+//            });
+
             $(".arr-wrapper").on('click', function () {
                 if ($(this).hasClass('arr_back')) {
                     app.goToPage('main');
@@ -721,8 +726,9 @@ var app = {
                 $(".arr-wrapper").addClass("arr_down");
                 return false;
             });
-            $(document).on("click touchend", function (e) {
+            $(document).on("click", function (e) {
                 if (!$(e.target).hasClass('menu') && $(e.target).parents('.menu').length == 0) {
+                    //alert($('.menu').hasClass('active'))
                     if ($('.menu').hasClass('active')) {
                         fadeOut('.menu', function () {
                             $(".menu").removeClass('active');
@@ -874,7 +880,7 @@ var app = {
                             }, 0);
                         }, function () {
                             app.cameraError(samePage);
-                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.NATIVE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
+                        }, {quality: 75, sourceType: Camera.PictureSourceType.PHOTOLIBRARY, destinationType: Camera.DestinationType.FILE_URI, encodingType: Camera.EncodingType.JPEG, targetWidth: 800, targetHeight: 800, correctOrientation: true});
                     } else {
                         if (samePage == false) {
                             app.goToPage('main');
@@ -1009,7 +1015,7 @@ var app = {
         $(".add-address").val('');
 
         if (fromGallery) {
-            if ($('html').hasClass('oldAndroid')) {
+            if ($('html').hasClass('oldAndroid') || typeof window.FileReader == 'undefined') {
                 setImage(imageURI);
                 getCurrrentLocation();
             } else {
