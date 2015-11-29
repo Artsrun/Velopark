@@ -24,7 +24,7 @@ var app = {
     firstLoad: true,
     defaultType: 'parking',
     onlineStatus: '',
-    gMapApiKey: 'AIzaSyBiXhsB_EDoECMR_bJiRSGnRllbLQPAeXA', // 'AIzaSyBSTzxHlrxgWyu3k59l4nf-c6kfuDf1D-U',
+    gMapApiKey: 'AIzaSyBSTzxHlrxgWyu3k59l4nf-c6kfuDf1D-U', // 'AIzaSyBSTzxHlrxgWyu3k59l4nf-c6kfuDf1D-U',
     defaultLocation: {
         latitude: 40.1778541,
         longitude: 44.5136349
