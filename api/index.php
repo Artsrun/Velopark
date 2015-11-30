@@ -125,8 +125,9 @@ function add_place($link) {
     
 	$status = 'failed';
 
-	$image_data = getimagesize($_FILES["file"]['tmp_name']);
-	$mime_type = ($image_data!=false)?$image_data['mime']:false;
+	$image_data = @getimagesize($_FILES["file"]['tmp_name']);
+	$mime_type = (!empty($image_data['mime']))?$image_data['mime']:false;
+	
 	file_put_contents('log.txt',"PLACE NAME-".$link->real_escape_string(trim($_POST['name'])).PHP_EOL, FILE_APPEND); //remove
 	file_put_contents('log.txt',"DATE-".date("Y-m-d H:i:s").PHP_EOL, FILE_APPEND); //remove
 	file_put_contents('log.txt',"FILES ARRAY-".serialize($_FILES).PHP_EOL, FILE_APPEND);//remove
@@ -135,101 +136,104 @@ function add_place($link) {
 	file_put_contents('log.txt',"INITIAL SIZE-".$image_data[3].PHP_EOL, FILE_APPEND);//remove
 	if($mime_type == 'image/jpeg' || $mime_type == 'image/png'){
 		
-		$unique_id = $link->real_escape_string(trim($_POST['device_id']));
-		$latitude = $link->real_escape_string(trim($_POST['lat']));
-		$longitude = $link->real_escape_string(trim($_POST['long']));
-		$name = $link->real_escape_string(trim($_POST['name']));
-		$desc = $link->real_escape_string(trim($_POST['desc']));
-		$address = $link->real_escape_string(trim($_POST['address']));
-		$type = $link->real_escape_string(trim($_POST['type']));
-		
 		if($mime_type == 'image/jpeg'){
-			$image = imagecreatefromjpeg($_FILES["file"]["tmp_name"]);
+			$image = @imagecreatefromjpeg($_FILES["file"]["tmp_name"]);
 		}elseif($mime_type == 'image/png'){			
-			$image = imagecreatefrompng($_FILES["file"]["tmp_name"]);
+			$image = @imagecreatefrompng($_FILES["file"]["tmp_name"]);
 		}
-		file_put_contents('log.txt',"OPEN FILE SIZE-".imagesx ($image).'x'.imagesy ($image).PHP_EOL, FILE_APPEND);//remove
-		if($mime_type == 'image/jpeg'){
-			file_put_contents('log.txt',"ENTER ROTATE".PHP_EOL, FILE_APPEND);//remove
-			$exif = exif_read_data($_FILES["file"]["tmp_name"]);
+		if($image != false){
+			$unique_id = $link->real_escape_string(trim($_POST['device_id']));
+			$latitude = $link->real_escape_string(trim($_POST['lat']));
+			$longitude = $link->real_escape_string(trim($_POST['long']));
+			$name = $link->real_escape_string(trim($_POST['name']));
+			$desc = $link->real_escape_string(trim($_POST['desc']));
+			$address = $link->real_escape_string(trim($_POST['address']));
+			$type = $link->real_escape_string(trim($_POST['type']));
+			
+			file_put_contents('log.txt',"OPEN FILE SIZE-".imagesx ($image).'x'.imagesy ($image).PHP_EOL, FILE_APPEND);//remove
+			if($mime_type == 'image/jpeg'){
+				file_put_contents('log.txt',"ENTER ROTATE".PHP_EOL, FILE_APPEND);//remove
+				$exif = @exif_read_data($_FILES["file"]["tmp_name"]);
 
-			if (!empty($exif['Orientation'])) {
-				file_put_contents('log.txt',"READ EXIF DATA".PHP_EOL, FILE_APPEND);//remove
-				switch ($exif['Orientation']) {
-					case 2:
-						$image = image_flip($image,'horizontal');
-						break;
-					case 3:
-						$image = imagerotate($image, 180, 0);
-						break;
-					case 4:
-						$image = image_flip($image,'vertical');
-						break;
-					case 5:
-						$image = image_flip($image,'vertical');
-						$image = imagerotate($image, -90, 0);
-						break;
-					case 6:
-						$image = imagerotate($image, -90, 0);
-						break;
-					case 7:
-						$image = image_flip($image,'horizontal');
-						$image = imagerotate($image, -90, 0);
-						break;
-					case 8:
-						$image = imagerotate($image, 90, 0);
-						break;
+				if (!empty($exif['Orientation'])) {
+					file_put_contents('log.txt',"READ EXIF DATA".PHP_EOL, FILE_APPEND);//remove
+					switch ($exif['Orientation']) {
+						case 2:
+							$image = image_flip($image,'horizontal');
+							break;
+						case 3:
+							$image = imagerotate($image, 180, 0);
+							break;
+						case 4:
+							$image = image_flip($image,'vertical');
+							break;
+						case 5:
+							$image = image_flip($image,'vertical');
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 6:
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 7:
+							$image = image_flip($image,'horizontal');
+							$image = imagerotate($image, -90, 0);
+							break;
+						case 8:
+							$image = imagerotate($image, 90, 0);
+							break;
+					}
+					file_put_contents('log.txt','ROTATED WITH CODE-'.$exif['Orientation'].PHP_EOL, FILE_APPEND);//remove
 				}
-				file_put_contents('log.txt','ROTATED WITH CODE-'.$exif['Orientation'].PHP_EOL, FILE_APPEND);//remove
 			}
-		}
-   	    $width = imagesx ($image);
-		$height = imagesy ($image);  
-
-		if($width > 800 || $height > 800){
-			file_put_contents('log.txt','ENTER RESIZE'.PHP_EOL, FILE_APPEND);//remove
-			if($width > $height){
-				$newWidth = 800;
-				$newHeight = ($newWidth / $width) * $height;
-			}else{
-				$newHeight = 800;	
-				$newWidth = ($newHeight / $height) * $width;			
-			}
-		  
-			$resized = imagecreatetruecolor($newWidth,$newHeight);
-			imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
-			$image = $resized;
-			file_put_contents('log.txt','RESIZED'.PHP_EOL, FILE_APPEND);//remove
 			$width = imagesx ($image);
 			$height = imagesy ($image);  
-		}
-		
-		$size = ($width<$height)?$width:$height;	
-		$x = ($width>$height)?($width-$height)/2:0;
-		$y = ($width<$height)?($height-$width)/2:0;
-		$thumb = imagecreatetruecolor(150, 150);
-		imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
-		
-		ob_start(); 
-			imagejpeg($thumb); 
-			$contents = ob_get_contents(); 
-		ob_end_clean(); 
 
-		$base64 = base64_encode($contents);
-		file_put_contents('log.txt','THUMB CREATED'.PHP_EOL, FILE_APPEND);//remove
-		$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
-		
-		$result = $link->query($query);
-		if ($result != false) {
-			if ($link->affected_rows > 0) {
-				$id = $link->insert_id;
-				imagejpeg($image, "../uploads/" . $id . ".jpg");
-				file_put_contents('log.txt','BIG IMAGE CREATED'.PHP_EOL, FILE_APPEND);//remove
-				$query_vote = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $id . ", '" . $unique_id . "', '2') ";
-				$result = $link->query($query_vote);			
-				$status = 'success';
-				file_put_contents('log.txt','DONE'.PHP_EOL.'*************************************************************'.PHP_EOL, FILE_APPEND);//remove
-			}		
+			if($width > 800 || $height > 800){
+				file_put_contents('log.txt','ENTER RESIZE'.PHP_EOL, FILE_APPEND);//remove
+				if($width > $height){
+					$newWidth = 800;
+					$newHeight = ($newWidth / $width) * $height;
+				}else{
+					$newHeight = 800;	
+					$newWidth = ($newHeight / $height) * $width;			
+				}
+			  
+				$resized = imagecreatetruecolor($newWidth,$newHeight);
+				imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
+				$image = $resized;
+				file_put_contents('log.txt','RESIZED'.PHP_EOL, FILE_APPEND);//remove
+				$width = imagesx ($image);
+				$height = imagesy ($image);  
+			}
+			
+			$size = ($width<$height)?$width:$height;	
+			$x = ($width>$height)?($width-$height)/2:0;
+			$y = ($width<$height)?($height-$width)/2:0;
+			$thumb = imagecreatetruecolor(150, 150);
+			imagecopyresampled($thumb, $image, 0, 0, $x, $y, 150, 150, $size, $size);	
+			
+			ob_start(); 
+				imagejpeg($thumb); 
+				$contents = ob_get_contents(); 
+			ob_end_clean(); 
+
+			$base64 = @base64_encode($contents);
+			$base64 = ($base64 == false) ? '' : $base64;
+			file_put_contents('log.txt','THUMB CREATED'.PHP_EOL, FILE_APPEND);//remove
+			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
+			
+			$result = $link->query($query);
+			if ($result != false) {
+				if ($link->affected_rows > 0) {
+					$id = $link->insert_id;
+					imagejpeg($image, "../uploads/" . $id . ".jpg");
+					file_put_contents('log.txt','BIG IMAGE CREATED'.PHP_EOL, FILE_APPEND);//remove
+					$query_vote = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $id . ", '" . $unique_id . "', '2') ";
+					$result = $link->query($query_vote);			
+					$status = 'success';
+					file_put_contents('log.txt','DONE'.PHP_EOL.'*************************************************************'.PHP_EOL, FILE_APPEND);//remove
+				}		
+			}
 		}
 	}
 	
