@@ -435,6 +435,10 @@ ul.menu_list img{
     -webkit-overflow-scrolling: touch;
 }
 
+#new_places .wrapper{
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+}
 html.oldAndroid[data-active="main"] header{
     position:absolute;
 }
@@ -592,6 +596,7 @@ footer .footer-info p.desc{
     margin: 0 0 0 5%;
     background-position: center center;
     background-image: url(../img/foot_icon_parking.png);
+    background-repeat: no-repeat;
     background-size: cover;    
     display:inline-block;
 }
@@ -1231,7 +1236,7 @@ html.offline #add_places .wrapper, html.offline #new_places .wrapper{
 
 .loading {
     position:relative;
-    overflow: hidden;
+/*    overflow: hidden;*/
 }
 .page.loading .wrapper{
     overflow: hidden;
