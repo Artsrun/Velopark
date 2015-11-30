@@ -9,10 +9,6 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
-    <!-- Allow tel: links to open the dialer -->
-    <allow-intent href="mailto:*" />
-    <!-- Allow links to example.com to open in a browser -->
-    <allow-intent href="http://aparg.com/*" launch-external="yes"/>
     <platform name="android">
         <icon src="res/android/icons/ldpi.png" density="ldpi" />
         <icon src="res/android/icons/mdpi.png" density="mdpi" />

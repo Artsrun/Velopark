@@ -353,6 +353,7 @@ var app = {
             ft.upload(image, encodeURI(app.apiURL),
                     function (data) {
                         removeLoader('#add_places');
+                        var response;
                         try {
                             response = JSON.parse(data.response)
                         } catch (e) {
@@ -520,7 +521,7 @@ var app = {
             data: {
                 action: "get_version",
                 device_id: device.uuid,
-                platform:  app.platform,
+                platform: app.platform,
                 model: device.model,
                 version: device.version
             },
@@ -638,7 +639,7 @@ var app = {
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
         /* hide splashscreen when map loaded */
-        google.maps.event.addListenerOnce(app.map, 'idle', function () {
+        google.maps.event.addListenerOnce(app.map, 'tilesloaded', function () {
             if (navigator.splashscreen) {
                 navigator.splashscreen.hide();
             }
@@ -648,8 +649,8 @@ var app = {
             }
             app.setLocationHash('gmapfix');
             app.setLocationHash(app.getActivePage());
-
         });
+
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
             app.closeInfoWindow();
@@ -892,7 +893,7 @@ var app = {
         $("#map-canvas").html("");
         var script_tag = document.createElement('script');
         script_tag.setAttribute("type", "text/javascript");
-        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3&key=" + this.gMapApiKey + "&language=en&callback=app.start");
+        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3.22&key=" + this.gMapApiKey + "&language=en&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
     selectPlaces: function (type) {

@@ -1,5 +1,5 @@
 /* MAIN APP CLASS */
-var DEBUG = true;
+var DEBUG = false;
 if (DEBUG) {
     device = {};
     device.uuid = '5465sdfsdf46';
