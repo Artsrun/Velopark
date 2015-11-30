@@ -66,7 +66,7 @@ function get_votes($link) {
         $query = "SELECT id as server_id, latitude, longitude, name, address, description, image, type FROM places "
                 . "WHERE status='0' AND id NOT IN "
                 . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
-                . "WHERE votes.device_id = '" . $unique_id . "') ORDER BY id DESC";
+                . "WHERE votes.device_id = '" . $unique_id . "') ORDER BY id DESC LIMIT 0, 10";
         $result = $link->query($query);
 		if ($result != false) {
 			if ($result->num_rows > 0) {
@@ -128,12 +128,6 @@ function add_place($link) {
 	$image_data = @getimagesize($_FILES["file"]['tmp_name']);
 	$mime_type = (!empty($image_data['mime']))?$image_data['mime']:false;
 	
-	file_put_contents('log.txt',"PLACE NAME-".$link->real_escape_string(trim($_POST['name'])).PHP_EOL, FILE_APPEND); //remove
-	file_put_contents('log.txt',"DATE-".date("Y-m-d H:i:s").PHP_EOL, FILE_APPEND); //remove
-	file_put_contents('log.txt',"FILES ARRAY-".serialize($_FILES).PHP_EOL, FILE_APPEND);//remove
-	file_put_contents('log.txt',"MIME-".$mime_type.PHP_EOL, FILE_APPEND);//remove
-	file_put_contents('log.txt',"FILE SIZE-".filesize($_FILES["file"]['tmp_name']).PHP_EOL, FILE_APPEND);//remove	
-	file_put_contents('log.txt',"INITIAL SIZE-".$image_data[3].PHP_EOL, FILE_APPEND);//remove
 	if($mime_type == 'image/jpeg' || $mime_type == 'image/png'){
 		
 		if($mime_type == 'image/jpeg'){
@@ -150,13 +144,10 @@ function add_place($link) {
 			$address = $link->real_escape_string(trim($_POST['address']));
 			$type = $link->real_escape_string(trim($_POST['type']));
 			
-			file_put_contents('log.txt',"OPEN FILE SIZE-".imagesx ($image).'x'.imagesy ($image).PHP_EOL, FILE_APPEND);//remove
-			if($mime_type == 'image/jpeg'){
-				file_put_contents('log.txt',"ENTER ROTATE".PHP_EOL, FILE_APPEND);//remove
+			if($mime_type == 'image/jpeg'){				
 				$exif = @exif_read_data($_FILES["file"]["tmp_name"]);
 
-				if (!empty($exif['Orientation'])) {
-					file_put_contents('log.txt',"READ EXIF DATA".PHP_EOL, FILE_APPEND);//remove
+				if (!empty($exif['Orientation'])) {					
 					switch ($exif['Orientation']) {
 						case 2:
 							$image = image_flip($image,'horizontal');
@@ -181,15 +172,13 @@ function add_place($link) {
 						case 8:
 							$image = imagerotate($image, 90, 0);
 							break;
-					}
-					file_put_contents('log.txt','ROTATED WITH CODE-'.$exif['Orientation'].PHP_EOL, FILE_APPEND);//remove
+					}					
 				}
 			}
 			$width = imagesx ($image);
 			$height = imagesy ($image);  
 
-			if($width > 800 || $height > 800){
-				file_put_contents('log.txt','ENTER RESIZE'.PHP_EOL, FILE_APPEND);//remove
+			if($width > 800 || $height > 800){				
 				if($width > $height){
 					$newWidth = 800;
 					$newHeight = ($newWidth / $width) * $height;
@@ -200,8 +189,7 @@ function add_place($link) {
 			  
 				$resized = imagecreatetruecolor($newWidth,$newHeight);
 				imagecopyresampled($resized, $image, 0, 0, 0, 0,$newWidth, $newHeight, $width, $height);	
-				$image = $resized;
-				file_put_contents('log.txt','RESIZED'.PHP_EOL, FILE_APPEND);//remove
+				$image = $resized;				
 				$width = imagesx ($image);
 				$height = imagesy ($image);  
 			}
@@ -218,8 +206,7 @@ function add_place($link) {
 			ob_end_clean(); 
 
 			$base64 = @base64_encode($contents);
-			$base64 = ($base64 == false) ? '' : $base64;
-			file_put_contents('log.txt','THUMB CREATED'.PHP_EOL, FILE_APPEND);//remove
+			$base64 = ($base64 == false) ? '' : $base64;			
 			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
 			
 			$result = $link->query($query);
@@ -227,11 +214,9 @@ function add_place($link) {
 				if ($link->affected_rows > 0) {
 					$id = $link->insert_id;
 					imagejpeg($image, "../uploads/" . $id . ".jpg");
-					file_put_contents('log.txt','BIG IMAGE CREATED'.PHP_EOL, FILE_APPEND);//remove
 					$query_vote = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $id . ", '" . $unique_id . "', '2') ";
 					$result = $link->query($query_vote);			
-					$status = 'success';
-					file_put_contents('log.txt','DONE'.PHP_EOL.'*************************************************************'.PHP_EOL, FILE_APPEND);//remove
+					$status = 'success';					
 				}		
 			}
 		}
@@ -289,7 +274,7 @@ function get_count($link) {
     $query = "SELECT id FROM places "
             . "WHERE status='0' AND id NOT IN "
             . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
-            . "WHERE votes.device_id = '" . $device_id . "')";
+            . "WHERE votes.device_id = '" . $device_id . "')  LIMIT 0, 10";
     $result = $link->query($query);
 	if ($result != false) {
 		$row_cnt = $result->num_rows;		
