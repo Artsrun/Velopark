@@ -20,6 +20,11 @@ var app = {
         shop: null,
         parts: null
     },
+    systemMessage: {
+        'title': 'Velopark',
+        'message': '',
+        'show': false
+    },
     positionWatchId: null,
     firstLoad: true,
     defaultType: 'parking',
@@ -125,6 +130,8 @@ var app = {
                 app.start('offlineMap');
                 if (navigator.splashscreen) {
                     navigator.splashscreen.hide();
+                    app.systemMessage.show = true;
+                    app.systemAlert();
                 }
             }
         }
@@ -280,7 +287,7 @@ var app = {
             };
         }
         if (DEBUG) {
-            alert(text);
+            alert('title:' + title + " text:" + text);
         } else {
             navigator.notification.alert(text, callback, title, button);
         }
@@ -341,6 +348,7 @@ var app = {
             params.address = $(".add-address").val();
             params.name = $(".add-name").val();
             params.desc = $(".add-descript").val();
+            params.country = $('.add-country').val();
             params.type = $('.active_icon').attr("data-type");
             params.action = "add_place";
             options.params = params;
@@ -353,6 +361,7 @@ var app = {
             ft.upload(image, encodeURI(app.apiURL),
                     function (data) {
                         removeLoader('#add_places');
+                        var response;
                         try {
                             response = JSON.parse(data.response)
                         } catch (e) {
@@ -450,10 +459,7 @@ var app = {
                         $blockEl.remove();
                         app.showReviewMap();
                         if ($("#new_places .wrapper .content .vot_wrap").length == 0) {
-                            $("#new_places .wrapper .content").html("<p class='no_place_text'>Nothing to review</p>");
-                            if ($('html').hasClass('oldAndroid')) {
-                                $('html').addClass('fullHeight');
-                            }
+                            app.getNewPlaces();
                         }
                     }, 400);
                 } else {
@@ -466,6 +472,17 @@ var app = {
                 app.notification('Oops', 'Something went wrong', 'Close', null);
             }
         });
+    },
+    systemAlert: function () {
+        if (app.systemMessage.show && $.trim(app.systemMessage.message) != '' && typeof app.systemMessage.timer == 'undefined') {
+            app.systemMessage.timer = setTimeout(function () {
+                if ($.trim(app.systemMessage.message) != '') {
+                    app.notification(app.systemMessage.title, app.systemMessage.message, 'Close', null);
+                    app.systemMessage.message = '';
+                    app.systemMessage.show = false;
+                }
+            }, 3000);
+        }
     },
     onPause: function () {
         app.gpsStop();
@@ -491,15 +508,12 @@ var app = {
             success: function (res) {
                 if (res.status == 'success') {
                     var data = res.data;
-                    if (!isNaN(parseInt(localStorage.getItem("count")))) {
-                        var count = parseInt(data) - parseInt(localStorage.getItem("count"));
-                        if (count > 0) {
-                            $('header').addClass('new_not');
-                        }
-                        localStorage.setItem("count", data);
-                    } else {
-                        localStorage.setItem("count", data);
+                    var localCount = isNaN(parseInt(localStorage.getItem("count"))) ? 0 : parseInt(localStorage.getItem("count"));
+                    var remoteCount = parseInt(data);
+                    if (remoteCount > localCount) {
+                        $('header').addClass('new_not');
                     }
+                    localStorage.setItem("count", remoteCount);
                 } else {
                     // error while trying to get count, do nothing
                 }
@@ -520,7 +534,7 @@ var app = {
             data: {
                 action: "get_version",
                 device_id: device.uuid,
-                platform:  app.platform,
+                platform: app.platform,
                 model: device.model,
                 version: device.version
             },
@@ -531,6 +545,11 @@ var app = {
                     if (app.getLocalVersion() != res.data) {
                         /* get updates from server and insert to local db */
                         app.updateDB(res.data);
+                    }
+                    if (typeof res.msg.message != 'undefined') {
+                        app.systemMessage.title = $.trim(res.msg.title) == '' ? 'Hey' : res.msg.title;
+                        app.systemMessage.message = res.msg.message;
+                        app.systemAlert();
                     }
                 }
             }
@@ -638,9 +657,11 @@ var app = {
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
         /* hide splashscreen when map loaded */
-        google.maps.event.addListenerOnce(app.map, 'idle', function () {
+        google.maps.event.addListenerOnce(app.map, 'tilesloaded', function () {
             if (navigator.splashscreen) {
                 navigator.splashscreen.hide();
+                app.systemMessage.show = true;
+                app.systemAlert();
             }
             /* select places if exist */
             if (app.getLocalVersion() != 0) {
@@ -649,7 +670,12 @@ var app = {
             app.setLocationHash('gmapfix');
             app.setLocationHash(app.getActivePage());
 
+            $('img[src ^= "https://maps.gstatic.com/mapfiles/api-3/images/google"]').parents('a[href ^= "https://maps.google.com/maps"]').parent().addClass('google-fix');
+            $("span:contains('Map data ©2015 Google')").parents('.gmnoprint').addClass('google-fix');
+            $("a:contains('Terms of Use')").parents('.gmnoprint').addClass('google-fix');
+
         });
+
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
             app.closeInfoWindow();
@@ -724,7 +750,7 @@ var app = {
                 $(".arr-wrapper").addClass("arr_down");
                 return false;
             });
-            $(document).on("click", function (e) {
+            $(document).on("click touchend", function (e) {
                 if (!$(e.target).hasClass('menu') && $(e.target).parents('.menu').length == 0) {
                     if ($('.menu').hasClass('active')) {
                         fadeOut('.menu', function () {
@@ -892,7 +918,7 @@ var app = {
         $("#map-canvas").html("");
         var script_tag = document.createElement('script');
         script_tag.setAttribute("type", "text/javascript");
-        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3&key=" + this.gMapApiKey + "&language=en&callback=app.start");
+        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3.22&key=" + this.gMapApiKey + "&language=en&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
     selectPlaces: function (type) {
@@ -1190,6 +1216,14 @@ function newPlace(center, setAddress) {
 
     var new_map = new google.maps.Map(document.getElementById('add-map'), options);
 
+    google.maps.event.addListenerOnce(new_map, 'tilesloaded', function () {
+
+        $('img[src ^= "https://maps.gstatic.com/mapfiles/api-3/images/google"]').parents('a[href ^= "https://maps.google.com/maps"]').parent().addClass('google-fix');
+        $("span:contains('Map data ©2015 Google')").parents('.gmnoprint').addClass('google-fix');
+        $("a:contains('Terms of Use')").parents('.gmnoprint').addClass('google-fix');
+
+    });
+
     var image = {
         url: "img/marker.png",
         scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
@@ -1238,6 +1272,15 @@ function newPlace(center, setAddress) {
                     $(".add-address").removeClass('green');
                 }, 800);
                 $(".add-address").val(results[0].formatted_address);
+                var country = '';
+                for (var i = 0; i < results[0].address_components.length; i++) {
+                    var component = results[0].address_components[i];
+                    if (component.types[0] == 'country') {
+                        country = component.long_name;
+                        break;
+                    }
+                }
+                $(".add-country").val(country);
             }
         });
     }

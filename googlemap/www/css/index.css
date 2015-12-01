@@ -718,6 +718,8 @@ html.ios footer .footer-image{
     padding: 2px;
     transition:border 0.2s linear;
     -webkit-transition: border 0.2s linear;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 .add_img_icon_park{
@@ -954,6 +956,7 @@ a.swipebox_places{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    z-index:100;
 }
 a.swipebox_places:before{
     padding-top: 100%;
@@ -1090,7 +1093,7 @@ html.offline #add_places .wrapper, html.offline #new_places .wrapper{
     overflow: hidden; 
 }
 .page.loading .wrapper{
-        overflow: hidden;
+    overflow: hidden;
 }
 .loading:after {
     content: '';
@@ -1574,12 +1577,9 @@ a.infoMail:active{
 .gmnoprint {
     opacity: 0 !important;
 }
-.gmnoprint[style="z-index: 1000001; -webkit-user-select: none; height: 14px; line-height: 14px; position: absolute; right: 0px; bottom: 0px;"], .gmnoprint[style="z-index: 1000001; position: absolute; right: 72px; bottom: 0px; width: 121px;"]{
-    opacity: inherit !important;
+.google-fix{
     pointer-events: none !important;
-}
-.gm-style div[style="margin-left: 5px; margin-right: 5px; z-index: 1000000; position: absolute; left: 0px; bottom: 0px;"]{
-    pointer-events:none !important;
+    opacity: 1 !important;
 }
 /* google map */
 
