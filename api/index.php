@@ -51,7 +51,10 @@ function get_version($link) {
         $result->free();
     }
 	add_stats($link);
+	$msg='';
+	//$msg=['title'=>'Attention',	'message'=>'You won a cow']; // Both titleand message must be set
 	echo json_encode([
+		'msg'=>$msg,
 		'status'=>$status,
 		'data'=>$version
 	]);
@@ -143,6 +146,7 @@ function add_place($link) {
 			$desc = $link->real_escape_string(trim($_POST['desc']));
 			$address = $link->real_escape_string(trim($_POST['address']));
 			$type = $link->real_escape_string(trim($_POST['type']));
+			$country = $link->real_escape_string(trim($_POST['country']));
 			
 			if($mime_type == 'image/jpeg'){				
 				$exif = @exif_read_data($_FILES["file"]["tmp_name"]);
@@ -207,7 +211,7 @@ function add_place($link) {
 
 			$base64 = @base64_encode($contents);
 			$base64 = ($base64 == false) ? '' : $base64;			
-			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
+			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `country`, `description`,`image`, `type`, `version`, `status` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "','". $address ."' ,'". $country ."' ,'" . $desc . "','" . $base64 . "','" . $type . "', 0, '0')";
 			
 			$result = $link->query($query);
 			if ($result != false) {
