@@ -21,7 +21,7 @@ var app = {
         parts: null
     },
     systemMessage: {
-        'title': 'Velopark',
+        'title': 'Hey',
         'message': '',
         'show': false
     },

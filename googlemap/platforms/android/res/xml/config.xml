@@ -42,7 +42,7 @@
     <splash density="port-xxxhdpi" src="res/android/splash/screen-xxxhdpi-portrait.9.png" />
     <name>Velopark</name>
     <description>
-        VeloPark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+        Velopark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
     </description>
     <author email="info@aparg.com" href="http://aparg.com">
         Aparg

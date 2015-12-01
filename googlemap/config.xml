@@ -2,7 +2,7 @@
 <widget id="am.velopark.velopark" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Velopark</name>
     <description>
-        VeloPark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+        Velopark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
     </description>
     <author email="info@aparg.com" href="http://aparg.com">
         Aparg
@@ -64,7 +64,7 @@
     </platform>
    
     <preference name="SplashScreen" value="screen" />
-	<preference name="AutoHideSplashScreen" value="false" />
+    <preference name="AutoHideSplashScreen" value="false" />
     <preference name="SplashScreenDelay" value="10000" />
     <preference name="Orientation" value="portrait" />
 </widget>
