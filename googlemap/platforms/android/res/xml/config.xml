@@ -49,8 +49,6 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
-    <allow-intent href="mailto:*" />
-    <allow-intent href="http://aparg.com/*" launch-external="yes" />
     <preference name="SplashScreen" value="screen" />
     <preference name="AutoHideSplashScreen" value="false" />
     <preference name="SplashScreenDelay" value="10000" />
