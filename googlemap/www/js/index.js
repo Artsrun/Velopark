@@ -1036,6 +1036,7 @@ var app = {
 
         $(".add-image").val(imageURI);
         $(".add-address").val('');
+        $(".add-country").val('');
 
         if (fromGallery) {
             if ($('html').hasClass('oldAndroid') || typeof window.FileReader == 'undefined') {
@@ -1238,13 +1239,27 @@ function newPlace(center, setAddress) {
     $(".hidden-lat").val(parseFloat(new_marker.getPosition().lat()).toFixed(7));
     $(".hidden-long").val(parseFloat(new_marker.getPosition().lng()).toFixed(7));
     var geocoder = new google.maps.Geocoder();
-    if (setAddress) {
-        geocoder.geocode({'location': center}, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
+
+    geocoder.geocode({'location': center}, function (results, status) {
+        if (status === google.maps.GeocoderStatus.OK) {
+            if (setAddress) {
+                $(".add-address").removeClass('error');
                 $(".add-address").val(results[0].formatted_address);
             }
-        });
-    }
+            var country = '';
+            for (var i = 0; i < results[0].address_components.length; i++) {
+                var component = results[0].address_components[i];
+                if (component.types[0] == 'country') {
+                    country = component.long_name;
+                    break;
+                }
+            }
+            $(".add-country").val(country);
+        } else {
+            $(".add-address").val('');
+            $(".add-country").val('');
+        }
+    });
     var greenTimer;
     new_marker.addListener('dragend', function (event) {
         setNewAddress(event.latLng);
@@ -1281,6 +1296,9 @@ function newPlace(center, setAddress) {
                     }
                 }
                 $(".add-country").val(country);
+            } else {
+                $(".add-address").val('');
+                $(".add-country").val('');
             }
         });
     }
