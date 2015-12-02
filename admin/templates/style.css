@@ -46,7 +46,12 @@ a:hover{
 body{
     background:#f2f2f2;
 }
-
+#to-all, .to-all-label{
+	cursor:pointer;	
+}
+.to-all-label b{
+	vertical-align: top;
+}
 .wrapper{
     width:1300px; 
     margin:0 auto; 

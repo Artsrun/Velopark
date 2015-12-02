@@ -494,9 +494,23 @@ function add_msg($link){
         return false;
     } else{		
 	
-		$query = "INSERT INTO msg (`title`, `message`, `device_id`) VALUES ('" . $name . "', '" . $message . "', '".$device_id."')";
+		$query = "SELECT * FROM msg WHERE `device_id`='".$device_id."'";
 		$res = $link->query($query);
+		$msg = array();
+		if ($res!=false){
+			while ($row = $res->fetch_assoc()) {
+				$msg[] = $row;
+			}
+		}
+		$res->free();
 		
+		if(!empty($msg)){
+			$_SESSION['msg']['res'] = "<div class='error'>Error! Message wasn't added. Message for this user or all users already exists</div>";
+			return false;
+		}
+		
+		$query = "INSERT INTO msg (`title`, `message`, `device_id`) VALUES ('" . $name . "', '" . $message . "', '".$device_id."')";
+		$res = $link->query($query);		
 		if ($res!=false && $link->affected_rows > 0) {
 				$_SESSION['msg']['res'] = "<div class='success'>Message was added!</div>";
 				return true;
@@ -509,13 +523,25 @@ function add_msg($link){
 
 function get_msg($link){
 	
-	$query = "SELECT * FROM msg ORDER BY id DESC";
-    $msg = array();
-    $result = $link->query($query);
-    while ($row = $result->fetch_assoc()) {
-        $msg[] = $row;
-    }
-    $result->free();
+	$msg = array();
+	
+	$query = "SELECT * FROM msg WHERE device_id=''";    
+    $res = $link->query($query);
+	if ($res!=false){
+		while ($row = $res->fetch_assoc()) {
+			$msg[] = $row;
+		}
+	}
+    $res->free();
+	
+	$query = "SELECT * FROM msg WHERE device_id!='' ORDER BY id DESC";    
+    $res = $link->query($query);
+	if ($res!=false){
+		while ($row = $res->fetch_assoc()) {
+			$msg[] = $row;
+		}
+	}
+    $res->free();
 
     return $msg;
 }
@@ -523,8 +549,8 @@ function get_msg($link){
 function delete_msg($msg_id, $link) {
 	    
 	$query = "DELETE FROM msg WHERE id = ".$msg_id;
-	$result = $link->query($query);
-	if ($result!=false && $link->affected_rows > 0) {		
+	$res = $link->query($query);
+	if ($res!=false && $link->affected_rows > 0) {		
 		$_SESSION['msg']['res'] = "<div class='success'>Message has been deleted!</div>";	
 		return true;		
 	}	

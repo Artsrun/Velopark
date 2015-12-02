@@ -107,8 +107,9 @@ switch ($view) {
 			redirect('?view=msg');
 		}
 		if ($_POST) {
-			if(add_msg($link))
+			if(add_msg($link)){
 				redirect('?view=msg');
+			}
 		}
 		$msg = get_msg($link);
 		
