@@ -12,7 +12,7 @@
 	<h4 class="green">By model</h4>
 	<br />
 	<?php foreach($stats['by_model'] as $row){?>
-		<b><?=strtoupper ($row['model'])?>:</b> Total launch - <b><?=$row['opens']?></b> | Users - <b><?=$row['users']?></b></br>
+		<b><a class='blue' target='_blank' href="https://www.google.com/search?tbm=isch&q=<?=strtoupper ($row['model'])?>"><?=strtoupper ($row['model'])?></a>:</b> Total launch - <b><?=$row['opens']?></b> | Users - <b><?=$row['users']?></b></br>
 	<?php } ?>
 
 </div> 
