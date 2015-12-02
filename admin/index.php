@@ -101,6 +101,18 @@ switch ($view) {
 	case("stats"):
 		$stats = get_stats($link);
 		break;
+	case("msg"):	
+		if(isset($_GET['delete'])){			
+			delete_msg(abs((int) $_GET['delete']),$link);
+			redirect('?view=msg');
+		}
+		if ($_POST) {
+			if(add_msg($link))
+				redirect('?view=msg');
+		}
+		$msg = get_msg($link);
+		
+		break;
     default:
         $view = 'places';
         $perpage = 10;

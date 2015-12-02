@@ -39,7 +39,7 @@ function count_places($link) {
 function edit_place($place_id, $link) {
 	$status = get_status($place_id, $link);
 	if($status == '2'){
-		$_SESSION['edit_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
+		$_SESSION['edit_place']['res'] = "<div class='error'>Error! Place is currently deleted</div>";
         return false;
 	}
 	
@@ -49,6 +49,7 @@ function edit_place($place_id, $link) {
     $latitude = trim($_POST['latitude']);
     $longitude = trim($_POST['longitude']);
     $type = $_POST['type'];
+	$country = $_POST['country'];
 	$temp_file = empty(glob('temp/tmp.*'))?false:glob('temp/tmp.*')[0];
 	$image = false;
     if (empty($name)) {
@@ -74,6 +75,7 @@ function edit_place($place_id, $link) {
         $latitude = clear_admin($latitude, $link);
         $longitude = clear_admin($longitude, $link);
         $type = clear_admin($type, $link);
+		$country = clear_admin($country, $link);
         $query_image = " ";
 		
         if ($temp_file!=false) {
@@ -155,7 +157,8 @@ function edit_place($place_id, $link) {
                     description = '$description',
                     name = '$name',
                     address = '$address',
-                    type = '$type'" . $query_image . "
+                    type = '$type'" . $query_image . ",
+					country = '$country'
                         WHERE id = $place_id";
         $res = $link->query($query);
 
@@ -188,6 +191,7 @@ function add_place($link) {
     $latitude = trim($_POST['latitude']);
     $longitude = trim($_POST['longitude']);
     $type = $_POST['type'];
+	$country = $_POST['country'];
 	$temp_file = empty(glob('temp/tmp.*'))?false:glob('temp/tmp.*')[0];
 	$image = false;
     if (empty($name)) {
@@ -198,6 +202,7 @@ function add_place($link) {
         $_SESSION['add_place']['latitude'] = $latitude;
         $_SESSION['add_place']['longitude'] = $longitude;
         $_SESSION['add_place']['type'] = $type;
+		$_SESSION['add_place']['country'] = $country;
         array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else if (empty($address)) {
@@ -208,6 +213,7 @@ function add_place($link) {
         $_SESSION['add_place']['latitude'] = $latitude;
         $_SESSION['add_place']['longitude'] = $longitude;
         $_SESSION['add_place']['type'] = $type;
+		$_SESSION['add_place']['country'] = $country;
         array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else if (empty($latitude)) {
@@ -218,6 +224,7 @@ function add_place($link) {
         $_SESSION['add_place']['latitude'] = $latitude;
         $_SESSION['add_place']['longitude'] = $longitude;
         $_SESSION['add_place']['type'] = $type;
+		$_SESSION['add_place']['country'] = $country;
         array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else if (empty($longitude)) {
@@ -228,6 +235,7 @@ function add_place($link) {
         $_SESSION['add_place']['latitude'] = $latitude;
         $_SESSION['add_place']['longitude'] = $longitude;
         $_SESSION['add_place']['type'] = $type;
+		$_SESSION['add_place']['country'] = $country;
         array_map('unlink', glob("temp/tmp.*"));
         return false;
     } else {
@@ -237,6 +245,7 @@ function add_place($link) {
         $latitude = clear_admin($latitude, $link);
         $longitude = clear_admin($longitude, $link);
         $type = clear_admin($type, $link);
+		$country = clear_admin($country, $link);
         $base64 = "";
         if ($temp_file!=false) {
 			$ext = pathinfo($temp_file, PATHINFO_EXTENSION);
@@ -312,7 +321,7 @@ function add_place($link) {
 		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
         $vers = $link->query($query_version);				
         if ($link->affected_rows > 0) {
-			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "', (SELECT value FROM options WHERE name='version'), '1', 0)";
+			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `country`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "','".$country."', (SELECT value FROM options WHERE name='version'), '1', 0)";
 			$res = $link->query($query);
 		}        
         if ($link->affected_rows > 0) {
@@ -364,7 +373,7 @@ function confirm_place($place_id, $link) {
 function vote_place($place_id, $link) {
 	$status = get_status($place_id, $link);
 	if($status == '2'){
-		$_SESSION['vote_place']['res'] = "<div class='error'>Error! Place is deleted</div>";
+		$_SESSION['vote_place']['res'] = "<div class='error'>Error! Place is currently deleted</div>";
         return false;
 	}
 	
@@ -473,4 +482,51 @@ function get_stats($link){
 	$result->free();
 
     return $stats;
+}
+
+function add_msg($link){
+	
+	$name = trim($_POST['title']);
+    $message = trim($_POST['message']);
+    $device_id = trim($_POST['device_id']);
+	if (empty($message)) {
+        $_SESSION['msg']['res'] = "<div class='error'>Must be message!</div>";
+        return false;
+    } else{		
+	
+		$query = "INSERT INTO msg (`title`, `message`, `device_id`) VALUES ('" . $name . "', '" . $message . "', '".$device_id."')";
+		$res = $link->query($query);
+		
+		if ($res!=false && $link->affected_rows > 0) {
+				$_SESSION['msg']['res'] = "<div class='success'>Message was added!</div>";
+				return true;
+		}else{
+			$_SESSION['msg']['res'] = "<div class='error'>Error! Message wasn't added</div>";
+			return false;
+		}
+	}
+}
+
+function get_msg($link){
+	
+	$query = "SELECT * FROM msg ORDER BY id DESC";
+    $msg = array();
+    $result = $link->query($query);
+    while ($row = $result->fetch_assoc()) {
+        $msg[] = $row;
+    }
+    $result->free();
+
+    return $msg;
+}
+
+function delete_msg($msg_id, $link) {
+	    
+	$query = "DELETE FROM msg WHERE id = ".$msg_id;
+	$result = $link->query($query);
+	if ($result!=false && $link->affected_rows > 0) {		
+		$_SESSION['msg']['res'] = "<div class='success'>Message has been deleted!</div>";	
+		return true;		
+	}	
+	return false;
 }
