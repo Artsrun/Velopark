@@ -1243,6 +1243,7 @@ function newPlace(center, setAddress) {
     geocoder.geocode({'location': center}, function (results, status) {
         if (status === google.maps.GeocoderStatus.OK) {
             if (setAddress) {
+                $(".add-address").removeClass('error');
                 $(".add-address").val(results[0].formatted_address);
             }
             var country = '';
