@@ -8,6 +8,7 @@
     }
     ?>
     <form action="" method="post">
+		<input class="add-country" type="hidden" name="country" value="<?php if(isset($_SESSION['add_place']['country'])) echo $_SESSION['add_place']['country']; ?> " />
         <table class="add_edit_page" cellspacing="0" cellpadding="0">
             <tr>
                 <td class="add-edit-txt">Name</td>

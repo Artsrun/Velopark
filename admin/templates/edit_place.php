@@ -10,7 +10,7 @@
     }
     ?>
     <form action="" method="post">
-
+		<input class="add-country" type="hidden" name="country" value="<?= htmlspecialchars($get_place['country'])  ?> " />
         <table class="add_edit_page" cellspacing="0" cellpadding="0">
 			<tr>
 				<td class="add-edit-txt">Status</td>

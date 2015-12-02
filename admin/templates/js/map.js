@@ -1,33 +1,33 @@
-function initMap() {
-    var lat = $('input[name="latitude"]').val();
-    var longt = $('input[name="longitude"]').val();
-
-    if ((lat && typeof lat == 'number') && (longt && typeof longt == 'number')) {
-        var position = new google.maps.LatLng($('input[name="latitude"]').val(), $('input[name="longitude"]').val());
-    } else {
-        var position = new google.maps.LatLng(40.1778541, 44.5136349);
-    }
-
-    var mapOptions = {
+function initMap(){	 
+	var lat = parseFloat( $('input[name="latitude"]').val() );
+	var longt = parseFloat( $('input[name="longitude"]').val() );
+	
+	if( ( lat && typeof lat == 'number' ) && (longt && typeof longt == 'number') ){
+		var position = new google.maps.LatLng( $('input[name="latitude"]').val(), $('input[name="longitude"]').val() );
+	}else{
+		var position = new google.maps.LatLng( 40.1778541, 44.5136349 );
+	}
+	
+	var  mapOptions = {
         zoom: 14,
         scrollwheel: true,
         zoomControl: true,
         mapTypeControl: false,
         scaleControl: true,
         streetViewControl: false,
-        center: position
+		center: position
     }
 
 
     var map = new google.maps.Map(document.getElementById('google-map'), mapOptions);
-
-
-    var image = {
-        url: "//velopark.am/images/marker_" + $('.add-type').val() + ".png",
-        scaledSize: new google.maps.Size(28, 44)
-    };
-
-    var marker = new google.maps.Marker({
+	
+	
+	var image = {
+            url: "//velopark.am/images/marker_" + $('.add-type:checked').val() + ".png",
+            scaledSize: new google.maps.Size(28, 44)
+        };
+	
+	var marker = new google.maps.Marker({
         map: map,
         position: position,
         optimized: true,
@@ -35,17 +35,17 @@ function initMap() {
         icon: image,
         opacity: 1
     });
-
-    var geocoder = new google.maps.Geocoder();
-    $('.add-type').on('change', function () {
-        var image = {
+	
+	var geocoder = new google.maps.Geocoder();
+	$('.add-type').on('change',function(){
+		var image = {
             url: "//velopark.am/images/marker_" + $(this).val() + ".png",
             scaledSize: new google.maps.Size(28, 44)
         };
-        marker.setIcon(image);
-    });
-
-    marker.addListener('dragend', function (event) {
+		marker.setIcon(image);		
+	});
+	
+	marker.addListener('dragend', function (event) {
         setNewAddress(event.latLng);
     });
 
@@ -60,12 +60,21 @@ function initMap() {
 
         $('input[name="latitude"]').val(latitude);
         $('input[name="longitude"]').val(longitude);
-
+		$(".add-country").val('');
         geocoder.geocode({'location': latLng}, function (results, status) {
             if (status === google.maps.GeocoderStatus.OK) {
                 $('input[name="address"]').val(results[0].formatted_address);
+				var country = '';
+                for (var i = 0; i < results[0].address_components.length; i++) {
+                    var component = results[0].address_components[i];
+                    if (component.types[0] == 'country') {
+                        country = component.long_name;
+                        break;
+                    }
+                }
+                $(".add-country").val(country);
             }
         });
     }
-
-}
+	
+ }
