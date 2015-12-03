@@ -10,21 +10,21 @@
     }
     ?>
     <form action="" method="post">
-		<input class="add-country" type="hidden" name="country" value="<?= htmlspecialchars($get_place['country'])  ?> " />
+        <input class="add-country" type="hidden" name="country" value="<?= htmlspecialchars($get_place['country']) ?> " />
         <table class="add_edit_page" cellspacing="0" cellpadding="0">
-			<tr>
-				<td class="add-edit-txt">Status</td>
+            <tr>
+                <td class="add-edit-txt">Status</td>
                 <td>
-					<?php if ($get_place['status'] == "1"): ?>
-                       <span class="green upper"> comfirmed</span>
-                    <?php elseif($get_place['status'] == "0"): ?>
-                       <span class="red upper"> uncomfirmed</span>                    
-					<?php elseif($get_place['status'] == "2"): ?>
-                       <span class="red upper"> <b>deleted</b></span>
+                    <?php if ($get_place['status'] == "1"): ?>
+                        <span class="green upper"> comfirmed</span>
+                    <?php elseif ($get_place['status'] == "0"): ?>
+                        <span class="red upper"> uncomfirmed</span>                    
+                    <?php elseif ($get_place['status'] == "2"): ?>
+                        <span class="red upper"> <b>deleted</b></span>
                     <?php endif; ?>
-				</td>					
-			</tr>
-			<tr>
+                </td>					
+            </tr>
+            <tr>
                 <td class="add-edit-txt">Date</td>
                 <td><?php echo $get_place['date']; ?></td>
             </tr>
@@ -39,8 +39,8 @@
             <tr>
                 <td class="add-edit-txt">Description</td>
                 <td>
-				<textarea class="head-text" name="description" ><?= htmlspecialchars($get_place['description']) ?></textarea>
-				</td>
+                    <textarea class="head-text" name="description" ><?= htmlspecialchars($get_place['description']) ?></textarea>
+                </td>
             </tr>
             <tr>
                 <td>Latitude</td>
@@ -50,15 +50,15 @@
                 <td>Longitude</td>
                 <td><input class="head-text" type="text" name="longitude" value="<?= htmlspecialchars($get_place['longitude']) ?>" /></td>
             </tr>
-			<tr>
+            <tr>
                 <td>Map</td>
                 <td>	
-					<div id="google-map" style="height: 250px;width: 450px;"></div>
-					<br />
-					<a href='https://www.google.com/maps/place/<?= htmlspecialchars($get_place['latitude']) ?>+<?= htmlspecialchars($get_place['longitude']) ?>/@<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>,18z' target='_blank'>View on google maps</a>
-				</td>
+                    <div id="google-map" style="height: 250px;width: 450px;"></div>
+                    <br />
+                    <a href='https://www.google.com/maps/place/<?= htmlspecialchars($get_place['latitude']) ?>+<?= htmlspecialchars($get_place['longitude']) ?>/@<?= htmlspecialchars($get_place['latitude']) ?>,<?= htmlspecialchars($get_place['longitude']) ?>,18z' target='_blank'>View on google maps</a>
+                </td>
             </tr>
-			
+
             <tr>
                 <td>Type</td>
                 <td>
@@ -95,7 +95,7 @@
 </div> 
 </div>
 <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=<?=MAP_API_KEY?>&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?v=3.22&language=en&key=<?= MAP_API_KEY ?>&callback=initMap">
 </script>
 </body>
 </html>

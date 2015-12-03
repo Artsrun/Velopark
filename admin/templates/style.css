@@ -32,12 +32,12 @@ a{
     background-position: center;
 }
 .place_thumb{
-	
-	border-radius:3px;
-	width: 150px;
-	height: 150px;
-	background-size: cover;
-	background-position: center;
+
+    border-radius:3px;
+    width: 150px;
+    height: 150px;
+    background-size: cover;
+    background-position: center;
 }
 a:hover{
     text-decoration:none;
@@ -46,7 +46,12 @@ a:hover{
 body{
     background:#f2f2f2;
 }
-
+#to-all, .to-all-label{
+    cursor:pointer;	
+}
+.to-all-label b{
+    vertical-align: top;
+}
 .wrapper{
     width:1300px; 
     margin:0 auto; 
@@ -139,11 +144,11 @@ body{
     border-radius: 3px;
     border: none;
     text-transform:uppercase;
-	cursor:pointer;
+    cursor:pointer;
 }
 textarea.head-text{	
-	height: 100px;
-	
+    height: 100px;
+
 }
 .content h2{
     font-size:18px; 
@@ -183,7 +188,7 @@ a.vote{
     text-transform: uppercase;
 }
 .add_edit_page td{
-	vertical-align:top;
+    vertical-align:top;
 }
 .tabl th{
     padding:5px 0;
@@ -192,11 +197,11 @@ a.vote{
 .tabl td{
     text-align:left;
     background:#fff; 
-    
+
     padding:7px 10px;
     line-height: 24px;
 }
-	
+
 .add_edit_page{
     font-size: 14px; 
     color:#666666; 
@@ -219,7 +224,7 @@ a.vote{
 
 .add-edit-txt{
     width:155px;
-	vertical-align:top;
+    vertical-align:top;
 }
 
 .pager{
@@ -255,7 +260,7 @@ a.vote{
     background:#ffeded !important;
     color:#7f5354 !important;
     padding:3px;
-	margin-bottom:10px;
+    margin-bottom:10px;
 }
 
 .success{
@@ -264,7 +269,7 @@ a.vote{
     background:#f0faf1 !important;
     color:#58715e !important;
     padding:3px;
-	margin-bottom:10px;
+    margin-bottom:10px;
 }
 
 /*#upload-image{
@@ -330,4 +335,38 @@ a.nav_link:hover{
 
 
 
+.correct_h_flip .place_thumb{
+    -webkit-transform: scaleX(-1); 
+    transform: scaleX(-1);
+}
+
+.correct_v_flip .place_thumb{
+    -webkit-transform: scaleY(-1); 
+    transform: scaleY(-1);
+}
+
+.correct_180_rot .place_thumb{
+    -webkit-transform: rotate(180deg); 
+    transform:rotate(180deg);
+}
+
+.correct_v_flip_90_rot .place_thumb{
+    -webkit-transform:rotate(90deg) scaleY(-1);
+    transform:rotate(90deg) scaleY(-1);
+}
+
+.correct_90_rot .place_thumb{
+    -webkit-transform: rotate(90deg); 
+    transform:rotate(90deg);
+}
+
+.correct_h_flip_90_rot .place_thumb {
+    -webkit-transform:rotate(90deg) scaleX(-1);
+    transform:rotate(90deg) scaleX(-1);
+}
+
+.correct_90_rot_left .place_thumb{
+    -webkit-transform: rotate(-90deg); 
+    transform:rotate(-90deg);
+}
 
