@@ -50,11 +50,22 @@ function get_version($link) {
 		$status = 'success';
         $result->free();
     }
+		
+	$device_id = $link->real_escape_string(trim($_POST['device_id']));
+	$query = "SELECT * FROM msg WHERE device_id='".$device_id."' OR device_id='' ORDER BY device_id DESC";	
+	$result = $link->query($query);
+	$msg = array();
+    if ($result != false) {
+        while ($row = $result->fetch_assoc()) {
+            $msg[] = $row;
+        }		
+        $result->free();
+    }
+	$msg_to_send = empty($msg)?'dfsa':(isset($msg[1])?($msg[1]['device_id']==''?$msg[1]:$msg[0]):$msg[0]);	
+	
 	add_stats($link);
-	$msg='';
-	//$msg=['title'=>'Attention',	'message'=>'You won a cow']; // Both titleand message must be set
 	echo json_encode([
-		'msg'=>$msg,
+		'msg'=>$msg_to_send,
 		'status'=>$status,
 		'data'=>$version
 	]);
