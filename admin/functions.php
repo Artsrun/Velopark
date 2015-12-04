@@ -469,6 +469,7 @@ function get_stats($link){
 	
 	$by_platform = "SELECT platform, count(distinct device_id) as users, COUNT(*) AS opens FROM stats WHERE `platform`!='' GROUP BY `platform`";
 	$by_model = "SELECT model, count(distinct device_id) as users, COUNT(*) AS opens FROM stats WHERE `model`!='' GROUP BY `model`";
+	$by_place_add = "SELECT device_id, count(device_id) as place_add FROM votes WHERE `vote`='2' GROUP BY `device_id`";
     $stats = array();
 	$result = $link->query($by_platform);
     while ($row = $result->fetch_assoc()) {
@@ -478,6 +479,11 @@ function get_stats($link){
 	$result = $link->query($by_model);
     while ($row = $result->fetch_assoc()) {
         $stats['by_model'][] = $row;
+    }
+	$result->free();
+	$result = $link->query($by_place_add);
+    while ($row = $result->fetch_assoc()) {
+        $stats['by_place_add'][] = $row;
     }
 	$result->free();
 

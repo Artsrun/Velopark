@@ -32,12 +32,12 @@ a{
     background-position: center;
 }
 .place_thumb{
-
-    border-radius:3px;
-    width: 150px;
-    height: 150px;
-    background-size: cover;
-    background-position: center;
+	
+	border-radius:3px;
+	width: 150px;
+	height: 150px;
+	background-size: cover;
+	background-position: center;
 }
 a:hover{
     text-decoration:none;
@@ -47,10 +47,10 @@ body{
     background:#f2f2f2;
 }
 #to-all, .to-all-label{
-    cursor:pointer;	
+	cursor:pointer;	
 }
 .to-all-label b{
-    vertical-align: top;
+	vertical-align: top;
 }
 .wrapper{
     width:1300px; 
@@ -144,11 +144,11 @@ body{
     border-radius: 3px;
     border: none;
     text-transform:uppercase;
-    cursor:pointer;
+	cursor:pointer;
 }
 textarea.head-text{	
-    height: 100px;
-
+	height: 100px;
+	
 }
 .content h2{
     font-size:18px; 
@@ -164,7 +164,15 @@ textarea.head-text{
     color:#555555; 
     margin:0 0 20px 0;
 }
-
+.tabl tr:first-child{
+	    background-color: #2ecc71;
+}
+.tabl tr:nth-child(odd) td{
+	background:#f7f7f7; 
+}
+.tabl tr:nth-child(even) td{
+	background:#ffffff; 
+}
 a.edit{
     color:#335ECE;
     text-transform: uppercase;
@@ -188,7 +196,7 @@ a.vote{
     text-transform: uppercase;
 }
 .add_edit_page td{
-    vertical-align:top;
+	vertical-align:top;
 }
 .tabl th{
     padding:5px 0;
@@ -196,12 +204,11 @@ a.vote{
 
 .tabl td{
     text-align:left;
-    background:#fff; 
-
+    background:#ffffff; 
     padding:7px 10px;
     line-height: 24px;
 }
-
+	
 .add_edit_page{
     font-size: 14px; 
     color:#666666; 
@@ -224,7 +231,7 @@ a.vote{
 
 .add-edit-txt{
     width:155px;
-    vertical-align:top;
+	vertical-align:top;
 }
 
 .pager{
@@ -260,7 +267,7 @@ a.vote{
     background:#ffeded !important;
     color:#7f5354 !important;
     padding:3px;
-    margin-bottom:10px;
+	margin-bottom:10px;
 }
 
 .success{
@@ -269,7 +276,7 @@ a.vote{
     background:#f0faf1 !important;
     color:#58715e !important;
     padding:3px;
-    margin-bottom:10px;
+	margin-bottom:10px;
 }
 
 /*#upload-image{
@@ -294,6 +301,7 @@ a.vote{
     margin-bottom: 20px;
     border-radius: 3px;
     border: none;
+	text-transform: uppercase;
 }
 
 .enter{
