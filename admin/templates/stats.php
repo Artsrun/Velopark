@@ -36,7 +36,7 @@
 		<?php foreach ($stats['by_place_add'] as $row): ?>
             <tr>
                 <td><?= $i++; ?></td>
-                <td><?=strtoupper ($row['device_id'])?></td>
+                <td><?=$row['device_id']?></td>
                 <td><?=$row['place_add']?></td>
             </tr>
 
