@@ -47,15 +47,25 @@ switch ($view) {
     case('edit_place'):
         $place_id = abs((int) $_GET['place_id']);
         $get_place = get_place($place_id, $link);
+		
+		$perm_delete = isset($_GET['delete_perm'])?$_GET['delete_perm']:'';		
+		if($perm_delete == 'yes'){
+			if(delete_perm($place_id, $link)){
+				redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+			}else{
+				redirect('?view=edit_place&place_id='.$place_id.'&page='.(isset($_GET['page'])?$_GET['page']:1));
+			}
+		}
+		
         if ($_POST) {
             if (edit_place($place_id, $link))
                 redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
             else
                 redirect();
         }else {
-            if (file_exists("temp/tmp.jpg")) {
-                unlink("temp/tmp.jpg");
-            }
+            array_map('unlink', glob("temp/tmp.*"));
+			
+
         }
 
         break;
@@ -67,9 +77,8 @@ switch ($view) {
             else
                 redirect();
         }else {
-            if (file_exists("temp/tmp.jpg")) {
-                unlink("temp/tmp.jpg");
-            }
+            array_map('unlink', glob("temp/tmp.*"));
+            
         }
 
         break;

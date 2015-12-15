@@ -562,3 +562,21 @@ function delete_msg($msg_id, $link) {
 	}	
 	return false;
 }
+
+function delete_perm($place_id, $link) {
+	    
+	
+	$query = "DELETE FROM votes WHERE place_id = ".$place_id;
+	$res = $link->query($query);
+	if ($res!=false) {	
+		$query = "DELETE FROM places WHERE id = ".$place_id;
+		$res = $link->query($query);
+		if ($res!=false && $link->affected_rows > 0) {	
+			if( unlink("../uploads/" . $place_id . ".jpg")){
+				$_SESSION['answer'] = "<div class='success'>Place and it's data were permanently deleted!</div>";				
+				return true;		
+			}
+		}		
+	}	
+	return false;
+}

@@ -23,6 +23,9 @@ img{
 a{
     outline: none;
 }
+.delete_perm{
+	float:right;
+}
 .file_loader{
     width: 150px;
     height: 150px;
@@ -199,13 +202,16 @@ a.vote{
 	vertical-align:top;
 }
 .tabl th{
-    padding:5px 0;
+    padding:5px 0 5px 0;
 }
-
+.tabl td img{
+	display: block;
+	margin: 5px 0 5px 0;
+}
 .tabl td{
     text-align:left;
     background:#ffffff; 
-    padding:7px 10px;
+	padding:0 5px;
     line-height: 24px;
 }
 	
@@ -302,6 +308,7 @@ a.vote{
     border-radius: 3px;
     border: none;
 	text-transform: uppercase;
+	cursor:pointer;
 }
 
 .enter{
