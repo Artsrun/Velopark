@@ -8,7 +8,7 @@ function clear_admin($var, $link) {
 }
 
 function places($link, $start_pos, $perpage) {
-    $query = "SELECT * FROM places ORDER BY id DESC LIMIT $start_pos, $perpage";
+    $query = "SELECT * FROM places WHERE type!='DELETED' ORDER BY id DESC LIMIT $start_pos, $perpage";
     $places = array();
     $result = $link->query($query);
     while ($row = $result->fetch_assoc()) {
@@ -569,14 +569,27 @@ function delete_perm($place_id, $link) {
 	$query = "DELETE FROM votes WHERE place_id = ".$place_id;
 	$res = $link->query($query);
 	if ($res!=false) {	
-		$query = "DELETE FROM places WHERE id = ".$place_id;
-		$res = $link->query($query);
-		if ($res!=false && $link->affected_rows > 0) {	
-			if( unlink("../uploads/" . $place_id . ".jpg")){
-				$_SESSION['answer'] = "<div class='success'>Place and it's data were permanently deleted!</div>";				
-				return true;		
-			}
-		}		
+		$query = "UPDATE places SET status='2' WHERE id = $place_id";
+		$result = $link->query($query);
+		if ($result != false && $link->affected_rows > 0) {
+			$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+			$result = $link->query($query_version);
+			if ($result != false && $link->affected_rows > 0) {
+				$res = $link->query("UPDATE places SET latitude='DELETED',longitude='DELETED',name='DELETED',address='DELETED',country='DELETED',description='DELETED',image='DELETED',type='DELETED',votes_yes='-1',votes_no='-1',date='0000-00-00 00:00:00', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+				if ($res!=false && $link->affected_rows > 0) {	
+					if(file_exists("../uploads/" . $place_id . ".jpg")){
+						if( unlink("../uploads/" . $place_id . ".jpg")){
+							$_SESSION['answer'] = "<div class='success'>Place and it's data were permanently deleted!</div>";				
+							return true;		
+						}
+					}else{
+						$_SESSION['answer'] = "<div class='success'>Place and it's data were permanently deleted!</div>";				
+						return true;		
+					}
+				}		
+			}		
+		}				
 	}	
 	return false;
 }
+	
