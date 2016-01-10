@@ -671,7 +671,7 @@ var app = {
             app.setLocationHash(app.getActivePage());
 
             $('img[src ^= "https://maps.gstatic.com/mapfiles/api-3/images/google"]').parents('a[href ^= "https://maps.google.com/maps"]').parent().addClass('google-fix');
-            $("span:contains('Map data ©2015 Google')").parents('.gmnoprint').addClass('google-fix');
+            $("span:contains('Map data ©')").parents('.gmnoprint').addClass('google-fix');
             $("a:contains('Terms of Use')").parents('.gmnoprint').addClass('google-fix');
 
         });
