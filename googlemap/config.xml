@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="am.velopark.velopark" version="2.0.3"  android-versionCode = "20003"  xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="am.velopark.velopark" version="2.0.3"  android-versionCode = "20007"  xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Velopark</name>
     <description>
         Velopark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
