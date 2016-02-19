@@ -44,6 +44,28 @@
     </table>
 
 	</br></br>
+	
+	<h4 class="green">By deleted places</h4>
+	</br>
+	<table class="tabl" cellspacing="1">
+        <tr>
+			<th class="str_action">№</th>
+            <th class="str_action">Device ID</th>
+            <th class="str_action">Added places</th>
+        </tr>
+		<?php $i=1; ?>
+		<?php foreach ($stats['by_place_delete'] as $row): ?>
+            <tr>
+                <td><?= $i++; ?></td>
+                <td><?=$row['device_id']?></td>
+                <td><?=$row['place_add']?></td>
+            </tr>
+
+        <?php endforeach; ?>      
+    </table>
+
+	</br></br>
+	
 	<h4 class="green">By model</h4>
 	<br />	
 		<table class="tabl" cellspacing="1">

@@ -1,0 +1,4 @@
+[25-Dec-2015 17:58:51 UTC] PHP Warning:  unlink(../uploads/113.jpg): No such file or directory in /home/apargcom/public_html/sub/velopark/admin/functions.php on line 580
+[25-Dec-2015 18:16:44 UTC] PHP Fatal error:  Call to undefined function exif_read_data() in /home/apargcom/public_html/sub/velopark/admin/functions.php on line 259
+[25-Dec-2015 18:27:15 UTC] PHP Warning:  exif_read_data(tmp.jpg): Incorrect APP1 Exif Identifier Code in /home/apargcom/public_html/sub/velopark/admin/functions.php on line 259
+[19-Feb-2016 12:24:56 UTC] PHP Warning:  Invalid argument supplied for foreach() in /home/apargcom/public_html/sub/velopark/admin/templates/stats.php on line 57
