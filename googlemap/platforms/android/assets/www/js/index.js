@@ -103,7 +103,12 @@ var app = {
             }
         }, 10000);
 
-        app.db = openDatabase('places', '1', 'the database of places', 4 * 1024 * 1024);
+        app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
+        if (app.db.version == "1") {
+            app.db.changeVersion("1", "1.1", function (tx) {
+                tx.executeSql('ALTER TABLE places  ADD COLUMN delete_counter integer DEFAULT  0;');
+            });
+        }
         app.platform = device.platform.toLowerCase();
 
         $('html').addClass(app.platform);
@@ -473,6 +478,37 @@ var app = {
             }
         });
     },
+    markDelete: function () {
+        $.ajax({
+            url: app.apiURL,
+            method: "POST",
+            data: {
+                action: "add_delete",
+                device_id: device.uuid,
+                place_id: app.activeMarker.server_id
+            },
+            dataType: 'json',
+            success: function (res) {
+                alert(res.status);
+                if (res.status == 'success') {
+                    app.db.transaction(function (tx) {
+                        tx.executeSql("UPDATE places SET delete_counter = 1 WHERE server_id=?", [app.activeMarker.server_id], function (tx, results) {
+                            if (results.rowsAffected) {
+                                $('.mark-delete').removeClass('active');
+                            }
+                        }, null);
+                    });
+                } else {
+                    // error while trying to get count, do nothing
+                }
+            },
+            error: function (err) {
+                console.log(err);
+                // error while trying to get new places count, do nothing
+            }
+        });
+
+    },
     systemAlert: function () {
         if (app.systemMessage.show && $.trim(app.systemMessage.message) != '' && typeof app.systemMessage.timer == 'undefined') {
             app.systemMessage.timer = setTimeout(function () {
@@ -572,7 +608,7 @@ var app = {
                 if (res.status == 'success') {
                     var response = res.data;
                     app.db.transaction(function (tx) {
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS places(server_id integer PRIMARY KEY unique,latitude REAL, longitude REAL, name text, address varchar, description text, image text, type varchar, status varchar)', []);
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS places(server_id integer PRIMARY KEY unique,latitude REAL, longitude REAL, name text, address varchar, description text, image text, type varchar, status varchar, delete_counter integer DEFAULT 0)', []);
                         for (var i = 0; i < response.length; i++) {
                             if (response[i].status === "1") {
                                 tx.executeSql("UPDATE places SET latitude=?, longitude=?, name=?, address=?, description=?, image=?, type=?, status=? WHERE server_id=?", [response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status, response[i].id], null, null);
@@ -824,6 +860,20 @@ var app = {
                 });
             });
 
+            /* mark delete */
+            $('.mark-delete').on('click', function () {
+                if (app.activeMarker && app.activeMarker.server_id) {
+                    app.markDelete();
+//                    navigator.notification.confirm("Want to delete ?",
+//                            function confirmDelete(buttonIndex) {
+//                                if (buttonIndex == 2) {
+//                                    app.markDelete();
+//                                }
+//                            }, "Really", ["No", "Yes"]);
+
+                }
+            });
+
             var scrollTimer;
             if ($('html').hasClass('oldAndroid')) {
                 app.pageScrollTarget = window;
@@ -986,6 +1036,11 @@ var app = {
             app.activeMarker = this;
 
             app.getPlaceFromDB(this.server_id, function (data) {
+                if (data.delete_counter == 0) {
+                    $(".mark-delete").addClass('active');
+                } else {
+                    $(".mark-delete").removeClass('active');
+                }
                 if (data.image) {
                     $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image + ")");
                     $(".foot-link").css('background-size', 'cover');
