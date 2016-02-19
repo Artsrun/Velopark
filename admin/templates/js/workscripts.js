@@ -26,7 +26,7 @@ $(document).ready(function () {
                     return (css.match(/(^|\s)correct_\S+/g) || []).join(' ');
                 });
                 var img = new Image();
-                img.src = response + '?' + (new Date()).getTime();
+                img.src = response+'?' + (new Date()).getTime();
                 img.onload = function () {
                     EXIF.getData(img, function () {
                         var orientation = EXIF.getTag(this, 'Orientation');

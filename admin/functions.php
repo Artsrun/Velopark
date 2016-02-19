@@ -321,7 +321,7 @@ function add_place($link) {
 		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
         $vers = $link->query($query_version);				
         if ($link->affected_rows > 0) {
-			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `country`, `version`, `status`,`votes_yes` ) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "','".$country."', (SELECT value FROM options WHERE name='version'), '1', 0)";
+			$query = "INSERT INTO places (`latitude`, `longitude`, `name`, `address`, `description`, `image`, `type`, `country`, `version`, `status`) VALUES ('" . $latitude . "', '" . $longitude . "', '" . $name . "',  '" . $address . "', '" . $description . "','" . $base64 . "','" . $type . "','".$country."', (SELECT value FROM options WHERE name='version'), '1')";
 			$res = $link->query($query);
 		}        
         if ($link->affected_rows > 0) {
@@ -357,8 +357,9 @@ function delete_place($place_id, $link) {
 
 function confirm_place($place_id, $link) {
 	    
-    $query = "UPDATE places SET status='1' WHERE id = $place_id";
-    $result = $link->query($query);
+	$link->query("DELETE FROM votes WHERE place_id=" . $place_id . " AND (vote = '0' OR vote = '1')");	
+    $query = "UPDATE places SET status='1', votes_yes = '0', votes_no = '0' WHERE id = $place_id";						
+    $result = $link->query($query);	
     if ($link->affected_rows > 0) {
         $_SESSION['answer'] = "<div class='success'>Place has been approved!</div>";
 		
@@ -395,7 +396,8 @@ function vote_place($place_id, $link) {
         $precent_yes = $votes["votes_yes"] * 100 / $votes_count;
         if ($precent_yes >= 75 && $votes["votes_yes"] >= 10) {
             $link->query("UPDATE options SET value = CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'");
-            $link->query("UPDATE places SET status = '1', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+            $link->query("UPDATE places SET status = '1', votes_yes = '0', votes_no = '0', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);			
+			$link->query("DELETE FROM votes WHERE place_id=" . $place_id . " AND (vote = '0' OR vote = '1')");						
         }
         return true;
     }
@@ -470,6 +472,7 @@ function get_stats($link){
 	$by_platform = "SELECT platform, count(distinct device_id) as users, COUNT(*) AS opens FROM stats WHERE `platform`!='' GROUP BY `platform`";
 	$by_model = "SELECT model, count(distinct device_id) as users, COUNT(*) AS opens FROM stats WHERE `model`!='' GROUP BY `model`";
 	$by_place_add = "SELECT device_id, count(device_id) as place_add FROM votes WHERE `vote`='2' GROUP BY `device_id`";
+	$by_place_delete = "SELECT device_id, count(device_id) as place_add FROM votes WHERE `vote`='3' GROUP BY `device_id`";
     $stats = array();
 	$result = $link->query($by_platform);
     while ($row = $result->fetch_assoc()) {
@@ -486,6 +489,12 @@ function get_stats($link){
         $stats['by_place_add'][] = $row;
     }
 	$result->free();
+	$result = $link->query($by_place_delete);
+    while ($row = $result->fetch_assoc()) {
+        $stats['by_place_delete'][] = $row;
+    }
+	$result->free();
+	
 
     return $stats;
 }
@@ -575,7 +584,7 @@ function delete_perm($place_id, $link) {
 			$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
 			$result = $link->query($query_version);
 			if ($result != false && $link->affected_rows > 0) {
-				$res = $link->query("UPDATE places SET latitude='DELETED',longitude='DELETED',name='DELETED',address='DELETED',country='DELETED',description='DELETED',image='DELETED',type='DELETED',votes_yes='-1',votes_no='-1',date='0000-00-00 00:00:00', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+				$res = $link->query("UPDATE places SET latitude='DELETED',longitude='DELETED',name='DELETED',address='DELETED',country='DELETED',description='DELETED',image='DELETED',type='DELETED',votes_yes='-1',votes_no='-1',delete_couter=-1,date='0000-00-00 00:00:00', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
 				if ($res!=false && $link->affected_rows > 0) {	
 					if(file_exists("../uploads/" . $place_id . ".jpg")){
 						if( unlink("../uploads/" . $place_id . ".jpg")){
