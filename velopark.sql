@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Feb 19, 2016 at 12:40 PM
+-- Generation Time: Feb 19, 2016 at 01:24 PM
 -- Server version: 10.0.23-MariaDB
 -- PHP Version: 5.4.31
 
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `places` (
   KEY `status` (`status`),
   KEY `type` (`type`),
   KEY `country` (`country`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=532 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=533 ;
 
 --
 -- Dumping data for table `places`
@@ -241,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `stats` (
   `device_id` varchar(250) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2891 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2907 ;
 
 --
 -- Dumping data for table `stats`
@@ -809,7 +809,23 @@ INSERT INTO `stats` (`id`, `platform`, `model`, `version`, `device_id`, `date`) 
 (2887, 'ios', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 12:34:00'),
 (2888, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 12:34:01'),
 (2889, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 12:34:51'),
-(2890, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 12:35:00');
+(2890, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 12:35:00'),
+(2891, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 12:45:21'),
+(2892, 'ios', 'iPhone5,1', '9.2.1', '623E211D-40C3-4456-9C28-EFCCDB3EC141', '2016-02-19 12:57:26'),
+(2893, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 12:59:48'),
+(2894, 'ios', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 12:59:50'),
+(2895, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 13:00:52'),
+(2896, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 13:03:33'),
+(2897, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 13:03:41'),
+(2898, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 13:03:46'),
+(2899, 'ios', 'debug', '5.3.1', '5465sdfsdf46', '2016-02-19 13:04:15'),
+(2900, 'ios', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 13:08:47'),
+(2901, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 13:09:08'),
+(2902, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 13:14:01'),
+(2903, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 13:15:10'),
+(2904, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 13:15:34'),
+(2905, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 13:16:03'),
+(2906, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-02-19 13:17:32');
 
 -- --------------------------------------------------------
 
@@ -826,7 +842,7 @@ CREATE TABLE IF NOT EXISTS `votes` (
   PRIMARY KEY (`id`),
   KEY `device_id` (`device_id`),
   KEY `place_id` (`place_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1759 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1764 ;
 
 --
 -- Dumping data for table `votes`
@@ -842,12 +858,7 @@ INSERT INTO `votes` (`id`, `place_id`, `device_id`, `vote`, `date`) VALUES
 (1672, 521, 'f1f0d47d86b29ac7', '2', '2016-01-12 04:59:24'),
 (1673, 522, '79590DE6-43AD-4CD8-906C-2768018BE1AD', '2', '2016-01-17 09:17:57'),
 (1675, 523, '79590DE6-43AD-4CD8-906C-2768018BE1AD', '2', '2016-01-17 11:32:03'),
-(1680, 526, '79590DE6-43AD-4CD8-906C-2768018BE1AD', '2', '2016-02-11 09:50:47'),
-(1748, 23, '629833d0b599872a1455884794312', '3', '2016-02-19 12:26:33'),
-(1750, 23, '629833d0b599872a1455884796760', '3', '2016-02-19 12:26:36'),
-(1752, 23, '629833d0b599872a1455884798484', '3', '2016-02-19 12:26:37'),
-(1755, 6, '5465sdfsdf46', '3', '2016-02-19 12:34:46'),
-(1757, 336, '5465sdfsdf46', '3', '2016-02-19 12:34:56');
+(1680, 526, '79590DE6-43AD-4CD8-906C-2768018BE1AD', '2', '2016-02-11 09:50:47');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
