@@ -109,6 +109,10 @@ var app = {
                 tx.executeSql('ALTER TABLE places  ADD COLUMN delete_counter integer DEFAULT  0;');
             });
         }
+        if (app.db.version == "") {
+            app.db.changeVersion("", "1.1");
+        }
+        
         app.platform = device.platform.toLowerCase();
 
         $('html').addClass(app.platform);
@@ -617,6 +621,7 @@ var app = {
                             }
                         }
                         if (app.getLocalVersion() == 0) {
+                            app.firstDraw = true;
                             app.selectPlaces(app.defaultType);
                         }
                         localStorage.setItem("version", version);
@@ -699,7 +704,7 @@ var app = {
                 app.systemAlert();
             }
             /* select places if exist */
-            if (app.getLocalVersion() != 0) {
+            if (app.getLocalVersion() != 0 && typeof app.firstDraw == 'undefined') {
                 app.selectPlaces(app.defaultType);
             }
             app.setLocationHash('gmapfix');
@@ -862,7 +867,7 @@ var app = {
             /* mark delete */
             $('.mark-delete').on('click', function () {
                 if (app.activeMarker && app.activeMarker.server_id) {
-                    navigator.notification.confirm("Want to delete ?",
+                    navigator.notification.confirm("Want to ask community to delete place?",
                             function confirmDelete(buttonIndex) {
                                 if (buttonIndex == 2) {
                                     app.markDelete();
