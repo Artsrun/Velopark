@@ -800,11 +800,12 @@ html.ios footer .footer-image{
     right: 0 !important;
 }
 
-.about_text{
+.content_text{
     margin: 0 auto;
     line-height: 1.4;
     font-size: 18px;
     color: #555555;
+    margin-bottom: 20px;
 }
 .contacts {
     font-size: 16px;
@@ -1171,7 +1172,7 @@ input.error, textarea.error{
     display: block;
     margin: 0 auto;
     margin-top: 80px;
-    margin-bottom: 20px;
+/*    margin-bottom: 20px;*/
 }
 .poweredBy img {
     width:100%;

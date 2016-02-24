@@ -506,7 +506,7 @@ var app = {
                 }
             },
             error: function (err) {
-                console.log(err);
+                app.notification('Oops', 'Something went wrong', 'Close', null);
                 // error while trying to get new places count, do nothing
             }
         });
@@ -614,7 +614,7 @@ var app = {
                         tx.executeSql('CREATE TABLE IF NOT EXISTS places(server_id integer PRIMARY KEY unique,latitude REAL, longitude REAL, name text, address varchar, description text, image text, type varchar, status varchar, delete_counter integer DEFAULT 0)', []);
                         for (var i = 0; i < response.length; i++) {
                             if (response[i].status === "1") {
-                                tx.executeSql("UPDATE places SET latitude=?, longitude=?, name=?, address=?, description=?, image=?, type=?, status=? WHERE server_id=?", [response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status, response[i].id], null, null);
+                                tx.executeSql("UPDATE places SET latitude=?, longitude=?, name=?, address=?, description=?, image=?, type=?, status=?, delete_counter = 0 WHERE server_id=?", [response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status, response[i].id], null, null);
                                 tx.executeSql("INSERT OR IGNORE INTO places(server_id, latitude, longitude, name, address, description, image, type, status) values(?, ?, ?, ?, ?, ?, ?, ?, ?)", [response[i].id, response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status], null, null);
                             } else {
                                 tx.executeSql("DELETE FROM places WHERE server_id=?", [response[i].id], null, null);
@@ -867,7 +867,7 @@ var app = {
             /* mark delete */
             $('.mark-delete').on('click', function () {
                 if (app.activeMarker && app.activeMarker.server_id) {
-                    navigator.notification.confirm("Want to ask community to delete place?",
+                    navigator.notification.confirm("Want to ask community to delete this spot?",
                             function confirmDelete(buttonIndex) {
                                 if (buttonIndex == 2) {
                                     app.markDelete();
