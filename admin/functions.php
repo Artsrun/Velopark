@@ -354,6 +354,21 @@ function delete_place($place_id, $link) {
 	}	
 }
 
+function undelete_place($place_id, $link) {
+	    
+	$query = "UPDATE places SET status='1' WHERE id = $place_id";
+	$result = $link->query($query);
+	if ($link->affected_rows > 0) {
+		$_SESSION['answer'] = "<div class='success'>Place has been recovered!</div>";        
+		
+		$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
+		$link->query($query_version);
+		if ($link->affected_rows > 0) {
+			$link->query("UPDATE places SET version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+		}		
+	}	
+}
+
 
 function confirm_place($place_id, $link) {
 	    

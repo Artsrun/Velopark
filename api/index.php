@@ -80,7 +80,7 @@ function get_votes($link) {
         $query = "SELECT id as server_id, latitude, longitude, name, address, description, image, type FROM places "
                 . "WHERE status='0' AND id NOT IN "
                 . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
-                . "WHERE votes.device_id = '" . $unique_id . "') ORDER BY id DESC LIMIT 0, 10";
+                . "WHERE votes.device_id = '" . $unique_id . "' AND (votes.vote = '0' OR votes.vote = '1')) ORDER BY id DESC LIMIT 0, 10";
         $result = $link->query($query);
 		if ($result != false) {
 			if ($result->num_rows > 0) {
@@ -296,6 +296,8 @@ function add_delete($link) {
     $result = $link->query($query);	
 	$query = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $place_id . ", '" . $unique_id . "', '0')";
     $result = $link->query($query);
+	$query = "UPDATE places SET votes_no = votes_no + 1 WHERE id=" . $place_id;
+	$result = $link->query($query);	
 	if($result != false){
 		if ($link->affected_rows > 0) {
 			$query = "UPDATE places SET delete_counter = delete_counter + 1 WHERE id=" . $place_id;
@@ -328,7 +330,7 @@ function get_count($link) {
     $query = "SELECT id FROM places "
             . "WHERE status='0' AND id NOT IN "
             . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
-            . "WHERE votes.device_id = '" . $device_id . "')  LIMIT 0, 10";
+            . "WHERE votes.device_id = '" . $device_id . "' AND (votes.vote = '0' OR votes.vote = '1'))  LIMIT 0, 10";
     $result = $link->query($query);
 	if ($result != false) {
 		$row_cnt = $result->num_rows;		
