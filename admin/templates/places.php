@@ -57,13 +57,20 @@
                     <span class="red">No -  <?= $item['votes_no'] ?></span><br>
                     <b><?php if($item['votes_yes'] + $item['votes_no']!=0): ?>
                     % -  <?= round($item['votes_yes']*100/+($item['votes_yes'] + $item['votes_no']),2) ?>
-                    <?php endif; ?> </b>
+                    <?php endif; ?> </b><br>
+					<span class="red">Del -  <?= $item['delete_counter'] ?></span>
                 </td>
                 <td>
 					<a href="?view=edit_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="edit">edit</a><br>
+					<?php if($item['status'] !=2 ){ ?>
 					<a href="?view=delete_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="del" onclick="return confirm('are you sure?');">delete</a><br>
+					<?php }else{ ?>
+					<a href="?view=undelete_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="del" >recover</a><br>
+					<?php } ?>
 					<a href="?view=vote_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="vote">vote</a><br>
+					<?php if($item['status'] == 0){ ?>
 					<a href="?view=confirm_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="confirm"><b>confirm<b></a>
+					<?php } ?>
 				</td>
             </tr>
             <?php $i++; ?>
