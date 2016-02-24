@@ -867,7 +867,7 @@ var app = {
             /* mark delete */
             $('.mark-delete').on('click', function () {
                 if (app.activeMarker && app.activeMarker.server_id) {
-                    navigator.notification.confirm("Want to ask community to delete place?",
+                    navigator.notification.confirm("Want to ask community to delete this spot?",
                             function confirmDelete(buttonIndex) {
                                 if (buttonIndex == 2) {
                                     app.markDelete();
