@@ -61,7 +61,7 @@ function get_version($link) {
         }		
         $result->free();
     }
-	$msg_to_send = empty($msg)?'dfsa':(isset($msg[1])?($msg[1]['device_id']==''?$msg[1]:$msg[0]):$msg[0]);	
+	$msg_to_send = empty($msg)?'':(isset($msg[1])?($msg[1]['device_id']==''?$msg[1]:$msg[0]):$msg[0]);	
 	
 	add_stats($link);
 	echo json_encode([
