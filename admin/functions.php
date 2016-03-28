@@ -3,7 +3,7 @@
 defined('VELOPARK') or die('Access denied');
 
 function clear_admin($var, $link) {
-    $var = $link->real_escape_string($var);
+    $var = strip_tags($link->real_escape_string($var));
     return $var;
 }
 
@@ -599,7 +599,7 @@ function delete_perm($place_id, $link) {
 			$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
 			$result = $link->query($query_version);
 			if ($result != false && $link->affected_rows > 0) {
-				$res = $link->query("UPDATE places SET latitude='DELETED',longitude='DELETED',name='DELETED',address='DELETED',country='DELETED',description='DELETED',image='DELETED',type='DELETED',votes_yes='-1',votes_no='-1',delete_couter=-1,date='0000-00-00 00:00:00', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
+				$res = $link->query("UPDATE places SET latitude='DELETED',longitude='DELETED',name='DELETED',address='DELETED',country='DELETED',description='DELETED',image='DELETED',type='DELETED',votes_yes='-1',votes_no='-1',delete_counter=-1,date='0000-00-00 00:00:00', version = (SELECT value FROM options WHERE name='version') WHERE id=" . $place_id);
 				if ($res!=false && $link->affected_rows > 0) {	
 					if(file_exists("../uploads/" . $place_id . ".jpg")){
 						if( unlink("../uploads/" . $place_id . ".jpg")){

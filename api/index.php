@@ -3,10 +3,13 @@ date_default_timezone_set('UTC');
 require_once '../config.php';
 
 $link = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
+function clear_admin($var, $link) {
+    $var = strip_tags($link->real_escape_string($var));
+    return $var;
+}
 function get_places($link) {
 	
-    $local_version = $link->real_escape_string(trim($_POST["version"]));
+    $local_version = clear_admin(trim($_POST['version']), $link);
 	$status = 'failed';
     $places = array();
     if (!$local_version) {
@@ -30,10 +33,10 @@ function get_places($link) {
 
 function add_stats($link){
 
-	$platform = $link->real_escape_string(trim($_POST['platform']));
-    $device_id = $link->real_escape_string(trim($_POST['device_id']));
-	$model = $link->real_escape_string(trim($_POST['model']));
-    $version = $link->real_escape_string(trim($_POST['version']));
+	$platform = clear_admin(trim($_POST['platform']), $link);
+    $device_id = clear_admin(trim($_POST['device_id']), $link);
+	$model = clear_admin(trim($_POST['model']), $link);
+    $version = clear_admin(trim($_POST['version']), $link);
 	$query = "INSERT INTO stats (`platform`, `device_id`, `model`, `version`) VALUES ('" . $platform . "', '" . $device_id . "', '" . $model . "', '" . $version . "')";
 	$result = $link->query($query);
 	return ($result!=false)?true:false;
@@ -51,7 +54,7 @@ function get_version($link) {
         $result->free();
     }
 		
-	$device_id = $link->real_escape_string(trim($_POST['device_id']));
+	$device_id = clear_admin(trim($_POST['device_id']), $link);
 	$query = "SELECT * FROM msg WHERE device_id='".$device_id."' OR device_id='' ORDER BY device_id DESC";	
 	$result = $link->query($query);
 	$msg = array();
@@ -76,7 +79,7 @@ function get_votes($link) {
     $status = 'failed';
     if ($_POST["unique_id"]) {
 		
-        $unique_id = $link->real_escape_string(trim($_POST["unique_id"]));
+        $unique_id = clear_admin(trim($_POST['unique_id']), $link);
         $query = "SELECT id as server_id, latitude, longitude, name, address, description, image, type FROM places "
                 . "WHERE status='0' AND id NOT IN "
                 . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
@@ -150,14 +153,14 @@ function add_place($link) {
 			$image = @imagecreatefrompng($_FILES["file"]["tmp_name"]);
 		}
 		if($image != false){
-			$unique_id = $link->real_escape_string(trim($_POST['device_id']));
-			$latitude = $link->real_escape_string(trim($_POST['lat']));
-			$longitude = $link->real_escape_string(trim($_POST['long']));
-			$name = $link->real_escape_string(trim($_POST['name']));
-			$desc = $link->real_escape_string(trim($_POST['desc']));
-			$address = $link->real_escape_string(trim($_POST['address']));
-			$type = $link->real_escape_string(trim($_POST['type']));
-			$country = $link->real_escape_string(trim($_POST['country']));
+			$unique_id = clear_admin(trim($_POST['device_id']), $link);
+			$latitude = clear_admin(trim($_POST['lat']), $link);
+			$longitude = clear_admin(trim($_POST['long']), $link);
+			$name = clear_admin(trim($_POST['name']), $link);
+			$desc = clear_admin(trim($_POST['desc']), $link);
+			$address = clear_admin(trim($_POST['address']), $link);
+			$type = clear_admin(trim($_POST['type']), $link);
+			$country = clear_admin(trim($_POST['country']), $link);
 			
 			if($mime_type == 'image/jpeg'){				
 				$exif = @exif_read_data($_FILES["file"]["tmp_name"]);
@@ -249,9 +252,9 @@ function add_place($link) {
 function add_vote($link) {
     $votes = array();
 	$status = 'failed';
-    $unique_id = $link->real_escape_string(trim($_POST['device_id']));	
-    $place_id = abs((int) $link->real_escape_string(trim($_POST["place_id"])));
-    $vote = $link->real_escape_string(trim($_POST["vote"]));
+    $unique_id = clear_admin(trim($_POST['device_id']), $link);
+    $place_id = abs((int) clear_admin(trim($_POST['place_id']), $link));
+    $vote = clear_admin(trim($_POST['vote']), $link);
     $query = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $place_id . ", '" . $unique_id . "', '" . $vote . "')";
     $result = $link->query($query);
 	if($result != false){
@@ -289,8 +292,8 @@ function add_vote($link) {
 function add_delete($link) {
 	$deletes = array();
 	$status = 'failed';
-    $unique_id = $link->real_escape_string(trim($_POST['device_id']));	
-    $place_id = abs((int) $link->real_escape_string(trim($_POST["place_id"])));
+    $unique_id = clear_admin(trim($_POST['device_id']), $link);
+    $place_id = abs((int) clear_admin(trim($_POST['place_id']), $link));
 	
 	$query = "INSERT INTO votes (`place_id`, `device_id`, `vote`) VALUES (" . $place_id . ", '" . $unique_id . "', '3')";
     $result = $link->query($query);	

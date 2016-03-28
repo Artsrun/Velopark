@@ -89,7 +89,12 @@ switch ($view) {
         redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
 
         break;
-		
+	case("undelete_place"):
+        $place_id = abs((int) $_GET['place_id']);
+        undelete_place($place_id, $link);
+        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+
+        break;
 	case("confirm_place"):
 	    $place_id = abs((int) $_GET['place_id']);
         confirm_place($place_id, $link);
