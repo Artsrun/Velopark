@@ -3,6 +3,8 @@ date_default_timezone_set('UTC');
 require_once '../config.php';
 
 $link = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$link->set_charset('utf8');
+
 function clear_admin($var, $link) {
     $var = strip_tags($link->real_escape_string($var));
     return $var;

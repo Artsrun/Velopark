@@ -3,6 +3,7 @@ define('VELOPARK', TRUE);
 session_start();
 require_once '../../config.php';
 $link = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$link->set_charset('utf8');
 if (isset($_SESSION['auth']['admin'])) {
     header("Location: ../");
     exit;
