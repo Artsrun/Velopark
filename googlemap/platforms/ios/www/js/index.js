@@ -2,7 +2,10 @@
 var DEBUG = false;
 if (DEBUG) {
     device = {};
-    device.uuid = 'test_user';
+    device.uuid = '5465sdfsdf46';
+    device.platform = 'ios';
+    device.version = '5.3.1';
+    device.model = 'debug';
 }
 
 var app = {
@@ -17,19 +20,27 @@ var app = {
         shop: null,
         parts: null
     },
+    systemMessage: {
+        'title': 'Hey',
+        'message': '',
+        'show': false
+    },
     positionWatchId: null,
     firstLoad: true,
     defaultType: 'parking',
     onlineStatus: '',
-    gMapApiKey: 'AIzaSyBiXhsB_EDoECMR_bJiRSGnRllbLQPAeXA', // 'AIzaSyBSTzxHlrxgWyu3k59l4nf-c6kfuDf1D-U',
+    gmapKeys: {
+        'android': 'AIzaSyBiXhsB_EDoECMR_bJiRSGnRllbLQPAeXA',
+        'ios': 'AIzaSyBZUh_y4RG1sUi5tSRFUBn6LduphbfP--s'
+    },
     defaultLocation: {
         latitude: 40.1778541,
         longitude: 44.5136349
     },
     geolocationOptions: {
         enableHighAccuracy: true,
-        timeout: 3000,
-        maximumAge: 100
+        timeout: 5000,
+        maximumAge: 0
     },
     mapOptions: {
         zoom: 14,
@@ -37,15 +48,23 @@ var app = {
         zoomControl: false,
         mapTypeControl: false,
         scaleControl: false,
-        streetViewControl: false,
-        disableDefaultUI:true,
-        clickToGo:false
+        streetViewControl: false
+    },
+    markerOptions: {
+        places: {
+            w: 28,
+            h: 44
+        },
+        me: {
+            w: 15,
+            h: 15
+        }
     },
     getLocalVersion: function () {
         if (localStorage.getItem("version")) {
             return localStorage.getItem("version");
         } else {
-            return '0';
+            return 0;
         }
 
     },
@@ -65,6 +84,7 @@ var app = {
     bindEvents: function () {
         if (DEBUG) {
             app.onDeviceReady();
+            this.onLine();
         } else {
             document.addEventListener("deviceready", this.onDeviceReady, false);
         }
@@ -76,18 +96,52 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function () {
-        app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
+        /* hide splashscreen manually */
+        setTimeout(function () {
+            if (navigator.splashscreen) {
+                navigator.splashscreen.hide();
+            }
+        }, 10000);
 
+        app.db = openDatabase('places', '', 'the database of places', 4 * 1024 * 1024);
+        if (app.db.version == "1") {
+            app.db.changeVersion("1", "1.1", function (tx) {
+                tx.executeSql('ALTER TABLE places  ADD COLUMN delete_counter integer DEFAULT  0;');
+            });
+        }
+        if (app.db.version == "") {
+            app.db.changeVersion("", "1.1");
+        }
+        
+        app.platform = device.platform.toLowerCase();
+
+        $('html').addClass(app.platform);
+
+        app.gMapApiKey = app.gmapKeys[ app.platform];
+
+        if (app.platform == 'android' && parseInt(device.version) < 3) {
+            $('html').addClass('oldAndroid');
+        }
         if (DEBUG) {
             app.onlineStart = true;
+            app.onlineStatus = 'online';
+            $('html').addClass('online');
             app.googleMapEmbed();
         } else {
             if (navigator.connection && navigator.connection.type != "none") {
+                app.onlineStatus = 'online';
+                $('html').addClass('online');
+
                 app.onlineStart = true;
                 app.googleMapEmbed();
             } else {
                 app.onlineStart = false;
                 app.start('offlineMap');
+                if (navigator.splashscreen) {
+                    navigator.splashscreen.hide();
+                    app.systemMessage.show = true;
+                    app.systemAlert();
+                }
             }
         }
         document.addEventListener("pause", app.onPause, false);
@@ -109,9 +163,8 @@ var app = {
             app.onlineStatus = 'online';
             /* add class to body for further usage */
 
-            $('body').removeClass('offline');
-            $('body').removeClass('offlineMap');
-            $('body').addClass('online');
+            $('html').removeClass('offline');
+            $('html').addClass('online');
 
             if (app.getActivePage() == 'new_places') {
                 app.getNewPlaces();
@@ -120,7 +173,6 @@ var app = {
             if (app.getActivePage() == 'add_places') {
                 app.openCameraDialog();
             }
-            //$(".gps1, #arr_down").show();
             if (app.onlineStart == false) {
                 app.onlineStart = true;
                 app.googleMapEmbed();
@@ -131,13 +183,9 @@ var app = {
         if (app.onlineStatus != 'offline') {
             app.onlineStatus = 'offline';
             /* add class to body for further usage */
-            $('body').removeClass('online');
-            $('body').addClass('offline');
+            $('html').removeClass('online');
+            $('html').addClass('offline');
         }
-    },
-    // Update DOM on a Received Event
-    receivedEvent: function (id) {
-        console.log(id);
     },
     goToPage: function (pageId) {
         if ($('#' + pageId).hasClass('active')) {
@@ -146,12 +194,16 @@ var app = {
             $('.page').removeClass('active');
         }
         /* hide menu */
-        fadeOut('.menu');
+        fadeOut('.menu', function () {
+            $(".menu").removeClass('active');
+        });
 
 
         /* reset to default state */
-        $('#add_places input, #add_places textarea').val('');
-        $("#add_places .add-src").css("background-image", "none");
+        $('#add_places input, #add_places textarea ,#add_places .add-image').val('');
+        $("#add_places .add-src").css('background-image', 'none');
+        $("#add_places .add-src-cont").addClass('chooseLoader');
+        $("#add_places .add-src-cont").removeClass('chooseImageDone');
         $("#add-map").html("");
         $(".radio-wrap .add_img_icon").removeClass("add_img_icon_park");
         $(".radio-wrap .add_img_icon").removeClass("active_icon");
@@ -159,19 +211,12 @@ var app = {
         $("input.error, textarea.error").removeClass('error');
 
         if (pageId == 'main') {
-            if (!app.positionStatus) {
-                this.onResume();
-            }
-            $(".gps1, footer").show();
             $(".arr-wrapper").removeClass('arr_back');
         } else {
-            this.onPause();
-            $(".gps1, footer").hide();
             $(".arr-wrapper").addClass('arr_back');
-        }
-
-        if (pageId == 'new_places') {
-            $('header').removeClass('new_not');
+            if (pageId == 'new_places') {
+                $('header').removeClass('new_not');
+            }
         }
         /* correct menu */
         $('.menu li').removeClass("active_menu");
@@ -180,9 +225,23 @@ var app = {
         /* hide other pages */
         $('.page').addClass('hidden');
         /* show correct page */
+        app.scrollFix = -1;
         $('#' + pageId).removeClass('hidden').addClass('active');
-        $('body').attr('data-active', pageId);
+        $('html').attr('data-active', pageId);
         app.setLocationHash(pageId);
+        if ($('html').hasClass('oldAndroid')) {
+            window.scrollTo(0, 0);
+        } else {
+            $('#' + pageId + ' .wrapper').animate({
+                scrollTop: 0
+            }, 0);
+        }
+
+        if (pageId == 'main' || pageId == 'add_places') {
+            app.gpsStart();
+        } else {
+            app.gpsStop();
+        }
         return true;
     },
     getActivePage: function () {
@@ -204,10 +263,13 @@ var app = {
             },
             dataType: 'json',
             beforeSend: function () {
-                $("#new_places .wrapper").append("<img src='img/ajax_loader.gif' alt='' class='loader'>");
+                if ($('html').hasClass('oldAndroid')) {
+                    $('html').addClass('fullHeight');
+                }
+                addLoader('#new_places');
             },
             success: function (res) {
-                $("#new_places .wrapper .loader").remove();
+                removeLoader('#new_places');
                 if (res.status == 'success') {
                     app.showPlacesForVote(res.data);
                 } else {
@@ -219,7 +281,7 @@ var app = {
                 }
             },
             error: function (err) {
-                $("#new_places .wrapper .loader").remove();
+                removeLoader('#new_places');
                 if (app.getActivePage() === 'new_places') {
                     app.notification('Oops', 'Something went wrong', 'Close', function () {
                         app.goToPage('main');
@@ -234,7 +296,7 @@ var app = {
             };
         }
         if (DEBUG) {
-            alert(text)
+            alert('title:' + title + " text:" + text);
         } else {
             navigator.notification.alert(text, callback, title, button);
         }
@@ -243,7 +305,6 @@ var app = {
         if (typeof txt == 'undefined') {
             txt = 'There is no internet connection';
         }
-        console.log(txt);
     },
     addNewPlace: function (options) {
 
@@ -251,7 +312,7 @@ var app = {
             this.noConnection();
             return false;
         }
-        $('.error_msg').remove();
+        $('.error_msg').removeClass('show');
         $('#add_places .error').removeClass('error');
 
         var error = false;
@@ -281,17 +342,13 @@ var app = {
         }
 
         if (error) {
-            $('.add_place_icon_wrapper').append('<span class="error_msg">Please check required fields</span>');
+            $('.error_msg').addClass('show');
             setTimeout(function () {
-                fadeOut('.error_msg', function () {
-                    $('.error_msg').remove();
-                });
+                $('.error_msg').removeClass('show');
             }, 2000);
         } else {
             var options = new FileUploadOptions();
             options.fileKey = "file";
-            options.fileName = "name.jpg";
-            options.mimeType = "image/jpeg";
 
             var params = {};
             params.device_id = device.uuid;
@@ -300,25 +357,39 @@ var app = {
             params.address = $(".add-address").val();
             params.name = $(".add-name").val();
             params.desc = $(".add-descript").val();
+            params.country = $('.add-country').val();
             params.type = $('.active_icon').attr("data-type");
             params.action = "add_place";
             options.params = params;
 
-            var image = $(".add-image").attr("src");
+            var image = $(".add-image").val();
             var ft = new FileTransfer();
 
             addLoader('#add_places');
 
             ft.upload(image, encodeURI(app.apiURL),
-                    function () {
+                    function (data) {
                         removeLoader('#add_places');
-                        if (app.getActivePage() === 'add_places') {
-                            app.goToPage('main');
+                        var response;
+                        try {
+                            response = JSON.parse(data.response)
+                        } catch (e) {
+                            // invalid json input, set to null
+                            response = null
+                        }
+                        if (response && response.status == 'success') {
+                            if (app.getActivePage() == 'add_places') {
+                                app.goToPage('main');
+                            }
+                        } else {
+                            if (app.getActivePage() == 'add_places') {
+                                app.notification('Oops', 'Something went wrong', 'Close', null);
+                            }
                         }
                     },
                     function () {
                         removeLoader('#add_places');
-                        if (app.getActivePage() === 'add_places') {
+                        if (app.getActivePage() == 'add_places') {
                             app.notification('Oops', 'Something went wrong', 'Close', null);
                         }
                     }, options);
@@ -327,44 +398,40 @@ var app = {
     showPlacesForVote: function (places) {
         $("#new_places .wrapper .content").empty();
 
-        var map_width = parseInt($("#new_places .wrapper").outerWidth(true));
+        var wrapper_width = parseInt($("#new_places .content").outerWidth(true));
+        var wrapper_height = parseInt(wrapper_width / 2);
+
+        var map_height = (wrapper_height > 320) ? 320 : wrapper_height;
+
         var map_size = {
-            width: map_width,
-            height: parseInt(map_width / 2)
+            width: map_height * 2,
+            height: map_height
         }
         if (places.length) {
             for (var i = 0; i < places.length; i++) {
                 var output = "<div class='vot_wrap' id='vot_" + places[i].server_id + "' data-id='" + places[i].server_id + "' >";
-
                 output += "<div class='vot_img_icon_wrap'>";
                 if (places[i].image) {
-                    output += "<a class='swipebox_places " + places[i].type + "' rel='" + i + "' href='" + app.uploadsURL + places[i].server_id + ".jpg' onclick='return false;'><img class='vot_img' src='data:image/jpg;base64," + places[i].image + "' alt='' /></a>";
+                    output += "<a style='background-image:url(data:image/jpg;base64," + places[i].image + ")' class='swipebox_places " + places[i].type + "' rel='" + i + "' href='" + app.uploadsURL + places[i].server_id + ".jpg' onclick='return false;'></a>";
                 } else {
-                    output += "<a class='swipebox_places noimage' ontouch='return false;'>";
-                    if (places[i].type == "parking") {
-                        output += "<img class='vot_img' src='img/foot_icon_parking.png' />";
-                    } else if (places[i].type == "rent") {
-                        output += "<img class='vot_img' src='img/foot_icon_rent.png' />";
-                    } else if (places[i].type == "shop") {
-                        output += "<img class='vot_img' src='img/foot_icon_shop.png' />";
-                    } else if (places[i].type == "parts") {
-                        output += "<img class='vot_img' src='img/foot_icon_parts.png' />";
-                    }
-                    output += "</a>";
+                    output += "<a style='background-image:url(img/foot_icon_" + places[i].type + ".png)'  class='swipebox_places noimage' ontouch='return false;'></a>";
                 }
                 output += "<p>Name</p><p class='cont'>" + places[i].name + "</p><p>Address</p><p class='cont'>" + places[i].address + "</p>";
                 output += "</div>";
                 if (places[i].description) {
                     output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
-                output += "<div style='height:" + map_size.height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
-                output += "<div class='new_place_icon_wrap'><a src='img/add_place.png' class='new_place_icon accept' data-value='1'></a><a src='img/new_place.png' class='new_place_icon decline' data-value='0'></a></div>";
+                output += "<div style='height:" + wrapper_height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
+                output += "<div class='new_place_icon_wrap'><a href='javascript:void(0);' class='new_place_icon accept' data-value='1' ><img  src='img/add_place.png'  alt='' /></a><a href='javascript:void(0);' class='new_place_icon decline' data-value='0' ><img  src='img/new_place.png' alt='' /></a></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
 
                 app.activateSwipebox('#vot_' + places[i].server_id + ' .swipebox_places:not(".noimage")');
             }
-            $('#new_places .wrapper').trigger('scroll');
+            app.showReviewMap();
+            if ($('html').hasClass('oldAndroid')) {
+                $('html').removeClass('fullHeight');
+            }
         } else {
             $("#new_places .wrapper .content ").html("<p class='no_place_text'>Nothing to review</p>");
         }
@@ -392,27 +459,18 @@ var app = {
                 if (res.status == 'success') {
                     localStorage.setItem("count", parseInt(localStorage.getItem("count")) - 1);
                     var $blockEl = $('[data-id="' + voteData['place_id'] + '"]');
-                    var blockHeight = $blockEl.height();
-
+                    var curHeight = $blockEl.outerHeight(true);
                     $blockEl.addClass('swipe');
-                    $blockEl[0].offsetHeight;
-                    $blockEl.addClass('swipeLeft');
-
+                    $blockEl.nextAll().addClass('up_trans').css('transform', 'translateY(-' + curHeight + 'px)').css('-webkit-transform', 'translateY(-' + curHeight + 'px)');
 
                     setTimeout(function () {
-                        $blockEl.css('height', blockHeight);
-                        $blockEl.addClass('hideHeight');
-                        $blockEl[0].offsetHeight;
-                        $blockEl.css('height', 0);
-                    }, 250);
-
-                    setTimeout(function () {
+                        $blockEl.nextAll().removeClass('up_trans').removeAttr('style');
                         $blockEl.remove();
-                        $('#new_places .wrapper').trigger('scroll');
+                        app.showReviewMap();
                         if ($("#new_places .wrapper .content .vot_wrap").length == 0) {
-                            $("#new_places .wrapper .content").html("<p class='no_place_text'>Nothing to review</p>");
+                            app.getNewPlaces();
                         }
-                    }, 600);
+                    }, 400);
                 } else {
                     removeLoader('[data-id="' + voteData['place_id'] + '"]');
                     app.notification('Oops', 'Something went wrong', 'Close', null);
@@ -424,16 +482,53 @@ var app = {
             }
         });
     },
+    markDelete: function () {
+        $.ajax({
+            url: app.apiURL,
+            method: "POST",
+            data: {
+                action: "add_delete",
+                device_id: device.uuid,
+                place_id: app.activeMarker.server_id
+            },
+            dataType: 'json',
+            success: function (res) {
+                if (res.status == 'success') {
+                    app.db.transaction(function (tx) {
+                        tx.executeSql("UPDATE places SET delete_counter = 1 WHERE server_id=?", [app.activeMarker.server_id], function (tx, results) {
+                            if (results.rowsAffected) {
+                                $('.mark-delete').removeClass('active');
+                            }
+                        }, null);
+                    });
+                } else {
+                    // error while trying to get count, do nothing
+                }
+            },
+            error: function (err) {
+                app.notification('Oops', 'Something went wrong', 'Close', null);
+                // error while trying to get new places count, do nothing
+            }
+        });
+
+    },
+    systemAlert: function () {
+        if (app.systemMessage.show && $.trim(app.systemMessage.message) != '' && typeof app.systemMessage.timer == 'undefined') {
+            app.systemMessage.timer = setTimeout(function () {
+                if ($.trim(app.systemMessage.message) != '') {
+                    app.notification(app.systemMessage.title, app.systemMessage.message, 'Close', null);
+                    app.systemMessage.message = '';
+                    app.systemMessage.show = false;
+                }
+            }, 3000);
+        }
+    },
     onPause: function () {
-        app.positionStatus = false;
-        navigator.geolocation.clearWatch(app.positionWatchId);
+        app.gpsStop();
     },
     onResume: function () {
         setTimeout(function () {
-            if (app.getActivePage() == 'main') {
-                navigator.geolocation.clearWatch(app.positionWatchId);
-                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
-            }
+            app.gpsStart();
         }, 100);
     },
     getNewPlacesCount: function () {
@@ -452,15 +547,12 @@ var app = {
             success: function (res) {
                 if (res.status == 'success') {
                     var data = res.data;
-                    if (!isNaN(parseInt(localStorage.getItem("count")))) {
-                        var count = parseInt(data) - parseInt(localStorage.getItem("count"));
-                        if (count > 0) {
-                            $('header').addClass('new_not');
-                        }
-                        localStorage.setItem("count", data);
-                    } else {
-                        localStorage.setItem("count", data);
+                    var localCount = isNaN(parseInt(localStorage.getItem("count"))) ? 0 : parseInt(localStorage.getItem("count"));
+                    var remoteCount = parseInt(data);
+                    if (remoteCount > localCount) {
+                        $('header').addClass('new_not');
                     }
+                    localStorage.setItem("count", remoteCount);
                 } else {
                     // error while trying to get count, do nothing
                 }
@@ -479,25 +571,26 @@ var app = {
             url: app.apiURL,
             method: "POST",
             data: {
-                action: "get_version"
+                action: "get_version",
+                device_id: device.uuid,
+                platform: app.platform,
+                model: device.model,
+                version: device.version
             },
             dataType: 'json',
             success: function (res) {
                 if (res.status == 'success') {
                     /* no updates on server */
-                    if (app.getLocalVersion() == res.data) {
-                        app.selectPlaces(app.defaultType, false);
-                    } else { /* get updates from server and insert to local db */
+                    if (app.getLocalVersion() != res.data) {
+                        /* get updates from server and insert to local db */
                         app.updateDB(res.data);
                     }
-                } else {
-                    // try to load local data
-                    app.selectPlaces(app.defaultType, false);
+                    if (typeof res.msg.message != 'undefined') {
+                        app.systemMessage.title = $.trim(res.msg.title) == '' ? 'Hey' : res.msg.title;
+                        app.systemMessage.message = res.msg.message;
+                        app.systemAlert();
+                    }
                 }
-            },
-            error: function (r) {
-                // try to load local data
-                app.selectPlaces(app.defaultType, false);
             }
         });
     },
@@ -518,36 +611,55 @@ var app = {
                 if (res.status == 'success') {
                     var response = res.data;
                     app.db.transaction(function (tx) {
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS places(server_id integer unique,latitude varchar, longitude varchar, name text, address varchar, description text, image text, type varchar, status varchar)', []);
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS places(server_id integer PRIMARY KEY unique,latitude REAL, longitude REAL, name text, address varchar, description text, image text, type varchar, status varchar, delete_counter integer DEFAULT 0)', []);
                         for (var i = 0; i < response.length; i++) {
                             if (response[i].status === "1") {
-                                tx.executeSql("UPDATE places SET latitude=?, longitude=?, name=?, address=?, description=?, image=?, type=?, status=? WHERE server_id=?", [response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status, response[i].id], null, null);
+                                tx.executeSql("UPDATE places SET latitude=?, longitude=?, name=?, address=?, description=?, image=?, type=?, status=?, delete_counter = 0 WHERE server_id=?", [response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status, response[i].id], null, null);
                                 tx.executeSql("INSERT OR IGNORE INTO places(server_id, latitude, longitude, name, address, description, image, type, status) values(?, ?, ?, ?, ?, ?, ?, ?, ?)", [response[i].id, response[i].latitude, response[i].longitude, response[i].name, response[i].address, response[i].description, response[i].image, response[i].type, response[i].status], null, null);
                             } else {
                                 tx.executeSql("DELETE FROM places WHERE server_id=?", [response[i].id], null, null);
                             }
-
+                        }
+                        if (app.getLocalVersion() == 0) {
+                            app.firstDraw = true;
+                            app.selectPlaces(app.defaultType);
                         }
                         localStorage.setItem("version", version);
-                        app.selectPlaces(app.defaultType, false);
                     });
-                } else {
-                    // update issue load local data without updating version, next time again will try to load updates
-                    app.selectPlaces(app.defaultType, false);
                 }
-            },
-            error: function (err) {
-                // update issue load local data without updating version, next time again will try to load updates
-                app.selectPlaces(app.defaultType, false);
             }
         });
+    },
+    getPlaceFromDB: function (server_id, callback) {
+        app.db.transaction(function (tx) {
+            tx.executeSql("SELECT * FROM places WHERE server_id='" + server_id + "'", [], function (tx, results) {
+                var row = results.rows.item(0);
+                if (row) {
+                    callback(row);
+                }
+            });
+        });
+    },
+    gpsStart: function () {
+        if ((app.getActivePage() == 'main' || app.getActivePage() == 'add_places') && app.positionWatchId == null) {
+            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+        }
+    },
+    gpsStop: function () {
+        if (app.positionWatchId != null) {
+            navigator.geolocation.clearWatch(app.positionWatchId);
+            app.positionStatus = false;
+            app.positionWatchId = null;
+        }
     },
     initMap: function () {
         var mainMarker = null;
         app.positionStatus = false;
+        app.positionWatchId = null;
+
         app.currentLocation = {
-            latitude: app.defaultLocation.latitude,
-            longitude: app.defaultLocation.longitude
+            latitude: null,
+            longitude: null
         };
         app.onPositionSuccess = function (position) {
             app.positionStatus = true;
@@ -558,22 +670,26 @@ var app = {
             var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
             if (mainMarker == null) {
                 app.map.setCenter(myLatlng);
-                mainMarker = addMarker(app.map, {
-                    image: "img/marcer_main.png",
-                    w: 15,
-                    h: 15
-                }, myLatlng);
+                var image = {
+                    url: "img/marcer_main.png",
+                    scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
+                };
+                mainMarker = addMarker(app.map, image, myLatlng);
+                $('.gps1').addClass('displayBLock');
+                setTimeout(function () {
+                    $('.gps1').addClass('visible');
+                }, 0);
+
             }
             mainMarker.setPosition(myLatlng);
             mainMarker.setAnimation(null);
         }
 
         app.onPositionError = function (error) {
-            app.positionStatus = false;
-//            var erLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-//            app.map.setCenter(erLatlng);
-            navigator.geolocation.clearWatch(app.positionWatchId);
-            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            app.gpsStop();
+            setTimeout(function () {
+                app.gpsStart();
+            }, 2000);
         }
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
@@ -581,37 +697,69 @@ var app = {
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
         /* hide splashscreen when map loaded */
-        google.maps.event.addListenerOnce(app.map, 'idle', function () {
+        google.maps.event.addListenerOnce(app.map, 'tilesloaded', function () {
             if (navigator.splashscreen) {
                 navigator.splashscreen.hide();
+                app.systemMessage.show = true;
+                app.systemAlert();
             }
+            /* select places if exist */
+            if (app.getLocalVersion() != 0 && typeof app.firstDraw == 'undefined') {
+                app.selectPlaces(app.defaultType);
+            }
+            app.setLocationHash('gmapfix');
+            app.setLocationHash(app.getActivePage());
+
+            $('img[src ^= "https://maps.gstatic.com/mapfiles/api-3/images/google"]').parents('a[href ^= "https://maps.google.com/maps"]').parent().addClass('google-fix');
+            $("span:contains('Map data ©')").parents('.gmnoprint').addClass('google-fix');
+            $("a:contains('Terms of Use')").parents('.gmnoprint').addClass('google-fix');
+
         });
+
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
-            $(".controls").removeClass("transition");
+            app.closeInfoWindow();
         });
         /* gps button functionality */
         $(".gps1").off("click.gps");
         $(".gps1").on("click.gps", function (e) {
-            if (app.positionStatus == false) {
-                navigator.geolocation.clearWatch(app.positionWatchId);
-                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
-            } else {
+            if (app.currentLocation.latitude != null) {
                 app.map.panTo(new google.maps.LatLng(app.currentLocation.latitude, app.currentLocation.longitude));
             }
         });
         /* attach position watcher */
-        navigator.geolocation.clearWatch(app.positionWatchId);
-        app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+        app.gpsStart();
     },
     start: function (onlineMap) {
         if (typeof onlineMap != 'undefined') {
-            $('body').addClass('offlineMap');
+            $('html').removeClass('onlineMap');
+            $('html').addClass('offlineMap');
+        } else {
+            $('html').removeClass('offlineMap');
+            $('html').addClass('onlineMap');
         }
         /*nav functionality*/
         if (this.firstLoad == true) {
-            $("nav").css("marginTop", 0 - 1.5 * $("nav").height());
             this.firstLoad = false;
+
+            if ($('html').hasClass('ios')) {
+                $(document).on('touchstart', function (e) {
+                    if ($(e.target).prop("tagName").toLowerCase() != 'input' && $(e.target).prop("tagName").toLowerCase() != 'textarea' && $('input,textarea').is(':focus')) {
+                        $('input,textarea').trigger('blur');
+                        return false;
+                    }
+                });
+                $(document).on('focus', 'input, textarea', function () {
+                    $('header').hide();
+                    $('html').addClass('ios-keyboard-fix');
+                });
+                $(document).on('blur', 'input, textarea', function (e) {
+                    $('html').removeClass('ios-keyboard-fix');
+                    $('header').show();
+                });
+            }
+
+
             $(".arr-wrapper").on('click', function () {
                 if ($(this).hasClass('arr_back')) {
                     app.goToPage('main');
@@ -633,7 +781,7 @@ var app = {
             /* menu functionality*/
             $(".backg-cubs").on('click', function () {
                 fadeIn('.menu', function () {
-                    $(".menu").addClass('active')
+                    $(".menu").addClass('active');
                 });
                 $("nav").removeClass("nav_up");
                 $("nav").addClass("nav_down");
@@ -642,11 +790,13 @@ var app = {
                 $(".arr-wrapper").addClass("arr_down");
                 return false;
             });
-            $(document).on("click", function () {
-                if ($('.menu').hasClass('active')) {
-                    fadeOut('.menu', function () {
-                        $(".menu").removeClass('active');
-                    });
+            $(document).on("click touchend", function (e) {
+                if (!$(e.target).hasClass('menu') && $(e.target).parents('.menu').length == 0) {
+                    if ($('.menu').hasClass('active')) {
+                        fadeOut('.menu', function () {
+                            $(".menu").removeClass('active');
+                        });
+                    }
                 }
             });
 
@@ -662,8 +812,9 @@ var app = {
             /* activate swiepbox on footer image*/
             app.activateSwipebox('.foot-link.swipebox');
 
-            $('.swipebox_add').on('click', function () {
+            $('.add-src-cont').on('click', function () {
                 app.openCameraDialog(true);
+                return false;
             });
 
             $(".menu li").on("click", function () {
@@ -672,7 +823,7 @@ var app = {
                     if (pageId == 'add_places' && app.onlineStatus != 'offline') {
                         if (DEBUG) {
                             var center = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-                            newPlace(center)
+                            newPlace(center);
                         } else {
                             app.openCameraDialog();
                         }
@@ -691,7 +842,6 @@ var app = {
                     var type = $(this).data('type');
                     if (!$(this).hasClass('active')) {
                         app.selectPlaces(type);
-                        $(this).addClass('active');
                     } else {
                         $(this).removeClass('active');
                         for (var j in  app.data[type]['markers']) {
@@ -706,37 +856,44 @@ var app = {
             });
 
             $(document).on("click", "#new_places .new_place_icon_wrap .new_place_icon", function () {
-                var that = this;
-                var div_wrapper = $(that).closest(".vot_wrap");
+                var div_wrapper = $(this).closest(".vot_wrap");
                 app.voteForPlace({
                     device_id: device.uuid,
-                    vote: $(that).attr("data-value"),
+                    vote: $(this).attr("data-value"),
                     place_id: $(div_wrapper).data("id")
                 });
             });
 
+            /* mark delete */
+            $('.mark-delete').on('click', function () {
+                if (app.activeMarker && app.activeMarker.server_id) {
+                    navigator.notification.confirm("Want to ask community to delete this spot?",
+                            function confirmDelete(buttonIndex) {
+                                if (buttonIndex == 2) {
+                                    app.markDelete();
+                                }
+                            }, "Really", ["No", "Yes"]);
+                }
+            });
+
             var scrollTimer;
-            $('#new_places .wrapper').scroll(function () {
+            if ($('html').hasClass('oldAndroid')) {
+                app.pageScrollTarget = window;
+            } else {
+                app.pageScrollTarget = '#new_places .wrapper';
+            }
+            $(app.pageScrollTarget).scroll(function () {
+
+                if (app.scrollFix == $(app.pageScrollTarget).scrollTop()) {
+                    return false;
+                }
+                app.scrollFix = $(app.pageScrollTarget).scrollTop();
                 clearTimeout(scrollTimer);
                 if (app.getActivePage() != 'new_places') {
                     return true;
                 }
                 scrollTimer = setTimeout(function () {
-                    var allVoteElements = $('.vot_wrap:not(".loaded")');
-                    allVoteElements.each(function () {
-                        if (elementInViewport($(this)[0])) {
-                            $(this).addClass('loaded');
-                            var $mapContainer = $(this).find('.place_map[data-src]');
-                            var $img = $('<img />');
-                            $img.css('opacity', 0);
-                            $img[0].onload = function () {
-                                $mapContainer.css('background-image', 'none');
-                                $img.css('opacity', 1);
-                            }
-                            $mapContainer.html($img);
-                            $img.attr('src', $mapContainer.data('src'));
-                        }
-                    });
+                    app.showReviewMap();
                 }, 400);
             });
         }
@@ -750,6 +907,23 @@ var app = {
             app.getNewPlacesCount();
         }
 
+    },
+    showReviewMap: function () {
+        var allVoteElements = $('.vot_wrap:not(".loaded")');
+        allVoteElements.each(function () {
+            if (elementInViewport($(this)[0])) {
+                $(this).addClass('loaded');
+                var $mapContainer = $(this).find('.place_map[data-src]');
+                var $img = $('<img />');
+                $img.css('opacity', 0);
+                $img[0].onload = function () {
+                    $mapContainer.css('background-image', 'none');
+                    $img.css('opacity', 1);
+                }
+                $mapContainer.html($img);
+                $img.attr('src', $mapContainer.data('src'));
+            }
+        });
     },
     activateSwipebox: function (selector) {
         $(selector).swipebox({
@@ -789,101 +963,223 @@ var app = {
                             app.goToPage('main');
                         }
                     }
-                }, "", ["Camera", "Gallery", "Close"]);
+                }, "Choose", ["Camera", "Gallery", "Close"]);
+        return false;
     },
     googleMapEmbed: function () {
         $("#map-canvas").html("");
         var script_tag = document.createElement('script');
         script_tag.setAttribute("type", "text/javascript");
-        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?key=" + this.gMapApiKey + "&callback=app.start");
+        script_tag.setAttribute("src", "https://maps.googleapis.com/maps/api/js?v=3.22&key=" + this.gMapApiKey + "&language=en&callback=app.start");
         (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(script_tag);
     },
-    selectPlaces: function (type, animation) {
+    selectPlaces: function (type) {
         if (typeof type == 'undefined') {
             type = 'parking';
         }
-        if (typeof animation == 'undefined') {
-            animation = true;
-        }
+        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE status='1' AND type='" + type + "'";
         app.db.transaction(function (tx) {
-            tx.executeSql("SELECT * FROM places WHERE status='1' AND type='" + type + "'", [], function (tx, results) {
+            tx.executeSql(query, [], function (tx, results) {
                 app.data[type] = {
-                    places: {},
                     markers: {}
                 };
-                app.data[type]['places'] = results.rows;
                 app.data.status = 'ready';
                 /* show markesr on map by type*/
-                app.drawGroupMarkers(app.data[type]['places'], type, animation);
+                app.drawGroupMarkers(results.rows, type);
             });
+        }, function () {
+            app.data.status = 'error';
         });
     },
     clearPlaces: function (type) {
         app.data[type] = null;
-        $(".controls").removeClass("transition");
+        app.closeInfoWindow();
     },
-    drawGroupMarkers: function (places, type, animation) {
+    drawGroupMarkers: function (places, type) {
+
+        /* if there is no matched places do nothing */
+        if (places.length == 0) {
+            return;
+        }
+
         $('img[data-type="' + type + '"]').addClass('active');
-        $('header .green-menu .arr').addClass('visible');
+        if (!$('header .green-menu .arr').hasClass('visible')) {
+            $('header .green-menu .arr').addClass('displayBLock');
+            setTimeout(function () {
+                $('header .green-menu .arr').addClass('visible');
+            }, 0);
+
+        }
+
+
+        var image = {
+            url: "img/marker_" + type + ".png",
+            scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
+        };
         for (var k = 0; k < places.length; k++) {
             var place = places.item(k);
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
-            var opacity = 0;
-            if (!animation) {
-                opacity = 1;
-            }
-            var marker = addMarker(app.map,
-                    {
-                        image: "img/marker_" + type + ".png",
-                        w: 28,
-                        h: 44
-                    }, myLatlng, k, opacity, type);
-            if (animation) {
-                setMarkerOpacity(marker, 1);
-            } else {
-                marker.setAnimation(null);
-            }
+            var marker = addMarker(app.map, image, myLatlng, place.server_id, place.type);
 
-            app.data[type].markers[k] = marker;
-
-            atachInfoWindow(marker);
+            app.data[place.type].markers[k] = marker;
+            app.attachInfoWindow(marker);
         }
+    },
+    attachInfoWindow: function (marker) {
+        marker.addListener('click', function () {
+            if (app.activeMarker && app.activeMarker.server_id == this.server_id) {
+                app.closeInfoWindow();
+                return;
+            }
+
+            if (app.activeMarker) {
+                app.activeMarker.setAnimation(null);
+            }
+            app.activeMarker = this;
+
+            app.getPlaceFromDB(this.server_id, function (data) {
+                if (data.delete_counter == 0) {
+                    $(".mark-delete").addClass('active');
+                } else {
+                    $(".mark-delete").removeClass('active');
+                }
+                if (data.image) {
+                    $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image + ")");
+                    $(".foot-link").css('background-size', 'cover');
+
+                    $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
+                    $(".foot-link").removeAttr("ontouchstart");
+                } else {
+                    $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png)");
+                    $(".foot-link").css('background-size', 'cover');
+                    $(".foot-link").removeAttr("href");
+                    $(".foot-link").attr("ontouchstart", "return false;");
+                }
+                $(".footer-image img").css('border', 'none');
+
+                $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
+
+                $("footer .footer-info p.name").text(data.name);
+                $("footer .footer-info p.address").text(data.address);
+                if (data.description) {
+                    $("footer .footer-info .label.fordesc").show();
+                    $("footer .footer-info p.desc").text(data.description);
+                } else {
+                    $("footer .footer-info .label.fordesc").hide();
+                    $("footer .footer-info p.desc").text('');
+                }
+                if ($('.controls').hasClass('transition')) {
+                    app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                } else {
+                    $('.controls').addClass("transition");
+                    setTimeout(function () {
+                        app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                    }, 250);
+                }
+            });
+        });
+    },
+    closeInfoWindow: function () {
+        if (app.activeMarker) {
+            app.activeMarker.setAnimation(null)
+            app.activeMarker = null;
+        }
+        setTimeout(function () {
+            $(".controls").removeClass("transition");
+        }, 50);
+
     },
     cameraSuccess: function (imageURI, fromGallery) {
 
-        /* set image and activate default type */
-
-        $(".add-image").attr("src", imageURI);
-        $(".add-src").attr("href", imageURI);
-        $(".add-src").css("background-image", "url(" + imageURI + ")");
+        $(".add-image").val(imageURI);
+        $(".add-address").val('');
+        $(".add-country").val('');
 
         if (fromGallery) {
-            window.resolveLocalFileSystemURI(imageURI,
-                    function (entry) {
-                        entry.file(function (file) {
-                            var GPSLatitude, GPSLongitude;
-                            EXIF.getData(file, function () {
-                                GPSLatitude = EXIF.getTag(this, 'GPSLatitude');
-                                GPSLongitude = EXIF.getTag(this, 'GPSLongitude');
-                                if (GPSLatitude && GPSLongitude) {
-                                    var latitude = (GPSLatitude[0] + (GPSLatitude[1] / 60) + (GPSLatitude[2] / 3600)).toFixed(7);
-                                    var longitude = (GPSLongitude[0] + (GPSLongitude[1] / 60) + (GPSLongitude[2] / 3600)).toFixed(7);
-                                    center = new google.maps.LatLng(latitude, longitude);
-                                    newPlace(center, true)
-                                } else {
-                                    getCurrrentLocation();
-                                }
+            if ($('html').hasClass('oldAndroid') || typeof window.FileReader == 'undefined') {
+                setImage(imageURI);
+                getCurrrentLocation();
+            } else {
+                window.resolveLocalFileSystemURI(imageURI,
+                        function (entry) {
+                            entry.file(function (file) {
+                                var GPSLatitude, GPSLongitude, Orientation;
+                                EXIF.getData(file, function () {
+                                    GPSLatitude = EXIF.getTag(this, 'GPSLatitude');
+                                    GPSLongitude = EXIF.getTag(this, 'GPSLongitude');
+                                    Orientation = EXIF.getTag(this, 'Orientation');
+                                    /* rotate default state */
+                                    $(".add-src").removeClass(function (index, css) {
+                                        return (css.match(/(^|\s)correct_\S+/g) || []).join(' ');
+                                    });
+                                    switch (Orientation) {
+                                        case 2:
+                                            // horizontal flip
+                                            $(".add-src").addClass('correct_h_flip');
+                                            break;
+                                        case 3:
+                                            // 180° rotate left
+                                            $(".add-src").addClass('correct_180_rot');
+                                            break;
+                                        case 4:
+                                            // vertical flip
+                                            $(".add-src").addClass('correct_v_flip');
+                                            break;
+                                        case 5:
+                                            // vertical flip + 90 rotate right
+                                            $(".add-src").addClass('correct_v_flip_90_rot');
+                                            break;
+                                        case 6:
+                                            // 90° rotate right
+                                            $(".add-src").addClass('correct_90_rot');
+                                            break;
+                                        case 7:
+                                            // horizontal flip + 90 rotate right
+                                            $(".add-src").addClass('correct_h_flip_90_rot');
+                                            break;
+                                        case 8:
+                                            // 90° rotate left
+                                            $(".add-src").addClass('correct_90_rot_left');
+                                            break;
+                                    }
+                                    setImage(imageURI, true);
+
+                                    if (GPSLatitude && GPSLongitude) {
+                                        var latitude = (GPSLatitude[0] + (GPSLatitude[1] / 60) + (GPSLatitude[2] / 3600)).toFixed(7);
+                                        var longitude = (GPSLongitude[0] + (GPSLongitude[1] / 60) + (GPSLongitude[2] / 3600)).toFixed(7);
+                                        center = new google.maps.LatLng(latitude, longitude);
+                                        newPlace(center, true);
+                                    } else {
+                                        getCurrrentLocation();
+                                    }
+                                });
+                            }, function () {
+                                setImage(imageURI);
+                                getCurrrentLocation();
                             });
-                        }, function () {
+                        },
+                        function () {
+                            setImage(imageURI);
                             getCurrrentLocation();
-                        });
-                    },
-                    function (e) {
-                        getCurrrentLocation();
-                    }
-            );
+                        }
+                );
+            }
         } else {
+            setImage(imageURI);
             getCurrrentLocation(true);
+        }
+
+        function setImage(imageURI, orientation) {
+            if (typeof orientation == 'undefined') {
+                /* rotate default state */
+                $(".add-src").removeClass(function (index, css) {
+                    return (css.match(/(^|\s)correct_\S+/g) || []).join(' ');
+                });
+            }
+            /* image selected */
+            $(".add-src").css("background-image", "url(" + imageURI + ")");
+            $(".add-src-cont").removeClass('chooseLoader').addClass('chooseImageDone');
+            /* image selected */
         }
 
         function getCurrrentLocation(setMarker) {
@@ -892,10 +1188,10 @@ var app = {
             }
             navigator.geolocation.getCurrentPosition(function (pos) {
                 center = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-                newPlace(center, setMarker)
+                newPlace(center, setMarker);
             }, function () {
                 center = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
-                newPlace(center)
+                newPlace(center);
             }, app.geolocationOptions);
         }
     },
@@ -923,8 +1219,16 @@ function elementInViewport(el) {
     }
 
     var win = window;
-    var scrollWin = $('#new_places .wrapper');
+    var scrollWin = $(app.pageScrollTarget);
 
+    if (typeof app.pageScrollTarget == 'object') {
+        return (
+                top < (window.pageYOffset + window.innerHeight) &&
+                left < (window.pageXOffset + window.innerWidth) &&
+                (top + height) > window.pageYOffset &&
+                (left + width) > window.pageXOffset
+                );
+    }
     return (
             top < (scrollWin.scrollTop() + win.innerHeight) &&
             left < (scrollWin.offset().left + win.innerWidth) &&
@@ -934,38 +1238,26 @@ function elementInViewport(el) {
 }
 
 
-function addMarker(map, icon, pos, index, opacity, type) {
-    if (typeof opacity == 'undefined') {
-        opacity = 1;
-    }
-    var image = {
-        url: icon.image,
-        scaledSize: new google.maps.Size(icon.w, icon.h)
-    };
+function addMarker(map, image, pos, id, type) {
     var marker = new google.maps.Marker({
         map: map,
         position: pos,
-        animation: google.maps.Animation.DROP,
         optimized: true,
         draggable: false,
         icon: image,
-        opacity: opacity,
-        index: index,
+        opacity: 1,
+        server_id: id || null,
         type: type || null
     });
     return marker;
 }
-function setMarkerOpacity(marker, value) {
-    window.setTimeout(function () {
-        marker.setOpacity(value);
-    }, 200);
-}
+
 function removeMarker(marker) {
     marker.setMap(null);
 }
 
 function newPlace(center, setAddress) {
-    $('.add-src').height($('.add-src').width());
+
     var options = {
         center: center,
         zoom: 18,
@@ -973,13 +1265,26 @@ function newPlace(center, setAddress) {
         zoomControl: false,
         mapTypeControl: false,
         scaleControl: false,
-        streetViewControl: false,
-    }
+        streetViewControl: false
+    };
+
+    var map_width = parseInt($("#add_places .wrapper").outerWidth(true));
+    var map_height = parseInt(map_width * 2 / 3);
+    $('#add-map').css('height', map_height);
+
     var new_map = new google.maps.Map(document.getElementById('add-map'), options);
+
+    google.maps.event.addListenerOnce(new_map, 'tilesloaded', function () {
+
+        $('img[src ^= "https://maps.gstatic.com/mapfiles/api-3/images/google"]').parents('a[href ^= "https://maps.google.com/maps"]').parent().addClass('google-fix');
+        $("span:contains('Map data ©')").parents('.gmnoprint').addClass('google-fix');
+        $("a:contains('Terms of Use')").parents('.gmnoprint').addClass('google-fix');
+
+    });
 
     var image = {
         url: "img/marker.png",
-        scaledSize: new google.maps.Size(28, 44)
+        scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
     };
     var new_marker = new google.maps.Marker({
         map: new_map,
@@ -991,13 +1296,28 @@ function newPlace(center, setAddress) {
     $(".hidden-lat").val(parseFloat(new_marker.getPosition().lat()).toFixed(7));
     $(".hidden-long").val(parseFloat(new_marker.getPosition().lng()).toFixed(7));
     var geocoder = new google.maps.Geocoder();
-    if (setAddress) {
-        geocoder.geocode({'location': center}, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
+
+    geocoder.geocode({'location': center}, function (results, status) {
+        if (status === google.maps.GeocoderStatus.OK) {
+            if (setAddress) {
+                $(".add-address").removeClass('error');
                 $(".add-address").val(results[0].formatted_address);
             }
-        });
-    }
+            var country = '';
+            for (var i = 0; i < results[0].address_components.length; i++) {
+                var component = results[0].address_components[i];
+                if (component.types[0] == 'country') {
+                    country = component.long_name;
+                    break;
+                }
+            }
+            $(".add-country").val(country);
+        } else {
+            $(".add-address").val('');
+            $(".add-country").val('');
+        }
+    });
+    var greenTimer;
     new_marker.addListener('dragend', function (event) {
         setNewAddress(event.latLng);
     });
@@ -1005,6 +1325,7 @@ function newPlace(center, setAddress) {
     google.maps.event.addListener(new_map, 'click', function (event) {
         new_marker.setPosition(event.latLng);
         setNewAddress(event.latLng);
+        $('input,textarea').trigger('blur');
     });
 
     function setNewAddress(latLng) {
@@ -1016,8 +1337,25 @@ function newPlace(center, setAddress) {
 
         geocoder.geocode({'location': latLng}, function (results, status) {
             if (status === google.maps.GeocoderStatus.OK) {
+                clearTimeout(greenTimer);
                 $(".add-address").removeClass('error');
+                $(".add-address").addClass('green');
+                greenTimer = setTimeout(function () {
+                    $(".add-address").removeClass('green');
+                }, 800);
                 $(".add-address").val(results[0].formatted_address);
+                var country = '';
+                for (var i = 0; i < results[0].address_components.length; i++) {
+                    var component = results[0].address_components[i];
+                    if (component.types[0] == 'country') {
+                        country = component.long_name;
+                        break;
+                    }
+                }
+                $(".add-country").val(country);
+            } else {
+                $(".add-address").val('');
+                $(".add-country").val('');
             }
         });
     }
@@ -1026,8 +1364,9 @@ function newPlace(center, setAddress) {
 
 function addLoader(selector) {
     $(selector).addClass('loading');
-    $(selector)[0].offsetHeight;
-    $(selector).addClass('visibility');
+    setTimeout(function () {
+        $(selector).addClass('visibility');
+    }, 0);
 }
 
 function removeLoader(selector) {
@@ -1037,46 +1376,15 @@ function removeLoader(selector) {
     }, 200);
 }
 
-function atachInfoWindow(marker) {
-    marker.addListener('click', function () {
-        var index = this.index;
-        var type = this.type;
-        var dataParking = app.data[type].places.item(index);
-        if (dataParking.image != "") {
-            $(".footer-image").attr("src", "data:image/jpg;base64," + dataParking.image);
-            $(".foot-link").attr("href", app.uploadsURL + dataParking.server_id + ".jpg");
-            $(".foot-link").removeAttr("ontouchstart");
-        } else {
-            $(".footer-image").attr("src", "img/foot_icon_" + type + ".png");
-            $(".foot-link").removeAttr("href");
-            $(".foot-link").attr("ontouchstart", "return false;");
-        }
-        $('footer').slideDown(200);
-
-        $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
-
-
-        $("footer .footer-info p.name").text(dataParking.name);
-        $("footer .footer-info p.address").text(dataParking.address);
-        if (dataParking.description) {
-            $("footer .footer-info .label.fordesc").show();
-        } else {
-            $("footer .footer-info .label.fordesc").hide();
-        }
-        $("footer .footer-info p.desc").text(dataParking.description);
-        $('.controls').addClass("transition");
-    });
-}
-
-
 function fadeIn(selector, callback) {
     $(selector).addClass('fadeInStart');
     $(selector).removeClass('fadeOutComplete');
     $(selector).removeClass('fadeOut');
     $(selector).removeClass('fadeOutStart');
 
-    $(selector)[0].offsetHeight;
-    $(selector).addClass('fadeIn');
+    setTimeout(function () {
+        $(selector).addClass('fadeIn');
+    }, 0);
 
     if (typeof callback == 'function') {
         setTimeout(function () {
@@ -1085,16 +1393,18 @@ function fadeIn(selector, callback) {
     }
 }
 
+
 function fadeOut(selector, callback) {
     $(selector).addClass('fadeOutStart');
     $(selector).removeClass('fadeInStart');
     $(selector).removeClass('fadeIn');
-    $(selector)[0].offsetHeight;
-    $(selector).addClass('fadeOut');
+    setTimeout(function () {
+        $(selector).addClass('fadeOut');
+    }, 0);
     setTimeout(function () {
         $(selector).addClass('fadeOutComplete');
         if (typeof callback == 'function') {
             callback();
         }
-    }, 300)
+    }, 300);
 }

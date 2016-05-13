@@ -69,6 +69,9 @@
         }
     },
     "installed_plugins": {
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
         "cordova-plugin-dialogs": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
@@ -78,24 +81,25 @@
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
-        "org.apache.cordova.device": {
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
-        "org.apache.cordova.file": {
+        "cordova-plugin-file": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
-        "org.apache.cordova.file-transfer": {
+        "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
-        "org.apache.cordova.network-information": {
+        "cordova-plugin-network-information": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
-        "org.apache.cordova.splashscreen": {
-            "PACKAGE_NAME": "am.velopark.velopark"
-        },
-        "cordova-plugin-camera": {
+        "cordova-plugin-splashscreen": {
             "PACKAGE_NAME": "am.velopark.velopark"
         }
     },
-    "dependent_plugins": {}
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        }
+    }
 }

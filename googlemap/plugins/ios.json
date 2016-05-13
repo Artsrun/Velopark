@@ -6,6 +6,38 @@
     "config_munge": {
         "files": {}
     },
-    "installed_plugins": {},
-    "dependent_plugins": {}
+    "installed_plugins": {
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        }
+    },
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        }
+    }
 }
