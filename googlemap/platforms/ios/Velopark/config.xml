@@ -1,11 +1,23 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="21000" id="am.velopark.velopark" version="2.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-versionCode="22000" id="am.velopark.velopark" ios-CFBundleVersion="2.2.0" version="2.2.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <preference name="AllowInlineMediaPlayback" value="false" />
+    <preference name="BackupWebStorage" value="cloud" />
+    <preference name="DisallowOverscroll" value="false" />
+    <preference name="EnableViewportScale" value="false" />
+    <preference name="KeyboardDisplayRequiresUserAction" value="true" />
+    <preference name="MediaPlaybackRequiresUserAction" value="false" />
+    <preference name="SuppressesIncrementalRendering" value="false" />
+    <preference name="GapBetweenPages" value="0" />
+    <preference name="PageLength" value="0" />
+    <preference name="PaginationBreakingMode" value="page" />
+    <preference name="PaginationMode" value="unpaginated" />
     <feature name="LocalStorage">
         <param name="ios-package" value="CDVLocalStorage" />
     </feature>
     <feature name="Camera">
         <param name="ios-package" value="CDVCamera" />
     </feature>
+    <preference name="CameraUsesGeolocation" value="false" />
     <feature name="Notification">
         <param name="ios-package" value="CDVNotification" />
     </feature>
@@ -29,15 +41,6 @@
         <param name="ios-package" value="CDVSplashScreen" />
         <param name="onload" value="true" />
     </feature>
-    <name>Velopark</name>
-    <description>
-        Velopark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
-    </description>
-    <author email="info@aparg.com" href="http://aparg.com">
-        Aparg
-    </author>
-    <content src="index.html" />
-    <access origin="*" />
     <icon height="180" src="res/ios/icons/Icon-60@3x.png" width="180" />
     <icon height="60" src="res/ios/icons/Icon-60.png" width="60" />
     <icon height="120" src="res/ios/icons/Icon-60@2x.png" width="120" />
@@ -60,20 +63,18 @@
     <splash height="1136" src="res/ios/splash/Default-568h@2x.png" width="640" />
     <splash height="1334" src="res/ios/splash/Default-667h.png" width="750" />
     <splash height="2208" src="res/ios/splash/Default-736h.png" width="1242" />
-    <preference name="AllowInlineMediaPlayback" value="false" />
-    <preference name="BackupWebStorage" value="cloud" />
-    <preference name="EnableViewportScale" value="false" />
-    <preference name="KeyboardDisplayRequiresUserAction" value="true" />
-    <preference name="MediaPlaybackRequiresUserAction" value="false" />
-    <preference name="SuppressesIncrementalRendering" value="false" />
-    <preference name="GapBetweenPages" value="0" />
-    <preference name="PageLength" value="0" />
-    <preference name="PaginationBreakingMode" value="page" />
-    <preference name="PaginationMode" value="unpaginated" />
-    <preference name="CameraUsesGeolocation" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
+    <name>Velopark</name>
+    <description>
+        Velopark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+    </description>
+    <author email="info@aparg.com" href="http://aparg.com">
+        Aparg
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
     <preference name="SplashScreen" value="screen" />
     <preference name="AutoHideSplashScreen" value="false" />
     <preference name="SplashScreenDelay" value="10000" />
     <preference name="Orientation" value="portrait" />
-    <preference name="DisallowOverscroll" value="true" />
 </widget>

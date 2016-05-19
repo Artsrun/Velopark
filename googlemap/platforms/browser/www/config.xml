@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget android-versionCode="22000" id="am.velopark.velopark" ios-CFBundleVersion="2.2.0" version="2.2.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="Camera">
+        <param name="browser-package" value="Camera" />
+    </feature>
+    <feature name="Device">
+        <param name="browser-package" value="Device" />
+    </feature>
+    <name>Velopark</name>
+    <description>
+        Velopark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+    </description>
+    <author email="info@aparg.com" href="http://aparg.com">
+        Aparg
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <preference name="SplashScreen" value="screen" />
+    <preference name="AutoHideSplashScreen" value="false" />
+    <preference name="SplashScreenDelay" value="10000" />
+    <preference name="Orientation" value="portrait" />
+</widget>

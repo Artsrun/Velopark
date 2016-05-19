@@ -438,23 +438,49 @@ html.oldAndroid .arr.arr_back{
     backface-visibility: hidden;
 }
 
-.gps1{
+.lockButton{
     float: right;
-    margin-top: -20%;
     margin-right: 3%;
-    cursor: pointer;
-    width: 16%;
+    background-image: url(../img/lock_icon.png);
+    width: 14%;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
     display:none;
-    opacity:0;
-    -webkit-transition: opacity 0.2s linear;
-    transition: opacity 0.2s linear;   
 }
-.gps1.visible{
-    opacity: 1;
+
+.lockButton[data-action="unlock"]{
+    background-image: url(../img/unlock_icon.png);
+}
+
+.mybikeButton{
+    float: right;
+    margin-right: 3%;
+    background-image: url(../img/bike_icon.png);
+    width: 14%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    display:none;
+}
+
+.gps1{
+    float: right;   
+    margin-right: 3%;
+    cursor: pointer;
+    width: 14%;
+    background-image: url(../img/gps_icon.png); 
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    display:none;
+}
+
+.actions a{
+    margin-top: -17%;
 }
 
 .controls{
@@ -1172,7 +1198,7 @@ input.error, textarea.error{
     display: block;
     margin: 0 auto;
     margin-top: 80px;
-/*    margin-bottom: 20px;*/
+    /*    margin-bottom: 20px;*/
 }
 .poweredBy img {
     width:100%;
@@ -1645,4 +1671,41 @@ a.infoMail:active{
 .correct_90_rot_left{
     -webkit-transform: rotate(-90deg); 
     transform:rotate(-90deg);
+}
+
+.roundButton {
+    background-size: cover;
+    background-color: #2ECC71;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-box-shadow: 0px 2px 3px #7D7D7D;
+    box-shadow: 0px 2px 3px #7D7D7D  
+}
+.roundButton:after{
+    content:'';
+    display: block;
+    padding-top: 100%;
+}
+
+
+.action_trans{
+    -webkit-transition:  transform 0.2s linear;
+    -webkit-transition: -webkit-transform 0.2s linear;
+    transition:  transform 0.2s linear;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    transform-origin: 50% 50%;
+}
+
+.action_trans.toggle{
+    -webkit-transition:  transform 0.1s linear;
+    -webkit-transition: -webkit-transform 0.1s linear;
+    transition:  transform 0.1s linear;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    transform-origin: 50% 50%;
 }
