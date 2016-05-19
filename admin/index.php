@@ -14,10 +14,7 @@ if (!isset($_SESSION['auth']['admin'])) {
     include 'auth/index.php';
 }
 $link = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-if ($link->connect_errno) {
-    printf("Error to connecting database. Error code: %s\n", $link->connect_error);
-    exit;
-}
+$link->set_charset('utf8');
 require_once 'functions.php';
 
 $view = empty($_GET['view']) ? 'places' : $_GET['view'];
@@ -51,15 +48,15 @@ switch ($view) {
 		$perm_delete = isset($_GET['delete_perm'])?$_GET['delete_perm']:'';		
 		if($perm_delete == 'yes'){
 			if(delete_perm($place_id, $link)){
-				redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+				redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1).(isset($_GET['search'])?'&search='.$_GET['search']:''));
 			}else{
-				redirect('?view=edit_place&place_id='.$place_id.'&page='.(isset($_GET['page'])?$_GET['page']:1));
+				redirect('?view=edit_place&place_id='.$place_id.'&page='.(isset($_GET['page'])?$_GET['page']:1).(isset($_GET['search'])?'&search='.$_GET['search']:''));
 			}
 		}
 		
         if ($_POST) {
             if (edit_place($place_id, $link))
-                redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+                redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1).(isset($_GET['search'])?'&search='.$_GET['search']:''));
             else
                 redirect();
         }else {
@@ -86,19 +83,19 @@ switch ($view) {
     case("delete_place"):
         $place_id = abs((int) $_GET['place_id']);
         delete_place($place_id, $link);
-        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1).(isset($_GET['search'])?'&search='.$_GET['search']:''));
 
         break;
 	case("undelete_place"):
         $place_id = abs((int) $_GET['place_id']);
         undelete_place($place_id, $link);
-        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1).(isset($_GET['search'])?'&search='.$_GET['search']:''));
 
         break;
 	case("confirm_place"):
 	    $place_id = abs((int) $_GET['place_id']);
         confirm_place($place_id, $link);
-        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+        redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1).(isset($_GET['search'])?'&search='.$_GET['search']:''));
 
         break;
 
@@ -107,7 +104,7 @@ switch ($view) {
         $get_place = get_place($place_id, $link);
         if ($_POST) {
             if (vote_place($place_id, $link))
-                redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1));
+                redirect('?view=places&page='.(isset($_GET['page'])?$_GET['page']:1).(isset($_GET['search'])?'&search='.$_GET['search']:''));
             else
                 redirect();
         }

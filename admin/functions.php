@@ -7,8 +7,14 @@ function clear_admin($var, $link) {
     return $var;
 }
 
-function places($link, $start_pos, $perpage) {
-    $query = "SELECT * FROM places WHERE type!='DELETED' ORDER BY id DESC LIMIT $start_pos, $perpage";
+function places($link, $start_pos, $perpage) {	
+
+	if(isset($_GET['search'])){
+		$search_clause =  isset($_GET['search'])?"HAVING (s_c LIKE '%".preg_replace("/\s+/", "%' AND s_c LIKE '%", addslashes(trim(mb_strtolower($_GET['search']))))."%')":"";		
+		$query = "SELECT *, LOWER(CONCAT(name,address,country,description,type)) AS s_c FROM places WHERE type!='DELETED' $search_clause ORDER BY id DESC LIMIT $start_pos, $perpage";		
+	}else{
+		$query = "SELECT * FROM places WHERE type!='DELETED' ORDER BY id DESC LIMIT $start_pos, $perpage";
+	}
     $places = array();
     $result = $link->query($query);
     while ($row = $result->fetch_assoc()) {
@@ -29,7 +35,13 @@ function get_place($place_id, $link) {
 }
 
 function count_places($link) {
-    $query = "SELECT COUNT(id) FROM places";
+	    
+	if(isset($_GET['search'])){
+		$search_clause =  isset($_GET['search'])?"HAVING (s_c LIKE '%".preg_replace("/\s+/", "%' AND s_c LIKE '%", addslashes(trim(mb_strtolower($_GET['search']))))."%')":"";		
+		$query = "SELECT COUNT(id) FROM (SELECT id, LOWER(CONCAT(name,address,country,description,type)) AS s_c FROM places WHERE type!='DELETED' $search_clause) AS filtered";
+	}else{
+		$query = "SELECT COUNT(id) FROM places WHERE type!='DELETED'";
+	}
     $res = $link->query($query);
     $count_places = $res->fetch_row();
     $res->free();

@@ -8,6 +8,11 @@
     }
     ?>
     <a href="?view=add_place" class="add">add place</a>
+	<form action="" method="get" class="search-form">
+		<input type='text' name='search' placeholder="search" class="head-text" value="<?=isset($_GET['search'])?$_GET['search']:''?>" />
+		<input type="hidden" value="<?php echo (isset($_GET['page'])?$_GET['page']:1); ?>" name="page" >
+		<input type="submit" class='search' value="search" />
+	</form>
 	<?php if($pages_count > 1) pagination($page, $pages_count); ?>
     <table class="tabl" cellspacing="1">
         <tr>
@@ -16,11 +21,10 @@
             <th class="str_name">Name</th>
             <th class="str_name">Address</th>
             <th class="str_name">Description</th>
-            <th class="str_sort">Latitude</th>
-            <th class="str_action">Longitude</th>
+            <th class="str_sort">Country</th>            
             <th class="str_action">Type</th>
             <th class="str_action">Status</th>
-            <th class="str_action">Votes</th>
+            <th class="str_action">&nbsp;&nbsp;&nbsp;&nbsp;Votes&nbsp;&nbsp;&nbsp;&nbsp;</th>
             <th class="str_action">Action</th>
 
         </tr>
@@ -29,7 +33,7 @@
             <tr>
                 <td><?= $i ?></td>
                 <td>
-                    <a href="?view=edit_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="edit">
+                    <a href="?view=edit_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?><?=isset($_GET['search'])?'&search='.$_GET['search']:''?>" class="edit">
                     <?php if ($item['image']): ?>
                         <img src = "data:image/jpg;base64,<?= $item['image'] ?>" style="height: 150px; width:150px; border-radius: 3px">
                     <?php else: ?>
@@ -40,8 +44,7 @@
                 <td><?= $item['name'] ?></td>
                 <td><?= $item['address'] ?></td>
                 <td><?= $item['description'] ?></td>
-                <td><?= $item['latitude'] ?></td>
-                <td><?= $item['longitude'] ?></td>
+                <td><?= $item['country'] ?></td>                
                 <td class='upper blue'><?= $item['type'] ?></td>
                 <td>
                 <?php if ($item['status'] == "1"): ?>
@@ -61,15 +64,15 @@
 					<span class="red">Del -  <?= $item['delete_counter'] ?></span>
                 </td>
                 <td>
-					<a href="?view=edit_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="edit">edit</a><br>
+					<a href="?view=edit_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?><?=isset($_GET['search'])?'&search='.$_GET['search']:''?>" class="edit">edit</a><br>
 					<?php if($item['status'] !=2 ){ ?>
-					<a href="?view=delete_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="del" onclick="return confirm('are you sure?');">delete</a><br>
+					<a href="?view=delete_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?><?=isset($_GET['search'])?'&search='.$_GET['search']:''?>" class="del" onclick="return confirm('Are you sure you want to delete place?');">delete</a><br>
 					<?php }else{ ?>
-					<a href="?view=undelete_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="del" >recover</a><br>
+					<a href="?view=undelete_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?><?=isset($_GET['search'])?'&search='.$_GET['search']:''?>" class="del" >recover</a><br>
 					<?php } ?>
-					<a href="?view=vote_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="vote">vote</a><br>
+					<a href="?view=vote_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?><?=isset($_GET['search'])?'&search='.$_GET['search']:''?>" class="vote">vote</a><br>
 					<?php if($item['status'] == 0){ ?>
-					<a href="?view=confirm_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?>" class="confirm"><b>confirm<b></a>
+					<a href="?view=confirm_place&place_id=<?= $item['id'] ?>&page=<?=isset($_GET['page'])?$_GET['page']:1?><?=isset($_GET['search'])?'&search='.$_GET['search']:''?>" class="confirm"><b>confirm<b></a>
 					<?php } ?>
 				</td>
             </tr>
