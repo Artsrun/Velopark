@@ -598,14 +598,18 @@ var app = {
         });
     },
     getPlaceFromDB: function (server_id, callback) {
-        app.db.transaction(function (tx) {
-            tx.executeSql("SELECT * FROM places WHERE server_id='" + server_id + "'", [], function (tx, results) {
-                var row = results.rows.item(0);
-                if (row) {
-                    callback(row);
-                }
+        if (server_id == null) {
+            callback({});
+        } else {
+            app.db.transaction(function (tx) {
+                tx.executeSql("SELECT * FROM places WHERE server_id='" + server_id + "'", [], function (tx, results) {
+                    var row = results.rows.item(0);
+                    if (row) {
+                        callback(row);
+                    }
+                });
             });
-        });
+        }
     },
     gpsStart: function () {
         if ((app.getActivePage() == 'main' || app.getActivePage() == 'add_places') && app.positionWatchId == null) {
@@ -677,7 +681,7 @@ var app = {
                 url: "img/marker_bike.png",
                 scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
             };
-            var marker = addMarker(app.map, image, position, storedData.server_id, 'parking');
+            var marker = addMarker(app.map, image, position, storedData.server_id, storedData.type);
             app.lockPosition(marker);
 
         }
@@ -914,7 +918,7 @@ var app = {
             dataForSave.server_id = marker.server_id;
             dataForSave.lat = marker.position.lat();
             dataForSave.lng = marker.position.lng();
-            dataForSave.type = marker.type;
+            dataForSave.type = 'bike';
 
         } else {
             if (app.activeMarker) {
@@ -929,6 +933,8 @@ var app = {
                 removeMarker(app.activeMarker);
                 app.activeMarker = marker;
 
+                /* set animation and attache info window  */
+                marker.setAnimation(google.maps.Animation.BOUNCE)
 
             } else if (app.mainMarker) {
 
@@ -937,11 +943,12 @@ var app = {
                 dataForSave.type = 'bike';
 
                 /* add new marker on my position */
-                var marker = addMarker(app.map, image, app.mainMarker.position, app.mainMarker.server_id, app.mainMarker.type);
+                var marker = addMarker(app.map, image, app.mainMarker.position, app.mainMarker.server_id, 'bike');
+
+                app.reorderActions('lock', 'hide');
             }
 
-            /* set animation and attache info window  */
-            marker.setAnimation(google.maps.Animation.BOUNCE)
+
         }
         app.attachInfoWindow(marker);
 
@@ -1122,48 +1129,65 @@ var app = {
             }
             app.activeMarker = this;
             app.getPlaceFromDB(this.server_id, function (data) {
-                if (data.delete_counter == 0) {
-                    $(".mark-delete").addClass('active');
-                } else {
-                    $(".mark-delete").removeClass('active');
-                }
-                if (data.image) {
-                    $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image + ")");
-                    $(".foot-link").css('background-size', 'cover');
-                    $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
-                    $(".foot-link").removeAttr("ontouchstart");
-                } else {
-                    $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png)");
-                    $(".foot-link").css('background-size', 'cover');
-                    $(".foot-link").removeAttr("href");
-                    $(".foot-link").attr("ontouchstart", "return false;");
-                }
-                $(".footer-image img").css('border', 'none');
-                $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
-                $("footer .footer-info p.name").text(data.name);
-                $("footer .footer-info p.address").text(data.address);
-                if (data.description) {
-                    $("footer .footer-info .label.fordesc").show();
-                    $("footer .footer-info p.desc").text(data.description);
-                } else {
-                    $("footer .footer-info .label.fordesc").hide();
-                    $("footer .footer-info p.desc").text('');
-                }
-                if ($('.controls').hasClass('transition')) {
-                    app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
-                } else {
-                    $('.controls').addClass("transition");
+
+                if (!$.isEmptyObject(data)) {
+                    if (data.delete_counter == 0) {
+                        $(".mark-delete").addClass('active');
+                    } else {
+                        $(".mark-delete").removeClass('active');
+                    }
+                    if (data.image) {
+                        $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image + ")");
+                        $(".foot-link").css('background-size', 'cover');
+                        $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
+                        $(".foot-link").removeAttr("ontouchstart");
+                    } else {
+                        $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png)");
+                        $(".foot-link").css('background-size', 'cover');
+                        $(".foot-link").removeAttr("href");
+                        $(".foot-link").attr("ontouchstart", "return false;");
+                    }
+                    $(".footer-image img").css('border', 'none');
+                    $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
+                    $("footer .footer-info p.name").text(data.name);
+                    $("footer .footer-info p.address").text(data.address);
+                    if (data.description) {
+                        $("footer .footer-info .label.fordesc").show();
+                        $("footer .footer-info p.desc").text(data.description);
+                    } else {
+                        $("footer .footer-info .label.fordesc").hide();
+                        $("footer .footer-info p.desc").text('');
+                    }
+                    if ($('.controls').hasClass('transition')) {
+                        app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                    } else {
+                        $('.controls').addClass("transition");
+                        setTimeout(function () {
+                            app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                        }, 250);
+                    }
+                } else if (app.lockedBike) {
+                    $('.controls').removeClass("transition");
                     setTimeout(function () {
                         app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                     }, 250);
                 }
 
                 if (data.type == 'parking') {
+                    if (app.lockedBike && data.server_id == app.lockedBike.server_id) {
+                        app.reorderActions('lock', 'show');
+                    } else if (app.lockedBike) {
+                        app.reorderActions('lock', 'hide');
+                    } else {
+                        app.reorderActions('lock', 'show');
+                    }
+                } else if (data.type == 'bike' || app.activeMarker.type == 'bike') {
                     app.reorderActions('lock', 'show');
                 } else {
                     app.reorderActions('lock', 'hide');
                 }
             });
+
         });
     },
     reorderActions: function (button, action) {
@@ -1196,9 +1220,11 @@ var app = {
         if (app.activeMarker) {
             app.activeMarker.setAnimation(null)
             app.activeMarker = null;
+            if (!app.mainMarker || app.lockedBike) {
+                app.reorderActions('lock', 'hide');
+            }
         }
 
-        app.reorderActions('lock', 'hide');
         setTimeout(function () {
             $(".controls").removeClass("transition");
         }, 50);
@@ -1456,15 +1482,15 @@ function actionButtons(el, animation, position, callback) {
     /* show with scale if element not visible */
     if (!$(el).hasClass('visible')) {
         $(el).addClass('displayBLock');
-        $(el).css('transform', 'scale(0)');
+        $(el).css('-webkit-transform', 'scale(0)').css('transform', 'scale(0)');
     }
 
     if (animation == 'toggle') { /* toogle scale */
         $(el).addClass('action_trans').addClass('toggle');
 
-        $(el).css('transform', 'scale(1.2)');
+        $(el).css('-webkit-transform', 'scale(1.2)').css('transform', 'scale(1.2)');
         setTimeout(function () {
-            $(el).css('transform', 'scale(1)');
+            $(el).css('-webkit-transform', 'scale(1)').css('transform', 'scale(1)');
         }, 100);
     } else if (animation == 'hide') { /* hide with scale */
         $(el).addClass('action_trans');
@@ -1495,10 +1521,10 @@ function actionButtons(el, animation, position, callback) {
             if (!$(el).hasClass('visible')) {
                 var marginTop = parseInt($(el).css('margin-top')) - newCoords;
                 $(el).css('margin-top', marginTop);
-                $(el).css('transform', 'scale(0)');
+                $(el).css('-webkit-transform', 'scale(0)').css('transform', 'scale(0)');
             } else { /* if visible get old transform position as start position */
                 var oldTransformPosition = $(el).attr('data-transform') ? $(el).attr('data-transform') : '';
-                $(el).css('margin-top', '').css('transform', oldTransformPosition);
+                $(el).css('margin-top', '').css('-webkit-transform', oldTransformPosition).css('transform', oldTransformPosition);
                 $(el)[0].offsetHeight;
 
             }
@@ -1510,15 +1536,17 @@ function actionButtons(el, animation, position, callback) {
             $(el).attr('data-transform', 'translateY(-' + newCoords + 'px)');
 
             if (!$(el).hasClass('visible')) {
-                $(el).css('transform', 'scale(1)');
+                $(el).css('-webkit-transform', 'scale(1)').css('transform', 'scale(1)');
             } else {
-                $(el).css('transform', 'translateY(-' + newCoords + 'px)');
+                $(el).css('-webkit-transform', 'translateY(-' + newCoords + 'px)').css('transform', 'translateY(-' + newCoords + 'px)');
             }
 
             /* calculate and set  margin after transition */
             setTimeout(function () {
-                $(el).removeClass('action_trans').removeAttr('style');
-                var marginTop = parseInt($(el).css('margin-top')) - newCoords;
+                $(el).removeClass('action_trans').css('transform','').css('margin-top','');
+                var marginTop = parseInt($(el).css('margin-top'));
+                marginTop = marginTop < 0 ? marginTop : -marginTop;
+                marginTop = marginTop - newCoords;
                 $(el).css('margin-top', marginTop);
             }, 200);
             /* make it visible for roerdering*/

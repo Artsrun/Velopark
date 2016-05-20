@@ -1,5 +1,5 @@
 /* MAIN APP CLASS */
-var DEBUG = true;
+var DEBUG = false;
 if (DEBUG) {
     device = {};
     device.uuid = '5465sdfsdf46';
@@ -14,6 +14,7 @@ var app = {
     uploadsURL: 'http://velopark.am/uploads/',
     map: null,
     db: null,
+    lockedBike: null,
     data: {
         parking: null,
         rent: null,
@@ -115,9 +116,6 @@ var app = {
         app.platform = device.platform.toLowerCase();
         $('html').addClass(app.platform);
         app.gMapApiKey = app.gmapKeys[ app.platform];
-        if (app.platform == 'android' && parseInt(device.version) < 3) {
-            $('html').addClass('oldAndroid');
-        }
         if (DEBUG) {
             app.onlineStart = true;
             app.onlineStatus = 'online';
@@ -219,13 +217,10 @@ var app = {
         $('#' + pageId).removeClass('hidden').addClass('active');
         $('html').attr('data-active', pageId);
         app.setLocationHash(pageId);
-        if ($('html').hasClass('oldAndroid')) {
-            window.scrollTo(0, 0);
-        } else {
-            $('#' + pageId + ' .wrapper').animate({
-                scrollTop: 0
-            }, 0);
-        }
+
+        $('#' + pageId + ' .wrapper').animate({
+            scrollTop: 0
+        }, 0);
 
         if (pageId == 'main' || pageId == 'add_places') {
             app.gpsStart();
@@ -252,9 +247,6 @@ var app = {
             },
             dataType: 'json',
             beforeSend: function () {
-                if ($('html').hasClass('oldAndroid')) {
-                    $('html').addClass('fullHeight');
-                }
                 addLoader('#new_places');
             },
             success: function (res) {
@@ -409,9 +401,6 @@ var app = {
                 app.activateSwipebox('#vot_' + places[i].server_id + ' .swipebox_places:not(".noimage")');
             }
             app.showReviewMap();
-            if ($('html').hasClass('oldAndroid')) {
-                $('html').removeClass('fullHeight');
-            }
         } else {
             $("#new_places .wrapper .content ").html("<p class='no_place_text'>Nothing to review</p>");
         }
@@ -609,14 +598,18 @@ var app = {
         });
     },
     getPlaceFromDB: function (server_id, callback) {
-        app.db.transaction(function (tx) {
-            tx.executeSql("SELECT * FROM places WHERE server_id='" + server_id + "'", [], function (tx, results) {
-                var row = results.rows.item(0);
-                if (row) {
-                    callback(row);
-                }
+        if (server_id == null) {
+            callback({});
+        } else {
+            app.db.transaction(function (tx) {
+                tx.executeSql("SELECT * FROM places WHERE server_id='" + server_id + "'", [], function (tx, results) {
+                    var row = results.rows.item(0);
+                    if (row) {
+                        callback(row);
+                    }
+                });
             });
-        });
+        }
     },
     gpsStart: function () {
         if ((app.getActivePage() == 'main' || app.getActivePage() == 'add_places') && app.positionWatchId == null) {
@@ -640,9 +633,15 @@ var app = {
         };
         app.onPositionSuccess = function (position) {
             app.positionStatus = true;
-            app.currentLocation.latitude = position.coords.latitude;
-            app.currentLocation.longitude = position.coords.longitude;
-            var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            if (DEBUG) {
+                app.currentLocation.latitude = app.defaultLocation.latitude;
+                app.currentLocation.longitude = app.defaultLocation.longitude;
+                var myLatlng = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+            } else {
+                app.currentLocation.latitude = position.coords.latitude;
+                app.currentLocation.longitude = position.coords.longitude;
+                var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            }
             if (mainMarker == null) {
                 app.map.setCenter(myLatlng);
                 var image = {
@@ -651,6 +650,9 @@ var app = {
                 };
                 mainMarker = addMarker(app.map, image, myLatlng);
                 app.reorderActions('myLocation', 'show');
+                if (!app.lockedBike) {
+                    app.reorderActions('lock', 'show');
+                }
                 /* $('.gps1').addClass('displayBLock');
                  setTimeout(function () {
                  $('.gps1').addClass('visible');
@@ -670,6 +672,24 @@ var app = {
 
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
+
+        /* restore lockedBike if exist */
+        if (localStorage.getItem('lockedBike')) {
+            var storedData = $.parseJSON(localStorage.getItem('lockedBike'));
+            var position = new google.maps.LatLng(storedData.lat, storedData.lng);
+            var image = {
+                url: "img/marker_bike.png",
+                scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
+            };
+            var marker = addMarker(app.map, image, position, storedData.server_id, storedData.type);
+            app.lockPosition(marker);
+
+        }
+
+        if (DEBUG) {
+            app.onPositionSuccess();
+        }
+
         /* hide splashscreen when map loaded */
         google.maps.event.addListenerOnce(app.map, 'tilesloaded', function () {
             if (navigator.splashscreen) {
@@ -833,11 +853,7 @@ var app = {
                 }
             });
             var scrollTimer;
-            if ($('html').hasClass('oldAndroid')) {
-                app.pageScrollTarget = window;
-            } else {
-                app.pageScrollTarget = '#new_places .wrapper';
-            }
+            app.pageScrollTarget = '#new_places .wrapper';
             $(app.pageScrollTarget).scroll(function () {
 
                 if (app.scrollFix == $(app.pageScrollTarget).scrollTop()) {
@@ -884,54 +900,94 @@ var app = {
         }
 
     },
-    lockPosition: function () {
+    lockPosition: function (marker) {
+
+        var dataForSave = {
+            server_id: null,
+            lat: null,
+            lng: null,
+            type: null
+        };
 
         var image = {
             url: "img/marker_bike.png",
             scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
         };
 
-        if (app.activeMarker) {
-            var marker = addMarker(app.map, image, app.activeMarker.position, app.activeMarker.server_id, app.activeMarker.type);
-            removeMarker(app.activeMarker);
-            app.activeMarker = marker;
-        } else if (app.mainMarker) {
-            var marker = addMarker(app.map, image, app.mainMarker.position, app.mainMarker.server_id, app.mainMarker.type);
+        if (typeof marker != 'undefined') {
+            dataForSave.server_id = marker.server_id;
+            dataForSave.lat = marker.position.lat();
+            dataForSave.lng = marker.position.lng();
+            dataForSave.type = 'bike';
+
+        } else {
+            if (app.activeMarker) {
+
+                dataForSave.server_id = app.activeMarker.server_id;
+                dataForSave.lat = app.activeMarker.position.lat();
+                dataForSave.lng = app.activeMarker.position.lng();
+                dataForSave.type = app.activeMarker.type;
+
+                /* replace active marker*/
+                var marker = addMarker(app.map, image, app.activeMarker.position, app.activeMarker.server_id, app.activeMarker.type);
+                removeMarker(app.activeMarker);
+                app.activeMarker = marker;
+
+                /* set animation and attache info window  */
+                marker.setAnimation(google.maps.Animation.BOUNCE)
+
+            } else if (app.mainMarker) {
+
+                dataForSave.lat = app.mainMarker.position.lat();
+                dataForSave.lng = app.mainMarker.position.lng();
+                dataForSave.type = 'bike';
+
+                /* add new marker on my position */
+                var marker = addMarker(app.map, image, app.mainMarker.position, app.mainMarker.server_id, 'bike');
+
+                app.reorderActions('lock', 'hide');
+            }
+
+
         }
-
-        marker.setAnimation(google.maps.Animation.BOUNCE)
-        marker.locked = true;
         app.attachInfoWindow(marker);
-        localStorage.setItem("myBike", app.activeMarker.server_id);
 
-        app.myBikeMarker = marker;
+        /* save data in localstorage */
+        localStorage.setItem("lockedBike", JSON.stringify(dataForSave));
+
+        app.lockedBike = marker;
 
         app.reorderActions('myBike', 'show');
         $('.actions [data-button="lock"]').attr('data-action', 'unlock');
     },
     unlockPosition: function () {
-        /*if (app.myBikeMarker) {
-         
-         
-         app.reorderActions('myBike', 'hide');
-         
-         var image = {
-         url: "img/marker_parking.png",
-         scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
-         };
-         var marker = addMarker(app.map, image, app.myBikeMarker.position, app.myBikeMarker.server_id, app.myBikeMarker.type);
-         
-         if (app.activeMarker) {
-         removeMarker(app.activeMarker);
-         }
-         
-         marker.setAnimation(google.maps.Animation.BOUNCE)
-         app.attachInfoWindow(marker);
-         app.activeMarker = marker;
-         }
-         
-         
-         localStorage.setItem("myBike", ''); */
+
+        if (app.lockedBike) {
+            /* revert back to correct marker */
+            if (app.lockedBike.server_id && $('.menu_list [data-type="parking"]').hasClass('active')) {
+                var image = {
+                    url: "img/marker_" + app.lockedBike.type + ".png",
+                    scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
+                };
+                var marker = addMarker(app.map, image, app.lockedBike.position, app.lockedBike.server_id, app.lockedBike.type);
+
+                /* replace active if its opened marker */
+                if (app.activeMarker.server_id == app.lockedBike.server_id) {
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+                    app.activeMarker = marker;
+                }
+                app.data[marker.type].markers[marker.server_id] = marker;
+                /* attach info window */
+                app.attachInfoWindow(marker);
+            } else if (!$('.menu_list [data-type="parking"]').hasClass('active')) {
+                app.closeInfoWindow();
+            }
+            removeMarker(app.lockedBike);
+            app.lockedBike = null;
+
+            localStorage.setItem("lockedBike", '');
+        }
+        app.reorderActions('myBike', 'hide');
         $('.actions [data-button="lock"]').attr('data-action', 'lock');
     },
     goToMyLocation: function () {
@@ -940,8 +996,8 @@ var app = {
         }
     },
     goToMyBike: function () {
-        if (app.currentLocation.latitude != null) {
-            app.map.panTo(new google.maps.LatLng(app.currentLocation.latitude, app.currentLocation.longitude));
+        if (app.lockedBike) {
+            app.map.panTo(app.lockedBike.position);
         }
     },
     showReviewMap: function () {
@@ -1053,7 +1109,7 @@ var app = {
         };
         for (var k = 0; k < places.length; k++) {
             var place = places.item(k);
-            if (type == 'parking' && parseInt(localStorage.getItem("myBike")) == place.server_id)
+            if (type == 'parking' && (app.lockedBike && app.lockedBike.server_id == place.server_id))
                 continue;
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
             var marker = addMarker(app.map, image, myLatlng, place.server_id, place.type);
@@ -1073,43 +1129,65 @@ var app = {
             }
             app.activeMarker = this;
             app.getPlaceFromDB(this.server_id, function (data) {
-                if (data.delete_counter == 0) {
-                    $(".mark-delete").addClass('active');
-                } else {
-                    $(".mark-delete").removeClass('active');
-                }
-                if (data.image) {
-                    $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image + ")");
-                    $(".foot-link").css('background-size', 'cover');
-                    $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
-                    $(".foot-link").removeAttr("ontouchstart");
-                } else {
-                    $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png)");
-                    $(".foot-link").css('background-size', 'cover');
-                    $(".foot-link").removeAttr("href");
-                    $(".foot-link").attr("ontouchstart", "return false;");
-                }
-                $(".footer-image img").css('border', 'none');
-                $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
-                $("footer .footer-info p.name").text(data.name);
-                $("footer .footer-info p.address").text(data.address);
-                if (data.description) {
-                    $("footer .footer-info .label.fordesc").show();
-                    $("footer .footer-info p.desc").text(data.description);
-                } else {
-                    $("footer .footer-info .label.fordesc").hide();
-                    $("footer .footer-info p.desc").text('');
-                }
-                if ($('.controls').hasClass('transition')) {
-                    app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
-                } else {
-                    app.reorderActions('lock', 'show');
-                    $('.controls').addClass("transition");
+
+                if (!$.isEmptyObject(data)) {
+                    if (data.delete_counter == 0) {
+                        $(".mark-delete").addClass('active');
+                    } else {
+                        $(".mark-delete").removeClass('active');
+                    }
+                    if (data.image) {
+                        $(".foot-link").css('background-image', "url(data:image/jpg;base64," + data.image + ")");
+                        $(".foot-link").css('background-size', 'cover');
+                        $(".foot-link").attr("href", app.uploadsURL + data.server_id + ".jpg");
+                        $(".foot-link").removeAttr("ontouchstart");
+                    } else {
+                        $(".foot-link").css('background-image', "url(img/foot_icon_" + data.type + ".png)");
+                        $(".foot-link").css('background-size', 'cover');
+                        $(".foot-link").removeAttr("href");
+                        $(".foot-link").attr("ontouchstart", "return false;");
+                    }
+                    $(".footer-image img").css('border', 'none');
+                    $("footer .footer-info p.name, footer .footer-info p.address, footer .footer-info p.desc").empty();
+                    $("footer .footer-info p.name").text(data.name);
+                    $("footer .footer-info p.address").text(data.address);
+                    if (data.description) {
+                        $("footer .footer-info .label.fordesc").show();
+                        $("footer .footer-info p.desc").text(data.description);
+                    } else {
+                        $("footer .footer-info .label.fordesc").hide();
+                        $("footer .footer-info p.desc").text('');
+                    }
+                    if ($('.controls').hasClass('transition')) {
+                        app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                    } else {
+                        $('.controls').addClass("transition");
+                        setTimeout(function () {
+                            app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+                        }, 250);
+                    }
+                } else if (app.lockedBike) {
+                    $('.controls').removeClass("transition");
                     setTimeout(function () {
                         app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                     }, 250);
                 }
+
+                if (data.type == 'parking') {
+                    if (app.lockedBike && data.server_id == app.lockedBike.server_id) {
+                        app.reorderActions('lock', 'show');
+                    } else if (app.lockedBike) {
+                        app.reorderActions('lock', 'hide');
+                    } else {
+                        app.reorderActions('lock', 'show');
+                    }
+                } else if (data.type == 'bike' || app.activeMarker.type == 'bike') {
+                    app.reorderActions('lock', 'show');
+                } else {
+                    app.reorderActions('lock', 'hide');
+                }
             });
+
         });
     },
     reorderActions: function (button, action) {
@@ -1142,9 +1220,11 @@ var app = {
         if (app.activeMarker) {
             app.activeMarker.setAnimation(null)
             app.activeMarker = null;
+            if (!app.mainMarker || app.lockedBike) {
+                app.reorderActions('lock', 'hide');
+            }
         }
 
-        app.reorderActions('lock', 'hide');
         setTimeout(function () {
             $(".controls").removeClass("transition");
         }, 50);
@@ -1155,7 +1235,7 @@ var app = {
         $(".add-address").val('');
         $(".add-country").val('');
         if (fromGallery) {
-            if ($('html').hasClass('oldAndroid') || typeof window.FileReader == 'undefined') {
+            if (typeof window.FileReader == 'undefined') {
                 setImage(imageURI);
                 getCurrrentLocation();
             } else {
@@ -1274,19 +1354,10 @@ function elementInViewport(el) {
         left += el.offsetLeft;
     }
 
-    var win = window;
     var scrollWin = $(app.pageScrollTarget);
-    if (typeof app.pageScrollTarget == 'object') {
-        return (
-                top < (window.pageYOffset + window.innerHeight) &&
-                left < (window.pageXOffset + window.innerWidth) &&
-                (top + height) > window.pageYOffset &&
-                (left + width) > window.pageXOffset
-                );
-    }
     return (
-            top < (scrollWin.scrollTop() + win.innerHeight) &&
-            left < (scrollWin.offset().left + win.innerWidth) &&
+            top < (scrollWin.scrollTop() + window.innerHeight) &&
+            left < (scrollWin.offset().left + window.innerWidth) &&
             (top + height) > scrollWin.scrollTop() &&
             (left + width) > scrollWin.offset().left
             );
@@ -1411,15 +1482,15 @@ function actionButtons(el, animation, position, callback) {
     /* show with scale if element not visible */
     if (!$(el).hasClass('visible')) {
         $(el).addClass('displayBLock');
-        $(el).css('transform', 'scale(0)');
+        $(el).css('-webkit-transform', 'scale(0)').css('transform', 'scale(0)');
     }
 
     if (animation == 'toggle') { /* toogle scale */
         $(el).addClass('action_trans').addClass('toggle');
 
-        $(el).css('transform', 'scale(1.2)');
+        $(el).css('-webkit-transform', 'scale(1.2)').css('transform', 'scale(1.2)');
         setTimeout(function () {
-            $(el).css('transform', 'scale(1)');
+            $(el).css('-webkit-transform', 'scale(1)').css('transform', 'scale(1)');
         }, 100);
     } else if (animation == 'hide') { /* hide with scale */
         $(el).addClass('action_trans');
@@ -1450,10 +1521,10 @@ function actionButtons(el, animation, position, callback) {
             if (!$(el).hasClass('visible')) {
                 var marginTop = parseInt($(el).css('margin-top')) - newCoords;
                 $(el).css('margin-top', marginTop);
-                $(el).css('transform', 'scale(0)');
+                $(el).css('-webkit-transform', 'scale(0)').css('transform', 'scale(0)');
             } else { /* if visible get old transform position as start position */
                 var oldTransformPosition = $(el).attr('data-transform') ? $(el).attr('data-transform') : '';
-                $(el).css('margin-top', '').css('transform', oldTransformPosition);
+                $(el).css('margin-top', '').css('-webkit-transform', oldTransformPosition).css('transform', oldTransformPosition);
                 $(el)[0].offsetHeight;
 
             }
@@ -1465,15 +1536,17 @@ function actionButtons(el, animation, position, callback) {
             $(el).attr('data-transform', 'translateY(-' + newCoords + 'px)');
 
             if (!$(el).hasClass('visible')) {
-                $(el).css('transform', 'scale(1)');
+                $(el).css('-webkit-transform', 'scale(1)').css('transform', 'scale(1)');
             } else {
-                $(el).css('transform', 'translateY(-' + newCoords + 'px)');
+                $(el).css('-webkit-transform', 'translateY(-' + newCoords + 'px)').css('transform', 'translateY(-' + newCoords + 'px)');
             }
 
             /* calculate and set  margin after transition */
             setTimeout(function () {
-                $(el).removeClass('action_trans').removeAttr('style');
-                var marginTop = parseInt($(el).css('margin-top')) - newCoords;
+                $(el).removeClass('action_trans').css('transform','').css('margin-top','');
+                var marginTop = parseInt($(el).css('margin-top'));
+                marginTop = marginTop < 0 ? marginTop : -marginTop;
+                marginTop = marginTop - newCoords;
                 $(el).css('margin-top', marginTop);
             }, 200);
             /* make it visible for roerdering*/

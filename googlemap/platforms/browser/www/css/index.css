@@ -401,28 +401,6 @@ ul.menu_list img{
     -webkit-overflow-scrolling: touch;
 }
 
-html.oldAndroid[data-active="main"] header{
-    position:absolute;
-}
-html.oldAndroid {
-    height: auto; 
-}
-html.oldAndroid[data-active="main"], html.oldAndroid.fullHeight[data-active="new_places"]{
-    height: 100%;
-    overflow: hidden;
-}
-html.oldAndroid.offline{
-    height: 100%;
-}
-html.oldAndroid[data-active="main"] .container, html.oldAndroid[data-active="main"] .wrapper{
-    height: 100%;
-}
-
-html.oldAndroid .arr.arr_back{
-    background-image:url(../img/arr_back.png);
-    -webkit-transform: rotateZ(360deg);
-    transform: rotateZ(360deg);
-}
 .wrapper::-webkit-scrollbar {
     -webkit-appearance: none;
     display:none;
@@ -1193,16 +1171,6 @@ input.error, textarea.error{
     opacity:0;
 }
 
-.poweredBy{
-    width: 25%;
-    display: block;
-    margin: 0 auto;
-    margin-top: 80px;
-    /*    margin-bottom: 20px;*/
-}
-.poweredBy img {
-    width:100%;
-}
 
 a.infoMail:link,
 a.infoMail:visited,
@@ -1217,7 +1185,7 @@ a.infoMail:active{
     display:none;
     margin-top: 2%;
     text-decoration: underline;
-    color: #e74c3c;
+    color: #dddddd;
 }
 .mark-delete.active{
     display:block;
@@ -1629,11 +1597,6 @@ a.infoMail:active{
 }
 /* google map */
 
-/* old android fix */
-.oldAndroid  .add_img_icon, .oldAndroid ul.menu_list img{
-    -webkit-border-radius:9999px;
-    border-radius: 9999px;
-}
 .correct_invisible{
     opacity: 0;
 }
