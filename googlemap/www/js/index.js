@@ -19,7 +19,8 @@ var app = {
         parking: null,
         rent: null,
         shop: null,
-        parts: null
+        parts: null,
+        bike: null
     },
     systemMessage: {
         'title': 'Hey',
@@ -869,7 +870,7 @@ var app = {
                 }, 400);
             });
             /* action buttons */
-            $('.actions a[data-action]').on('click', function () {
+            $(document).on('click', '.actions a[data-action]', function () {
                 var that = this;
                 if ($(this).hasClass('disabled')) {
                     return false;
@@ -889,6 +890,7 @@ var app = {
                     }
                     $(that).removeClass('disabled');
                 });
+                return false;
             });
         }
         if (app.onlineStart == true) {
@@ -918,8 +920,7 @@ var app = {
             dataForSave.server_id = marker.server_id;
             dataForSave.lat = marker.position.lat();
             dataForSave.lng = marker.position.lng();
-            dataForSave.type = 'bike';
-
+            dataForSave.type = marker.type;
         } else {
             if (app.activeMarker) {
 
@@ -956,7 +957,6 @@ var app = {
         localStorage.setItem("lockedBike", JSON.stringify(dataForSave));
 
         app.lockedBike = marker;
-
         app.reorderActions('myBike', 'show');
         $('.actions [data-button="lock"]').attr('data-action', 'unlock');
     },
@@ -970,7 +970,6 @@ var app = {
                     scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
                 };
                 var marker = addMarker(app.map, image, app.lockedBike.position, app.lockedBike.server_id, app.lockedBike.type);
-
                 /* replace active if its opened marker */
                 if (app.activeMarker.server_id == app.lockedBike.server_id) {
                     marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -980,15 +979,16 @@ var app = {
                 /* attach info window */
                 app.attachInfoWindow(marker);
             } else if (!$('.menu_list [data-type="parking"]').hasClass('active')) {
-                app.closeInfoWindow();
+                //app.closeInfoWindow();
+                app.activeMarker = null;
             }
             removeMarker(app.lockedBike);
             app.lockedBike = null;
 
             localStorage.setItem("lockedBike", '');
+            app.reorderActions('myBike', 'hide');
+            $('.actions [data-button="lock"]').attr('data-action', 'lock');
         }
-        app.reorderActions('myBike', 'hide');
-        $('.actions [data-button="lock"]').attr('data-action', 'lock');
     },
     goToMyLocation: function () {
         if (app.currentLocation.latitude != null) {
@@ -1481,20 +1481,28 @@ function newPlace(center, setAddress) {
 function actionButtons(el, animation, position, callback) {
     /* show with scale if element not visible */
     if (!$(el).hasClass('visible')) {
-        $(el).addClass('displayBLock');
         $(el).css('-webkit-transform', 'scale(0)').css('transform', 'scale(0)');
+        $(el).addClass('displayBLock');
     }
 
     if (animation == 'toggle') { /* toogle scale */
         $(el).addClass('action_trans').addClass('toggle');
-
-        $(el).css('-webkit-transform', 'scale(1.2)').css('transform', 'scale(1.2)');
+        $(el).css({
+            '-webkit-transform': 'scale(1.2)',
+            'transform': 'scale(1.2)'
+        });
         setTimeout(function () {
-            $(el).css('-webkit-transform', 'scale(1)').css('transform', 'scale(1)');
+            $(el).css({
+                '-webkit-transform': 'scale(1)',
+                'transform': 'scale(1)'
+            });
         }, 100);
     } else if (animation == 'hide') { /* hide with scale */
         $(el).addClass('action_trans');
-        $(el).css('transform', 'scale(0)');
+        $(el).css({
+            '-webkit-transform': 'scale(0)',
+            'transform': 'scale(0)'
+        });
         $(el).removeClass('visible');
 
         /* move to initial position */
@@ -1507,47 +1515,53 @@ function actionButtons(el, animation, position, callback) {
     } else if (animation == 'move' && position) { /* move to correct position */
 
         /* calculate new coordinates */
-        var newCoords = (position - 1) * $(el).height() + (position - 1) * ($(el).height() * 0.2);
+        var elementHeight = $(el).height();
+        var newCoords = (position - 1) * elementHeight + (position - 1) * (elementHeight * 0.2);
         var transform = 'translateY(-' + newCoords + 'px)';
 
-        var needMove = true;
-        if ($(el).hasClass('visible') && $(el).data('current-position') == position) {
-            needMove = false;
-        }
-
+        var needMove = ($(el).hasClass('visible') && $(el).data('current-position') == position) ? false : true;
         /* move to correct position */
         if (needMove) {
             /* if not visible move to correct position wihtout showing */
             if (!$(el).hasClass('visible')) {
-                var marginTop = parseInt($(el).css('margin-top')) - newCoords;
-                $(el).css('margin-top', marginTop);
-                $(el).css('-webkit-transform', 'scale(0)').css('transform', 'scale(0)');
+                var marginTop = $(el).get(0).offsetTop - newCoords;
+                $(el).css({
+                    'margin-top': marginTop,
+                    '-webkit-transform': 'scale(0)',
+                    'transform': 'scale(0)'
+                });
             } else { /* if visible get old transform position as start position */
                 var oldTransformPosition = $(el).attr('data-transform') ? $(el).attr('data-transform') : '';
-                $(el).css('margin-top', '').css('-webkit-transform', oldTransformPosition).css('transform', oldTransformPosition);
+                $(el).css({
+                    'margin-top': '',
+                    '-webkit-transform': oldTransformPosition,
+                    'transform': oldTransformPosition
+                });
                 $(el)[0].offsetHeight;
-
             }
-
             $(el).addClass('action_trans');
-
             /* save position and transition */
             $(el).data('current-position', position);
             $(el).attr('data-transform', 'translateY(-' + newCoords + 'px)');
 
             if (!$(el).hasClass('visible')) {
-                $(el).css('-webkit-transform', 'scale(1)').css('transform', 'scale(1)');
+                $(el).css({
+                    '-webkit-transform': 'scale(1)',
+                    'transform': 'scale(1)'
+                });
             } else {
-                $(el).css('-webkit-transform', 'translateY(-' + newCoords + 'px)').css('transform', 'translateY(-' + newCoords + 'px)');
+                $(el).css({
+                    '-webkit-transform': 'translateY(-' + newCoords + 'px) scale(1)',
+                    'transform': 'translateY(-' + newCoords + 'px)  scale(1)'
+                });
             }
 
             /* calculate and set  margin after transition */
             setTimeout(function () {
-                $(el).removeClass('action_trans').css('transform','').css('margin-top','');
-                var marginTop = parseInt($(el).css('margin-top'));
-                marginTop = marginTop < 0 ? marginTop : -marginTop;
-                marginTop = marginTop - newCoords;
+                $(el).removeClass('action_trans').removeAttr('style')
+                var marginTop = $(el).get(0).offsetTop - newCoords;
                 $(el).css('margin-top', marginTop);
+                $(el).css('transform', 'scale(1)');
             }, 200);
             /* make it visible for roerdering*/
             $(el).addClass('visible');
