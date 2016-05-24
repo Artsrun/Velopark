@@ -444,12 +444,25 @@ ul.menu_list img{
     display:none;
 }
 
-.gps1{
+.myLocationButton{
     float: right;   
     margin-right: 3%;
     cursor: pointer;
     width: 14%;
     background-image: url(../img/gps_icon.png); 
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    display:none;
+}
+
+.plusButton{
+    float: right;   
+    margin-right: 3%;
+    cursor: pointer;
+    width: 14%;
+    background-image: url(../img/plus_icon.png); 
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
@@ -1045,7 +1058,7 @@ html.offlineMap[data-active="main"] .arr {
     display:none;
 }
 
-html.offlineMap .gps1{
+html.offlineMap .myLocation{
     display:none !important;
 }
 

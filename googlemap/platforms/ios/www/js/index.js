@@ -654,10 +654,6 @@ var app = {
                 if (!app.lockedBike) {
                     app.reorderActions('lock', 'show');
                 }
-                /* $('.gps1').addClass('displayBLock');
-                 setTimeout(function () {
-                 $('.gps1').addClass('visible');
-                 }, 0); */
             }
             mainMarker.setPosition(myLatlng);
             mainMarker.setAnimation(null);
@@ -712,13 +708,6 @@ var app = {
         google.maps.event.addListener(app.map, "click", function () {
             app.closeInfoWindow();
         });
-        /* gps button functionality */
-        /*$(".gps1").off("click.gps");
-         $(".gps1").on("click.gps", function (e) {
-         if (app.currentLocation.latitude != null) {
-         app.map.panTo(new google.maps.LatLng(app.currentLocation.latitude, app.currentLocation.longitude));
-         } 
-         });*/
         /* attach position watcher */
         app.gpsStart();
     },
@@ -733,6 +722,7 @@ var app = {
         /*nav functionality*/
         if (this.firstLoad == true) {
             this.firstLoad = false;
+            app.reorderActions('addPlace', 'show');
             if ($('html').hasClass('ios')) {
                 $(document).on('touchstart', function (e) {
                     if ($(e.target).prop("tagName").toLowerCase() != 'input' && $(e.target).prop("tagName").toLowerCase() != 'textarea' && $('input,textarea').is(':focus')) {
@@ -887,6 +877,8 @@ var app = {
                         app.lockPosition();
                     } else if (action == 'unlock') {
                         app.unlockPosition();
+                    } else if (action == 'addPlace') {
+                        $('.menu li[data-page="add_places"]').click();
                     }
                     $(that).removeClass('disabled');
                 });
@@ -963,6 +955,7 @@ var app = {
     unlockPosition: function () {
 
         if (app.lockedBike) {
+            var closeInfoWindow = false;
             /* revert back to correct marker */
             if (app.lockedBike.server_id && $('.menu_list [data-type="parking"]').hasClass('active')) {
                 var image = {
@@ -978,8 +971,9 @@ var app = {
                 app.data[marker.type].markers[marker.server_id] = marker;
                 /* attach info window */
                 app.attachInfoWindow(marker);
+            } else if (app.lockedBike.server_id && !$('.menu_list [data-type="parking"]').hasClass('active')) {
+                closeInfoWindow = true;
             } else if (!$('.menu_list [data-type="parking"]').hasClass('active')) {
-                //app.closeInfoWindow();
                 app.activeMarker = null;
             }
             removeMarker(app.lockedBike);
@@ -988,6 +982,9 @@ var app = {
             localStorage.setItem("lockedBike", '');
             app.reorderActions('myBike', 'hide');
             $('.actions [data-button="lock"]').attr('data-action', 'lock');
+            if (closeInfoWindow) {
+                app.closeInfoWindow();
+            }
         }
     },
     goToMyLocation: function () {
@@ -1220,7 +1217,9 @@ var app = {
         if (app.activeMarker) {
             app.activeMarker.setAnimation(null)
             app.activeMarker = null;
-            if (!app.mainMarker || app.lockedBike) {
+            if (app.lockedBike) {
+                app.reorderActions('lock', 'hide');
+            } else if (!app.mainMarker) {
                 app.reorderActions('lock', 'hide');
             }
         }
