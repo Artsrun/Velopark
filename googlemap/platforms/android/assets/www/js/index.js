@@ -44,6 +44,12 @@ var app = {
         timeout: 5000,
         maximumAge: 0
     },
+    selectedPlaces: {
+        parking: '',
+        rent: '',
+        shop: '',
+        parts: ''
+    },
     mapOptions: {
         zoom: 14,
         scrollwheel: false,
@@ -703,7 +709,29 @@ var app = {
             $('img[src ^= "https://maps.gstatic.com/mapfiles/api-3/images/google"]').parents('a[href ^= "https://maps.google.com/maps"]').parent().addClass('google-fix');
             $("span:contains('Map data ©')").parents('.gmnoprint').addClass('google-fix');
             $("a:contains('Terms of Use')").parents('.gmnoprint').addClass('google-fix');
+
+            google.maps.event.addListener(app.map, 'idle', function () {
+                var getSelectedType = $('.menu_list img.active');
+                var type;
+                if ($('.menu_list img.active').length > 1) {
+                    type = [];
+                    $('.menu_list img.active').each(
+                            function () {
+                                type.push($(this).data('type'));
+                            }
+                    )
+                } else {
+                    type = $('.menu_list img.active').data('type')
+                }
+                if (type) {
+                    app.selectPlaces(type);
+                }
+
+            });
         });
+
+
+
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
             app.closeInfoWindow();
@@ -814,11 +842,13 @@ var app = {
                         app.selectPlaces(type);
                     } else {
                         $(this).removeClass('active');
-                        for (var j in  app.data[type]['markers']) {
-                            if (typeof app.data[type]['markers'][j] != 'object') {
-                                continue;
+                        if (app.data[type]) {
+                            for (var j in  app.data[type]['markers']) {
+                                if (typeof app.data[type]['markers'][j] != 'object') {
+                                    continue;
+                                }
+                                removeMarker(app.data[type]['markers'][j]);
                             }
-                            removeMarker(app.data[type]['markers'][j]);
                         }
                         app.clearPlaces(type);
                     }
@@ -1066,15 +1096,52 @@ var app = {
         if (typeof type == 'undefined') {
             type = 'parking';
         }
-        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE status='1' AND type='" + type + "'";
+
+        var bounds = app.map.getBounds();
+        var northNEtLat = bounds.getNorthEast().lat();
+        var northNELng = bounds.getNorthEast().lng();
+
+        var southSWLat = bounds.getSouthWest().lat();
+        var southSWLng = bounds.getSouthWest().lng();
+
+        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE (latitude < '" + northNEtLat + "' AND  latitude > '" + southSWLat + "') AND  (longitude < '" + northNELng + "' AND  longitude > '" + southSWLng + "') AND  status='1' ";
+        var notInList = '';
+
+        /* don't select already loaded places */
+        for (var key in app.selectedPlaces) {
+            if (app.selectedPlaces[key] == '')
+                continue;
+            if (notInList == '') {
+                notInList = app.selectedPlaces[key];
+            } else {
+                notInList += ', ' + app.selectedPlaces[key];
+            }
+        }
+        if (notInList) {
+            query += ' AND server_id NOT IN (' + notInList + ')'
+        }
+        /* end of query */
+
+        if (typeof type == 'string') {
+            query += ' AND type="' + type + '"';
+            $('img[data-type="' + type + '"]').addClass('active');
+        } else {
+            var selectedType;
+            for (var i = 0; i < type.length; i++) {
+                if (typeof selectedType == 'undefined') {
+                    selectedType = '"' + type[i] + '"';
+                } else {
+                    selectedType += ', "' + type[i] + '"';
+                }
+                $('img[data-type="' + type[i] + '"]').addClass('active');
+            }
+            query += ' AND type IN (' + selectedType + ')';
+        }
         app.db.transaction(function (tx) {
             tx.executeSql(query, [], function (tx, results) {
-                app.data[type] = {
-                    markers: {}
-                };
                 app.data.status = 'ready';
                 /* show markesr on map by type*/
-                app.drawGroupMarkers(results.rows, type);
+                app.drawGroupMarkers(results.rows);
             });
         }, function () {
             app.data.status = 'error';
@@ -1082,16 +1149,16 @@ var app = {
     },
     clearPlaces: function (type) {
         app.data[type] = null;
+        app.selectedPlaces[type] = '';
         app.closeInfoWindow();
     },
-    drawGroupMarkers: function (places, type) {
+    drawGroupMarkers: function (places) {
 
         /* if there is no matched places do nothing */
         if (places.length == 0) {
             return;
         }
 
-        $('img[data-type="' + type + '"]').addClass('active');
         if (!$('header .green-menu .arr').hasClass('visible')) {
             $('header .green-menu .arr').addClass('displayBLock');
             setTimeout(function () {
@@ -1101,17 +1168,30 @@ var app = {
 
 
         var image = {
-            url: "img/marker_" + type + ".png",
             scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
         };
         for (var k = 0; k < places.length; k++) {
             var place = places.item(k);
-            if (type == 'parking' && (app.lockedBike && app.lockedBike.server_id == place.server_id))
+            if (place.type == 'parking' && (app.lockedBike && app.lockedBike.server_id == place.server_id))
                 continue;
+            image.url = "img/marker_" + place.type + ".png";
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
             var marker = addMarker(app.map, image, myLatlng, place.server_id, place.type);
-            app.data[place.type].markers[k] = marker;
+
+            if (!app.data[place.type]) {
+                app.data[place.type] = {
+                    markers: {}
+                };
+            }
+            app.data[place.type].markers[place.server_id] = marker;
             app.attachInfoWindow(marker);
+
+            if (app.selectedPlaces[place.type]) {
+                app.selectedPlaces[place.type] += ', ' + place.server_id;
+
+            } else {
+                app.selectedPlaces[place.type] = place.server_id
+            }
         }
     },
     attachInfoWindow: function (marker) {
