@@ -471,7 +471,7 @@ ul.menu_list img{
 }
 
 .actions a{
-    margin-top: -17%;
+    margin-top: -18%;
 }
 
 .controls{
@@ -503,9 +503,9 @@ ul.menu_list img{
     margin-top: 0;
 }
 .controls.transition{
-    -webkit-transition: transform 0.2s linear 0.05s;
-    -webkit-transition: -webkit-transform 0.2s linear 0.05s;
-    transition: transform 0.2s linear 0.05s;
+    -webkit-transition: transform 0.2s linear 0.05s, height 0.2s;
+    -webkit-transition: -webkit-transform 0.2s linear 0.05s,height 0.2s;
+    transition: transform 0.2s linear 0.05s,height 0.2s;
     -webkit-transform: translateY(-100%);
     transform: translateY(-100%);
 }
@@ -522,6 +522,7 @@ footer{
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
+    height: 100%;
 }
 
 

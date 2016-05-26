@@ -44,6 +44,7 @@ var app = {
         timeout: 5000,
         maximumAge: 0
     },
+    country: '',
     selectedPlaces: {
         parking: '',
         rent: '',
@@ -118,6 +119,13 @@ var app = {
         }
         if (app.db.version == "") {
             app.db.changeVersion("", "1.1");
+        }
+        /* get country if stored */
+        if (localStorage.getItem('storedPosition')) {
+            var storedPosition = $.parseJSON(localStorage.getItem('storedPosition'));
+            app.country = storedPosition.country;
+            app.defaultLocation.latitude = storedPosition.latitude;
+            app.defaultLocation.longitude = storedPosition.longitude;
         }
 
         app.platform = device.platform.toLowerCase();
@@ -630,6 +638,34 @@ var app = {
             app.positionWatchId = null;
         }
     },
+    detectLocatinFromNetwork: function () {
+        if (this.onlineStatus === 'offline') {
+            this.noConnection();
+            return false;
+        }
+        if (app.positionStatus) {
+            return;
+        }
+        $.getJSON("http://ip-api.com/json/?callback=?", function (data) {
+            /* use data if gps data still unavailable */
+            if (!app.positionStatus) {
+                var dataToStore = {
+                    country: data.country,
+                    latitude: data.lat,
+                    longitude: data.lon
+                }
+                app.country = data.country;
+                app.defaultLocation.latitude = data.lat;
+                app.defaultLocation.longitude = data.lon;
+                localStorage.setItem('storedPosition', JSON.stringify(dataToStore));
+
+                var center = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+                app.map.setCenter(center);
+
+            }
+
+        });
+    },
     initMap: function () {
         var mainMarker = null;
         app.positionStatus = false;
@@ -638,6 +674,8 @@ var app = {
             latitude: null,
             longitude: null
         };
+        app.gpsCorrection = false;
+
         app.onPositionSuccess = function (position) {
             app.positionStatus = true;
             if (DEBUG) {
@@ -648,6 +686,30 @@ var app = {
                 app.currentLocation.latitude = position.coords.latitude;
                 app.currentLocation.longitude = position.coords.longitude;
                 var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            }
+            if (!app.gpsCorrection) {
+                app.gpsCorrection = true;
+                var dataToStore = {
+                    latitude: app.currentLocation.latitude,
+                    longitude: app.currentLocation.longitude
+                }
+                var geocoder = new google.maps.Geocoder();
+                geocoder.geocode({'location': myLatlng}, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        var country = '';
+                        for (var i = 0; i < results[0].address_components.length; i++) {
+                            var component = results[0].address_components[i];
+                            if (component.types[0] == 'country') {
+                                country = component.long_name;
+                                break;
+                            }
+                        }
+                        dataToStore['country'] = country
+                        localStorage.setItem('storedPosition', JSON.stringify(dataToStore));
+                        app.country = country;
+                        app.gpsCorrection = true;
+                    }
+                });
             }
             if (mainMarker == null) {
                 app.map.setCenter(myLatlng);
@@ -668,6 +730,9 @@ var app = {
 
         app.onPositionError = function (error) {
             app.gpsStop();
+            if (app.country == '') {
+                app.detectLocatinFromNetwork();
+            }
             setTimeout(function () {
                 app.gpsStart();
             }, 2000);
@@ -690,7 +755,7 @@ var app = {
         }
 
         if (DEBUG) {
-            app.onPositionSuccess();
+            //app.onPositionSuccess();
         }
 
         /* hide splashscreen when map loaded */
@@ -1249,6 +1314,14 @@ var app = {
                         app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                     }, 250);
                 }
+
+                var oldHeight = $('.controls').height();
+
+                $('.controls').css('height', 'auto');
+                var getRealHeight = $('.controls').height();
+
+                $('.controls').height(oldHeight);
+                $('.controls').height(getRealHeight);
 
                 if (data.type == 'parking') {
                     if (app.lockedBike && data.server_id == app.lockedBike.server_id) {

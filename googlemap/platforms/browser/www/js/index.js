@@ -1,5 +1,5 @@
 /* MAIN APP CLASS */
-var DEBUG = false;
+var DEBUG = true;
 if (DEBUG) {
     device = {};
     device.uuid = '5465sdfsdf46';
@@ -44,6 +44,7 @@ var app = {
         timeout: 5000,
         maximumAge: 0
     },
+    country: '',
     selectedPlaces: {
         parking: '',
         rent: '',
@@ -630,6 +631,16 @@ var app = {
             app.positionWatchId = null;
         }
     },
+    detectLocatinFromNetwork: function () {
+        if (this.onlineStatus === 'offline') {
+            this.noConnection();
+            return false;
+        }
+        $.getJSON("http://ip-api.com/json/?callback=?", function (data) {
+            alert(data.country);
+            app.country = data.country;
+        });
+    },
     initMap: function () {
         var mainMarker = null;
         app.positionStatus = false;
@@ -648,6 +659,22 @@ var app = {
                 app.currentLocation.latitude = position.coords.latitude;
                 app.currentLocation.longitude = position.coords.longitude;
                 var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            }
+            if (app.country == '') {
+                var geocoder = new google.maps.Geocoder();
+                geocoder.geocode({'location': myLatlng}, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        var country = '';
+                        for (var i = 0; i < results[0].address_components.length; i++) {
+                            var component = results[0].address_components[i];
+                            if (component.types[0] == 'country') {
+                                country = component.long_name;
+                                break;
+                            }
+                        }
+                        app.country = country;
+                    }
+                });
             }
             if (mainMarker == null) {
                 app.map.setCenter(myLatlng);
@@ -668,6 +695,9 @@ var app = {
 
         app.onPositionError = function (error) {
             app.gpsStop();
+            if (app.country == '') {
+                app.detectLocatinFromNetwork();
+            }
             setTimeout(function () {
                 app.gpsStart();
             }, 2000);
@@ -1249,6 +1279,14 @@ var app = {
                         app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                     }, 250);
                 }
+
+                var oldHeight = $('.controls').height();
+
+                $('.controls').css('height', 'auto');
+                var getRealHeight = $('.controls').height();
+
+                $('.controls').height(oldHeight);
+                $('.controls').height(getRealHeight);
 
                 if (data.type == 'parking') {
                     if (app.lockedBike && data.server_id == app.lockedBike.server_id) {

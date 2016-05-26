@@ -44,6 +44,7 @@ var app = {
         timeout: 5000,
         maximumAge: 0
     },
+    country: '',
     selectedPlaces: {
         parking: '',
         rent: '',
@@ -51,7 +52,7 @@ var app = {
         parts: ''
     },
     mapOptions: {
-        zoom: 14,
+        zoom: 2,
         scrollwheel: false,
         zoomControl: false,
         mapTypeControl: false,
@@ -118,6 +119,13 @@ var app = {
         }
         if (app.db.version == "") {
             app.db.changeVersion("", "1.1");
+        }
+        /* get country if stored */
+        if (localStorage.getItem('storedPosition')) {
+            var storedPosition = $.parseJSON(localStorage.getItem('storedPosition'));
+            app.country = storedPosition.country;
+            app.defaultLocation.latitude = storedPosition.latitude;
+            app.defaultLocation.longitude = storedPosition.longitude;
         }
 
         app.platform = device.platform.toLowerCase();
@@ -630,6 +638,34 @@ var app = {
             app.positionWatchId = null;
         }
     },
+    detectLocatinFromNetwork: function () {
+        if (this.onlineStatus === 'offline') {
+            this.noConnection();
+            return false;
+        }
+        if (app.positionStatus) {
+            return;
+        }
+        $.getJSON("http://ip-api.com/json/?callback=?", function (data) {
+            /* use data if gps data still unavailable */
+            if (!app.positionStatus) {
+                var dataToStore = {
+                    country: data.country,
+                    latitude: data.lat,
+                    longitude: data.lon
+                }
+                app.country = data.country;
+                app.defaultLocation.latitude = data.lat;
+                app.defaultLocation.longitude = data.lon;
+                localStorage.setItem('storedPosition', JSON.stringify(dataToStore));
+
+                var center = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+                app.map.setCenter(center);
+
+            }
+
+        });
+    },
     initMap: function () {
         var mainMarker = null;
         app.positionStatus = false;
@@ -638,6 +674,8 @@ var app = {
             latitude: null,
             longitude: null
         };
+        app.gpsCorrection = false;
+
         app.onPositionSuccess = function (position) {
             app.positionStatus = true;
             if (DEBUG) {
@@ -648,6 +686,30 @@ var app = {
                 app.currentLocation.latitude = position.coords.latitude;
                 app.currentLocation.longitude = position.coords.longitude;
                 var myLatlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            }
+            if (!app.gpsCorrection) {
+                app.gpsCorrection = true;
+                var dataToStore = {
+                    latitude: app.currentLocation.latitude,
+                    longitude: app.currentLocation.longitude
+                }
+                var geocoder = new google.maps.Geocoder();
+                geocoder.geocode({'location': myLatlng}, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        var country = '';
+                        for (var i = 0; i < results[0].address_components.length; i++) {
+                            var component = results[0].address_components[i];
+                            if (component.types[0] == 'country') {
+                                country = component.long_name;
+                                break;
+                            }
+                        }
+                        dataToStore['country'] = country
+                        localStorage.setItem('storedPosition', JSON.stringify(dataToStore));
+                        app.country = country;
+                        app.gpsCorrection = true;
+                    }
+                });
             }
             if (mainMarker == null) {
                 app.map.setCenter(myLatlng);
@@ -668,6 +730,9 @@ var app = {
 
         app.onPositionError = function (error) {
             app.gpsStop();
+            if (app.country == '') {
+                app.detectLocatinFromNetwork();
+            }
             setTimeout(function () {
                 app.gpsStart();
             }, 2000);
@@ -842,14 +907,25 @@ var app = {
                         app.selectPlaces(type);
                     } else {
                         $(this).removeClass('active');
-                        if (app.data[type]) {
-                            for (var j in  app.data[type]['markers']) {
-                                if (typeof app.data[type]['markers'][j] != 'object') {
-                                    continue;
-                                }
-                                removeMarker(app.data[type]['markers'][j]);
+                        app.markerC
+                        $(app.markerCluster.getMarkers()).each(function () {
+                            if (app.lockedBike && (app.lockedBike.server_id == this.server_id || this.type == 'bike')) {
+                                return true;
                             }
-                        }
+
+                            if (this.type == type) {
+                                app.markerCluster.removeMarker(this);
+                            }
+                        });
+                        /*
+                         if (app.data[type]) {
+                         for (var j in  app.data[type]['markers']) {
+                         if (typeof app.data[type]['markers'][j] != 'object') {
+                         continue;
+                         }
+                         removeMarker(app.data[type]['markers'][j]);
+                         }
+                         }*/
                         app.clearPlaces(type);
                     }
                 }
@@ -998,7 +1074,7 @@ var app = {
                     marker.setAnimation(google.maps.Animation.BOUNCE);
                     app.activeMarker = marker;
                 }
-                app.data[marker.type].markers[marker.server_id] = marker;
+                //app.data[marker.type].markers[marker.server_id] = marker;
                 /* attach info window */
                 app.attachInfoWindow(marker);
             } else if (app.lockedBike.server_id && !$('.menu_list [data-type="parking"]').hasClass('active')) {
@@ -1025,6 +1101,7 @@ var app = {
     goToMyBike: function () {
         if (app.lockedBike) {
             app.map.panTo(app.lockedBike.position);
+            app.map.setZoom(15)
         }
     },
     showReviewMap: function () {
@@ -1148,7 +1225,7 @@ var app = {
         });
     },
     clearPlaces: function (type) {
-        app.data[type] = null;
+        //app.data[type] = null;
         app.selectedPlaces[type] = '';
         app.closeInfoWindow();
     },
@@ -1178,12 +1255,12 @@ var app = {
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
             var marker = addMarker(app.map, image, myLatlng, place.server_id, place.type);
 
-            if (!app.data[place.type]) {
-                app.data[place.type] = {
-                    markers: {}
-                };
-            }
-            app.data[place.type].markers[place.server_id] = marker;
+            /*if (!app.data[place.type]) {
+             app.data[place.type] = {
+             markers: []
+             };
+             }
+             app.data[place.type].markers.push(marker); */
             app.attachInfoWindow(marker);
 
             if (app.selectedPlaces[place.type]) {
@@ -1249,6 +1326,14 @@ var app = {
                         app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                     }, 250);
                 }
+
+                var oldHeight = $('.controls').height();
+
+                $('.controls').css('height', 'auto');
+                var getRealHeight = $('.controls').height();
+
+                $('.controls').height(oldHeight);
+                $('.controls').height(getRealHeight);
 
                 if (data.type == 'parking') {
                     if (app.lockedBike && data.server_id == app.lockedBike.server_id) {
@@ -1445,7 +1530,7 @@ function elementInViewport(el) {
 
 function addMarker(map, image, pos, id, type) {
     var marker = new google.maps.Marker({
-        map: map,
+        //map: map,
         position: pos,
         optimized: true,
         draggable: false,
@@ -1454,11 +1539,39 @@ function addMarker(map, image, pos, id, type) {
         server_id: id || null,
         type: type || null
     });
+
+    if (!app.markerCluster) {
+        var styles = [{
+                url: './img/clusters/m1.png',
+                height: 53,
+                width: 53
+            }, {
+                url: './img/clusters/m2.png',
+                height: 56,
+                width: 56
+            }, {
+                url: './img/clusters/m3.png',
+                height: 66,
+                width: 66
+            },
+            , {
+                url: './img/clusters/m4.png',
+                height: 78,
+                width: 78
+            }, {
+                url: './img/clusters/m5.png',
+                height: 90,
+                width: 90
+            }];
+        app.markerCluster = new MarkerClusterer(app.map, [], {maxZoom: 7, styles: styles});
+    }
+    app.markerCluster.addMarker(marker);
     return marker;
 }
 
 function removeMarker(marker) {
-    marker.setMap(null);
+    app.markerCluster.removeMarker(marker);
+//    marker.setMap(null);
 }
 
 function newPlace(center, setAddress) {
