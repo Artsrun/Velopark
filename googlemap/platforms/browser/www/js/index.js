@@ -52,7 +52,7 @@ var app = {
         parts: ''
     },
     mapOptions: {
-        zoom: 0,
+        zoom: 2,
         scrollwheel: false,
         zoomControl: false,
         mapTypeControl: false,
@@ -201,9 +201,11 @@ var app = {
             $('.page').removeClass('active');
         }
         /* hide menu */
-        fadeOut('.menu', function () {
-            $(".menu").removeClass('active');
-        });
+        if ($('.menu').hasClass('active')) {
+            fadeOut('.menu', function () {
+                $(".menu").removeClass('active');
+            });
+        }
         /* reset to default state */
         $('#add_places input, #add_places textarea ,#add_places .add-image').val('');
         $("#add_places .add-src").css('background-image', 'none');
@@ -253,6 +255,11 @@ var app = {
             this.noConnection();
             return false;
         }
+        /* if country don't detected return */
+        if (app.country == '') {
+            return false;
+        }
+
         $.ajax({
             url: app.apiURL,
             method: "POST",
@@ -685,6 +692,7 @@ var app = {
             }
             if (mainMarker == null) {
                 app.map.setCenter(myLatlng);
+                app.map.setZoom(14);
                 var image = {
                     url: "img/marcer_main.png",
                     scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
@@ -707,6 +715,9 @@ var app = {
             }, 2000);
         }
 
+        if (app.country) {
+            this.mapOptions['zoom'] = 14;
+        }
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
 
@@ -719,6 +730,7 @@ var app = {
                 scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
             };
             var marker = addMarker(app.map, image, position, storedData.server_id, storedData.type);
+            app.selectedPlaces[storedData.type] = storedData.server_id;
             app.lockPosition(marker);
 
         }
@@ -966,8 +978,10 @@ var app = {
             app.initMap();
             /* will check db version if anything new will call updateDB function; */
             app.checkDBVersion();
-            /* get new places count */
-            app.getNewPlacesCount();
+            /* get new places  if country detected */
+            if (app.country) {
+                app.getNewPlacesCount();
+            }
         }
 
     },
@@ -1006,7 +1020,7 @@ var app = {
                 app.activeMarker = marker;
 
                 /* set animation and attache info window  */
-                // marker.setAnimation(google.maps.Animation.BOUNCE)
+                marker.setAnimation(google.maps.Animation.BOUNCE)
 
             } else if (app.mainMarker) {
 
@@ -1034,7 +1048,7 @@ var app = {
     unlockPosition: function () {
 
         if (app.lockedBike) {
-            var closeInfoWindow = false;
+            var closeInfoWindow = true;
             /* revert back to correct marker */
             if (app.lockedBike.server_id && $('.menu_list [data-type="parking"]').hasClass('active')) {
                 var image = {
@@ -1047,9 +1061,6 @@ var app = {
                     marker.setAnimation(google.maps.Animation.BOUNCE);
                     app.activeMarker = marker;
                 }
-                //app.data[marker.type].markers[marker.server_id] = marker;
-                /* attach info window */
-                //app.attachInfoWindow(marker);
             } else if (app.lockedBike.server_id && !$('.menu_list [data-type="parking"]').hasClass('active')) {
                 closeInfoWindow = true;
             } else if (!$('.menu_list [data-type="parking"]').hasClass('active')) {
@@ -1074,7 +1085,7 @@ var app = {
     goToMyBike: function () {
         if (app.lockedBike) {
             app.map.panTo(app.lockedBike.position);
-            app.map.setZoom(15)
+            google.maps.event.trigger(app.lockedBike, 'click');
         }
     },
     showReviewMap: function () {
@@ -1221,8 +1232,9 @@ var app = {
         };
         for (var k = 0; k < places.length; k++) {
             var place = places.item(k);
-            if (place.type == 'parking' && (app.lockedBike && app.lockedBike.server_id == place.server_id))
+            if (place.type == 'parking' && (app.lockedBike && app.lockedBike.server_id == place.server_id)) {
                 continue;
+            }
             image.url = "img/marker_" + place.type + ".png";
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
             var marker = addMarker(null, image, myLatlng, place.server_id, place.type);
@@ -1525,7 +1537,7 @@ function addMarker(map, image, pos, id, type) {
                 height: 53,
                 width: 53,
                 textColor: '#ffffff',
-                textSize:12
+                textSize: 12
             }, {
                 url: './img/clusters/m2.png',
                 height: 56,
@@ -1552,7 +1564,7 @@ function addMarker(map, image, pos, id, type) {
                 textColor: '#ffffff',
                 textSize: 12
             }];
-        app.markerCluster = new MarkerClusterer(app.map, [], {styles: clusterIcons});
+        app.markerCluster = new MarkerClusterer(app.map, [], {maxZoom: 14, styles: clusterIcons});
     }
     if (map == null) {
         app.markerCluster.addMarker(marker);
