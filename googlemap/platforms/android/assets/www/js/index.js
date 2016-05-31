@@ -52,7 +52,8 @@ var app = {
         parts: ''
     },
     mapOptions: {
-        zoom: 2,
+        minZoom: 3,
+        zoom: 3,
         scrollwheel: false,
         zoomControl: false,
         mapTypeControl: false,
@@ -265,7 +266,8 @@ var app = {
             method: "POST",
             data: {
                 action: "get_votes",
-                unique_id: device.uuid
+                unique_id: device.uuid,
+                country: app.country
             },
             dataType: 'json',
             beforeSend: function () {
@@ -530,7 +532,8 @@ var app = {
             method: "POST",
             data: {
                 action: "get_count",
-                device_id: device.uuid
+                device_id: device.uuid,
+                country: app.country
             },
             dataType: 'json',
             success: function (res) {
@@ -679,7 +682,7 @@ var app = {
                         for (var i = 0; i < results[0].address_components.length; i++) {
                             var component = results[0].address_components[i];
                             if (component.types[0] == 'country') {
-                                country = component.long_name;
+                                country = component.short_name.toLowerCase();
                                 break;
                             }
                         }
@@ -692,7 +695,7 @@ var app = {
             }
             if (mainMarker == null) {
                 app.map.setCenter(myLatlng);
-                app.map.setZoom(14);
+                app.map.setZoom(15);
                 var image = {
                     url: "img/marcer_main.png",
                     scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
@@ -716,7 +719,7 @@ var app = {
         }
 
         if (app.country) {
-            this.mapOptions['zoom'] = 14;
+            this.mapOptions['zoom'] = 15;
         }
         this.mapOptions['center'] = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
         app.map = new google.maps.Map(document.getElementById('map-canvas'), this.mapOptions);
@@ -751,12 +754,14 @@ var app = {
             $("a:contains('Terms of Use')").parents('.gmnoprint').addClass('google-fix');
         });
 
+        var selectedPlacesDrawn = false;
         google.maps.event.addListener(app.map, 'idle', function () {
             var getSelectedType = $('.menu_list img.active');
-            if (getSelectedType.length == 0) { // first load
+            if (getSelectedType.length == 0 && !selectedPlacesDrawn) { // first load
                 /* select places if exist */
                 if (app.getLocalVersion() != 0 && typeof app.firstDraw == 'undefined') {
                     app.selectPlaces(app.defaultType);
+                    selectedPlacesDrawn = true;
                 }
             } else {
                 var type;
@@ -890,25 +895,11 @@ var app = {
                         app.selectPlaces(type);
                     } else {
                         $(this).removeClass('active');
-                        app.markerC
-                        $(app.markerCluster.getMarkers()).each(function () {
-                            if (app.lockedBike && (app.lockedBike.server_id == this.server_id || this.type == 'bike')) {
-                                return true;
-                            }
 
-                            if (this.type == type) {
-                                app.markerCluster.removeMarker(this);
-                            }
+                        var markersByType = jQuery.grep(app.markerCluster.getMarkers(), function (e) {
+                            return e.type == type;
                         });
-                        /*
-                         if (app.data[type]) {
-                         for (var j in  app.data[type]['markers']) {
-                         if (typeof app.data[type]['markers'][j] != 'object') {
-                         continue;
-                         }
-                         removeMarker(app.data[type]['markers'][j]);
-                         }
-                         }*/
+                        app.markerCluster.removeMarkers(markersByType);
                         app.clearPlaces(type);
                     }
                 }
@@ -1005,44 +996,41 @@ var app = {
             dataForSave.lng = marker.position.lng();
             dataForSave.type = marker.type;
         } else {
+            var position;
             if (app.activeMarker) {
-
                 dataForSave.server_id = app.activeMarker.server_id;
                 dataForSave.lat = app.activeMarker.position.lat();
                 dataForSave.lng = app.activeMarker.position.lng();
                 dataForSave.type = app.activeMarker.type;
 
+                position = app.activeMarker.position;
                 /* replace active marker*/
                 removeMarker(app.activeMarker);
 
-                var marker = addMarker(app.map, image, app.activeMarker.position, app.activeMarker.server_id, app.activeMarker.type);
-
-                app.activeMarker = marker;
-
-                /* set animation and attache info window  */
-                marker.setAnimation(google.maps.Animation.BOUNCE)
-
             } else if (app.mainMarker) {
-
+                dataForSave.server_id = null;
                 dataForSave.lat = app.mainMarker.position.lat();
                 dataForSave.lng = app.mainMarker.position.lng();
                 dataForSave.type = 'bike';
 
-                /* add new marker on my position */
-                var marker = addMarker(app.map, image, app.mainMarker.position, app.mainMarker.server_id, 'bike');
-
-                app.reorderActions('lock', 'hide');
+                position = app.mainMarker.position;
             }
 
+            /* add new marker on my position */
+            var marker = addMarker(app.map, image, position, dataForSave.server_id, dataForSave.type);
+            app.activeMarker = marker;
+            /* set animation and attache info window  */
+            marker.setAnimation(google.maps.Animation.BOUNCE);
 
         }
-        //app.attachInfoWindow(marker);
 
         /* save data in localstorage */
         localStorage.setItem("lockedBike", JSON.stringify(dataForSave));
 
         app.lockedBike = marker;
-        app.reorderActions('myBike', 'show');
+        if (!app.activeMarker) {
+            app.reorderActions('myBike', 'show');
+        }
         $('.actions [data-button="lock"]').attr('data-action', 'unlock');
     },
     unlockPosition: function () {
@@ -1170,7 +1158,7 @@ var app = {
 
         /* don't select already loaded places */
         for (var key in app.selectedPlaces) {
-            if (app.selectedPlaces[key] == '')
+            if (!app.selectedPlaces[key])
                 continue;
             if (notInList == '') {
                 notInList = app.selectedPlaces[key];
@@ -1209,9 +1197,12 @@ var app = {
         });
     },
     clearPlaces: function (type) {
-        //app.data[type] = null;
         app.selectedPlaces[type] = '';
-        app.closeInfoWindow();
+        if (app.activeMarker && app.activeMarker.type == type) {
+            app.closeInfoWindow();
+        } else if (app.activeMarker && !app.activeMarker.getAnimation()) {
+            app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
+        }
     },
     drawGroupMarkers: function (places) {
 
@@ -1239,20 +1230,18 @@ var app = {
             var myLatlng = new google.maps.LatLng(place.latitude, place.longitude);
             var marker = addMarker(null, image, myLatlng, place.server_id, place.type);
 
-            /*if (!app.data[place.type]) {
-             app.data[place.type] = {
-             markers: []
-             };
-             }
-             app.data[place.type].markers.push(marker); */
-            //app.attachInfoWindow(marker);
+            if (place.server_id) {
+                if (app.selectedPlaces[place.type]) {
+                    app.selectedPlaces[place.type] += ', ' + place.server_id;
 
-            if (app.selectedPlaces[place.type]) {
-                app.selectedPlaces[place.type] += ', ' + place.server_id;
-
-            } else {
-                app.selectedPlaces[place.type] = place.server_id
+                } else {
+                    app.selectedPlaces[place.type] = place.server_id
+                }
             }
+        }
+
+        if (app.activeMarker && !app.activeMarker.getAnimation()) {
+            app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
         }
     },
     attachInfoWindow: function (marker) {
@@ -1321,14 +1310,20 @@ var app = {
 
                 if (data.type == 'parking') {
                     if (app.lockedBike && data.server_id == app.lockedBike.server_id) {
-                        app.reorderActions('lock', 'show');
+                        app.reorderActions('myBike', 'hide', function () {
+                            app.reorderActions('lock', 'show');
+                        });
                     } else if (app.lockedBike) {
-                        app.reorderActions('lock', 'hide');
+                        app.reorderActions('lock', 'hide', function () {
+                            app.reorderActions('myBike', 'show');
+                        });
                     } else {
                         app.reorderActions('lock', 'show');
                     }
                 } else if (data.type == 'bike' || app.activeMarker.type == 'bike') {
-                    app.reorderActions('lock', 'show');
+                    app.reorderActions('myBike', 'hide', function () {
+                        app.reorderActions('lock', 'show');
+                    });
                 } else {
                     app.reorderActions('lock', 'hide');
                 }
@@ -1336,7 +1331,8 @@ var app = {
 
         });
     },
-    reorderActions: function (button, action) {
+    reorderActions: function (button, action, callback) {
+        var countOfActions = 1;
         var $buttonElement = $('[data-button="' + button + '"]');
         if (action == 'show') {
             var $getNextVisible = $buttonElement.nextAll('.visible:first');
@@ -1358,8 +1354,25 @@ var app = {
             if ($nextElement.length) {
                 correctPosition = $nextElement.data('current-position') ? $nextElement.data('current-position') + 1 : 1;
             }
-            actionButtons($(this), 'move', correctPosition);
+
+            var needAction = false;
+            if ($(this).hasClass('visible') && $(this).data('current-position') == correctPosition) {
+                needAction = false;
+            } else {
+                needAction = true;
+                countOfActions++
+            }
+
+            if (needAction) {
+                actionButtons($(this), 'move', correctPosition);
+            }
+
         });
+        if (typeof callback == 'function') {
+            setTimeout(function () {
+                callback();
+            }, countOfActions * 200);
+        }
 
     },
     closeInfoWindow: function () {
@@ -1367,7 +1380,9 @@ var app = {
             app.activeMarker.setAnimation(null)
             app.activeMarker = null;
             if (app.lockedBike) {
-                app.reorderActions('lock', 'hide');
+                app.reorderActions('lock', 'hide', function () {
+                    app.reorderActions('myBike', 'show');
+                });
             } else if (!app.mainMarker) {
                 app.reorderActions('lock', 'hide');
             }
@@ -1564,7 +1579,7 @@ function addMarker(map, image, pos, id, type) {
                 textColor: '#ffffff',
                 textSize: 12
             }];
-        app.markerCluster = new MarkerClusterer(app.map, [], {maxZoom: 14, styles: clusterIcons});
+        app.markerCluster = new MarkerClusterer(app.map, [], {minimumClusterSize: 5, maxZoom: 12, styles: clusterIcons});
     }
     if (map == null) {
         app.markerCluster.addMarker(marker);
@@ -1629,7 +1644,7 @@ function newPlace(center, setAddress) {
             for (var i = 0; i < results[0].address_components.length; i++) {
                 var component = results[0].address_components[i];
                 if (component.types[0] == 'country') {
-                    country = component.long_name;
+                    country = component.short_name.toLowerCase();
                     break;
                 }
             }

@@ -1198,11 +1198,11 @@ a.infoMail:active{
 .mark-delete{
     display:none;
     margin-top: 2%;
-    text-decoration: underline;
+    border-bottom: 1px dashed #dddddd;
     color: #dddddd;
 }
 .mark-delete.active{
-    display:block;
+    display:inline-block;
 }
 
 @media only screen and (min-width: 320px) {
