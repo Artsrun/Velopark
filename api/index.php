@@ -81,9 +81,11 @@ function get_votes($link) {
     $status = 'failed';
     if ($_POST["unique_id"]) {
 		
+		$country = isset($_POST['country']) ? clear_admin(trim($_POST['country']), $link) : '';
+		$country_state = ($country == '') ? '' : "AND country='" . $country  . "'";
         $unique_id = clear_admin(trim($_POST['unique_id']), $link);
         $query = "SELECT id as server_id, latitude, longitude, name, address, description, image, type FROM places "
-                . "WHERE status='0' AND id NOT IN "
+                . "WHERE status='0' " . $country_state . " AND id NOT IN "
                 . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
                 . "WHERE votes.device_id = '" . $unique_id . "' AND (votes.vote = '0' OR votes.vote = '1')) ORDER BY id DESC LIMIT 0, 10";
         $result = $link->query($query);
@@ -330,17 +332,23 @@ function add_delete($link) {
 }
 
 function get_count($link) {
-	$status = 'failed';
-    $device_id = $_POST["device_id"];
-    $query = "SELECT id FROM places "
-            . "WHERE status='0' AND id NOT IN "
-            . "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
-            . "WHERE votes.device_id = '" . $device_id . "' AND (votes.vote = '0' OR votes.vote = '1'))  LIMIT 0, 10";
-    $result = $link->query($query);
-	if ($result != false) {
-		$row_cnt = $result->num_rows;		
-		$status = 'success';
-	}	
+	$row_cnt = 0;
+    $status = 'failed';
+    if ($_POST["device_id"]) {
+				
+		$device_id = clear_admin(trim($_POST['device_id']), $link);
+		$country = isset($_POST['country']) ? clear_admin(trim($_POST['country']), $link) : '';
+		$country_state = ($country == '') ? '' : "AND country='" . $country  . "'";
+		$query = "SELECT id FROM places "
+				. "WHERE status='0' " . $country_state . " AND id NOT IN "
+				. "(SELECT places.id FROM places INNER JOIN votes ON places.id=votes.place_id "
+				. "WHERE votes.device_id = '" . $device_id . "' AND (votes.vote = '0' OR votes.vote = '1')) LIMIT 0, 10";
+		$result = $link->query($query);
+		if ($result != false) {
+			$row_cnt = $result->num_rows;		
+			$status = 'success';
+		}	
+	}
 	
 	echo json_encode([
 		'status'=>$status,
