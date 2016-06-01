@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Jun 01, 2016 at 08:06 AM
+-- Generation Time: Jun 01, 2016 at 08:48 AM
 -- Server version: 10.0.25-MariaDB
 -- PHP Version: 5.4.31
 
@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS `stats` (
   `device_id` varchar(250) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5790 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5793 ;
 
 --
 -- Dumping data for table `stats`
@@ -3742,7 +3742,10 @@ INSERT INTO `stats` (`id`, `platform`, `model`, `version`, `device_id`, `date`) 
 (5786, 'android', 'Nexus 5', '6.0.1', '629833d0b599872a', '2016-06-01 06:11:25'),
 (5787, 'android', 'Nexus 5X', '6.0.1', 'c3c63fb3faea4f7e', '2016-06-01 07:40:17'),
 (5788, 'android', 'Nexus 5X', '6.0.1', 'c3c63fb3faea4f7e', '2016-06-01 08:05:49'),
-(5789, 'android', 'Nexus 5X', '6.0.1', 'c3c63fb3faea4f7e', '2016-06-01 08:06:08');
+(5789, 'android', 'Nexus 5X', '6.0.1', 'c3c63fb3faea4f7e', '2016-06-01 08:06:08'),
+(5790, 'android', 'Nexus 5X', '6.0.1', 'c3c63fb3faea4f7e', '2016-06-01 08:07:04'),
+(5791, 'android', 'Nexus 5X', '6.0.1', 'c3c63fb3faea4f7e', '2016-06-01 08:40:57'),
+(5792, 'android', 'Nexus 5X', '6.0.1', 'c3c63fb3faea4f7e', '2016-06-01 08:41:12');
 
 -- --------------------------------------------------------
 
