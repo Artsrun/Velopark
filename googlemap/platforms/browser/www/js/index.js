@@ -820,7 +820,6 @@ var app = {
         /*nav functionality*/
         if (this.firstLoad == true) {
             this.firstLoad = false;
-            app.reorderActions('addPlace', 'show');
             if ($('html').hasClass('ios')) {
                 $(document).on('touchstart', function (e) {
                     if ($(e.target).prop("tagName").toLowerCase() != 'input' && $(e.target).prop("tagName").toLowerCase() != 'textarea' && $('input,textarea').is(':focus')) {
@@ -974,8 +973,6 @@ var app = {
                         app.lockPosition();
                     } else if (action == 'unlock') {
                         app.unlockPosition();
-                    } else if (action == 'addPlace') {
-                        $('.menu li[data-page="add_places"]').click();
                     }
                     $(that).removeClass('disabled');
                 });
