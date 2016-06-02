@@ -1102,8 +1102,8 @@ html.offline #add_places .wrapper, html.offline #new_places .wrapper{
     transform:  translateX(110%);
 }
 .hideHeight{
-    -webkit-transition: height 0.2s linear, margin 0.2s linear;
-    transition: height 0.2s linear, margin 0.2s linear;
+    -webkit-transition: height 0.1s linear, margin 0.1s linear;
+    transition: height 0.1s linear, margin 0.1s linear;
     margin: 0;
 }
 

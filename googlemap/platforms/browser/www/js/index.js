@@ -1019,7 +1019,11 @@ var app = {
 
                 position = app.activeMarker.position;
                 /* replace active marker*/
-                removeMarker(app.activeMarker);
+                var no_redraw = false;
+                if (app.map.getZoom() > app.markerCluster.getMaxZoom()) {
+                    no_redraw = true;
+                }
+                removeMarker(app.activeMarker, false, no_redraw);
 
             } else if (app.mainMarker) {
                 dataForSave.server_id = null;
@@ -1032,6 +1036,7 @@ var app = {
 
             /* add new marker on my position */
             var marker = addMarker(app.map, image, position, dataForSave.server_id, dataForSave.type);
+            app.activeMarker = null;
             app.activeMarker = marker;
             /* set animation and attache info window  */
             marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -1050,7 +1055,7 @@ var app = {
     unlockPosition: function () {
 
         if (app.lockedBike) {
-            var closeInfoWindow = true;
+            var closeInfoWindow = false;
             /* revert back to correct marker */
             if (app.lockedBike.server_id && $('.menu_list [data-type="parking"]').hasClass('active')) {
                 var image = {
@@ -1061,6 +1066,8 @@ var app = {
                 /* replace active if its opened marker */
                 if (app.activeMarker.server_id == app.lockedBike.server_id) {
                     marker.setAnimation(google.maps.Animation.BOUNCE);
+                    removeMarker(app.activeMarker, true);
+                    app.activeMarker = null;
                     app.activeMarker = marker;
                 }
             } else if (app.lockedBike.server_id && !$('.menu_list [data-type="parking"]').hasClass('active')) {
@@ -1087,7 +1094,6 @@ var app = {
     goToMyBike: function () {
         if (app.lockedBike) {
             app.map.panTo(app.lockedBike.position);
-            google.maps.event.trigger(app.lockedBike, 'click');
         }
     },
     showReviewMap: function () {
@@ -1212,7 +1218,7 @@ var app = {
     },
     clearPlaces: function (type) {
         app.selectedPlaces[type] = '';
-        if (app.activeMarker && app.activeMarker.type == type) {
+        if (app.activeMarker && app.activeMarker.type == type && !app.lockedBike) {
             app.closeInfoWindow();
         } else if (app.activeMarker && !app.activeMarker.getAnimation()) {
             app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
@@ -1271,6 +1277,12 @@ var app = {
             app.activeMarker = this;
             app.getPlaceFromDB(this.server_id, function (data) {
 
+                var transitionDelay = 0;
+                var whatToDo = {
+                    atFirst: {},
+                    onCallback: null
+                };
+
                 if (!$.isEmptyObject(data)) {
                     if (data.delete_counter == 0) {
                         $(".mark-delete").addClass('active');
@@ -1303,44 +1315,55 @@ var app = {
                         app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                     } else {
                         $('.controls').addClass("transition");
+                        transitionDelay = 200;
                         setTimeout(function () {
                             app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                         }, 250);
                     }
+                    /*fix for infobox height jumping */
+                    var oldHeight = $('.controls').height();
+                    $('.controls').css('height', 'auto');
+                    var getRealHeight = $('.controls').height();
+                    $('.controls').height(oldHeight);
+                    $('.controls').height(getRealHeight);
+                    /* fix end */
+
+                    if (data.type == 'parking') {
+                        if (app.lockedBike && data.server_id == app.lockedBike.server_id) {
+                            whatToDo.atFirst = {'name': 'myBike', 'action': 'hide'};
+                            whatToDo.onCallback = {'name': 'lock', 'action': 'show'};
+                        } else if (app.lockedBike) {
+                            whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
+                            whatToDo.onCallback = {'name': 'myBike', 'action': 'show'};
+                        } else {
+                            whatToDo.atFirst = {'name': 'lock', 'action': 'show'};
+                        }
+                    } else {
+                        whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
+                        if (app.lockedBike) {
+                            whatToDo.onCallback = {'name': 'myBike', 'action': 'show'};
+                        }
+                    }
                 } else if (app.lockedBike) {
-                    $('.controls').removeClass("transition");
+                    if ($('.controls').hasClass('transition')) {
+                        transitionDelay = 200;
+                        $('.controls').removeClass("transition");
+                    }
                     setTimeout(function () {
                         app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                     }, 250);
+
+                    whatToDo.atFirst = {'name': 'myBike', 'action': 'hide'};
+                    whatToDo.onCallback = {'name': 'lock', 'action': 'show'};
                 }
-
-                var oldHeight = $('.controls').height();
-
-                $('.controls').css('height', 'auto');
-                var getRealHeight = $('.controls').height();
-
-                $('.controls').height(oldHeight);
-                $('.controls').height(getRealHeight);
-
-                if (data.type == 'parking') {
-                    if (app.lockedBike && data.server_id == app.lockedBike.server_id) {
-                        app.reorderActions('myBike', 'hide', function () {
-                            app.reorderActions('lock', 'show');
-                        });
-                    } else if (app.lockedBike) {
-                        app.reorderActions('lock', 'hide', function () {
-                            app.reorderActions('myBike', 'show');
-                        });
-                    } else {
-                        app.reorderActions('lock', 'show');
-                    }
-                } else if (data.type == 'bike' || app.activeMarker.type == 'bike') {
-                    app.reorderActions('myBike', 'hide', function () {
-                        app.reorderActions('lock', 'show');
+                /* do action buttons after infoBox transition */
+                setTimeout(function () {
+                    app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
+                        if (whatToDo.onCallback) {
+                            app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action);
+                        }
                     });
-                } else {
-                    app.reorderActions('lock', 'hide');
-                }
+                }, transitionDelay);
             });
 
         });
@@ -1390,21 +1413,33 @@ var app = {
 
     },
     closeInfoWindow: function () {
+        var whatToDo = {
+            atFirst: null,
+            onCallback: null
+        };
         if (app.activeMarker) {
             app.activeMarker.setAnimation(null)
             app.activeMarker = null;
             if (app.lockedBike) {
-                app.reorderActions('lock', 'hide', function () {
-                    app.reorderActions('myBike', 'show');
-                });
+                whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
+                whatToDo.onCallback = {'name': 'myBike', 'action': 'show'};
             } else if (!app.mainMarker) {
-                app.reorderActions('lock', 'hide');
+                whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
             }
         }
 
         setTimeout(function () {
             $(".controls").removeClass("transition");
         }, 50);
+        if (whatToDo.atFirst) {
+            setTimeout(function () {
+                app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
+                    if (whatToDo.onCallback) {
+                        app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action);
+                    }
+                });
+            }, 250);
+        }
     },
     cameraSuccess: function (imageURI, fromGallery) {
 
@@ -1541,7 +1576,7 @@ function elementInViewport(el) {
 }
 
 
-function addMarker(map, image, pos, id, type) {
+function addMarker(map, image, pos, id, type, no_draw) {
 
     var markerOptions = {
         //map: map,
@@ -1596,7 +1631,7 @@ function addMarker(map, image, pos, id, type) {
         app.markerCluster = new MarkerClusterer(app.map, [], {minimumClusterSize: 5, maxZoom: 12, styles: clusterIcons});
     }
     if (map == null) {
-        app.markerCluster.addMarker(marker);
+        app.markerCluster.addMarker(marker, no_draw);
     }
     if (type) {
         app.attachInfoWindow(marker);
@@ -1605,11 +1640,12 @@ function addMarker(map, image, pos, id, type) {
     return marker;
 }
 
-function removeMarker(marker, single) {
+function removeMarker(marker, single, redraw) {
+    marker.setOpacity(0);
     if (single) {
         marker.setMap(null);
     } else {
-        app.markerCluster.removeMarker(marker);
+        app.markerCluster.removeMarker(marker, redraw);
     }
 }
 
