@@ -607,7 +607,7 @@ function delete_perm($place_id, $link) {
 	if ($res!=false) {	
 		$query = "UPDATE places SET status='2' WHERE id = $place_id";
 		$result = $link->query($query);
-		if ($result != false && $link->affected_rows > 0) {
+		if ($result != false) {
 			$query_version = "UPDATE options SET value=CAST((value + 0.01) AS DECIMAL(10,2)) WHERE name='version'";
 			$result = $link->query($query_version);
 			if ($result != false && $link->affected_rows > 0) {
