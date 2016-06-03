@@ -52,8 +52,8 @@ var app = {
         parts: ''
     },
     mapOptions: {
-        minZoom: 3,
-        zoom: 3,
+        minZoom: 1,
+        zoom: 1,
         scrollwheel: false,
         zoomControl: false,
         mapTypeControl: false,
@@ -797,7 +797,33 @@ var app = {
                 }
             }
         });
+        /*prevent dragging zone over north pole or under south pole */
+        var centerLatBeforeDrag;
+        google.maps.event.addListener(app.map, 'dragstart', function () {
+            centerLatBeforeDrag = app.map.getCenter().lat();
+        });
 
+        google.maps.event.addListener(app.map, 'center_changed', function () {
+            // If the map position is out of range, move it back
+            if (!app.map.getBounds()) {
+                return;
+            }
+            var latNorth = app.map.getBounds().getNorthEast().lat();
+            var latSouth = app.map.getBounds().getSouthWest().lat();
+
+            if ((latNorth < 85 && latSouth > -85) || (latNorth > 85 && latSouth < -85)) 
+                return;
+            else {
+                var newLat;
+                if (latNorth > 85)
+                    newLat = app.map.getCenter().lat() - (latNorth - 85);   /* too north, centering */
+                if (latSouth < -85)
+                    newLat = app.map.getCenter().lat() - (latSouth + 85);   /* too south, centering */
+                var newCenter = new google.maps.LatLng(newLat, app.map.getCenter().lng());
+                app.map.setCenter(newCenter);
+            }
+        });
+        
         if (DEBUG) {
             app.onPositionSuccess();
         }

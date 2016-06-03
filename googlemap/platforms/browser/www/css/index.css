@@ -1690,21 +1690,22 @@ a.infoMail:active{
 .container.tutorial_overlay:after{
     content: '';
     display: block;
-    background: url(../img/totorial_overlay.png);
+    background: url(../img/totorial_overlay.png) no-repeat;
+    background-size: cover ;
+    background-position: top center;
     position: fixed;
     top: 0;
     left: 0;
     bottom:0;
     right: 0;
-    width: 100%;
+    width: 101%; /* fix for 1px white border on old android */
     height: 100%;
     z-index: 9999;
-    background-size: cover;
-    background-position: top center;
-     -webkit-transition:  opacity 0.2s linear;
+    -webkit-transition:  opacity 0.2s linear;
     -webkit-transition: opacity 0.2s linear;
     transition:  opacity 0.2s linear;
     opacity: 1;
+    padding:0;
 }
 
 .container.tutorial_overlay.overlayOut:after{
