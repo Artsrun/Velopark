@@ -711,8 +711,8 @@ var app = {
                 });
             }
             if (mainMarker == null) {
-                app.map.setCenter(myLatlng);
                 app.map.setZoom(15);
+                app.map.setCenter(myLatlng);
                 var image = {
                     url: "img/marcer_main.png",
                     scaledSize: new google.maps.Size(app.markerOptions.me.w, app.markerOptions.me.h)
@@ -798,12 +798,7 @@ var app = {
             }
         });
         /*prevent dragging zone over north pole or under south pole */
-        var centerLatBeforeDrag;
-        google.maps.event.addListener(app.map, 'dragstart', function () {
-            centerLatBeforeDrag = app.map.getCenter().lat();
-        });
-
-        google.maps.event.addListener(app.map, 'center_changed', function () {
+          google.maps.event.addListener(app.map, 'center_changed', function () {
             // If the map position is out of range, move it back
             if (!app.map.getBounds()) {
                 return;
@@ -811,7 +806,7 @@ var app = {
             var latNorth = app.map.getBounds().getNorthEast().lat();
             var latSouth = app.map.getBounds().getSouthWest().lat();
 
-            if ((latNorth < 85 && latSouth > -85) || (latNorth > 85 && latSouth < -85)) 
+            if ((latNorth < 85 && latSouth > -85) || (latNorth > 85 && latSouth < -85))
                 return;
             else {
                 var newLat;
@@ -823,7 +818,7 @@ var app = {
                 app.map.setCenter(newCenter);
             }
         });
-        
+
         if (DEBUG) {
             app.onPositionSuccess();
         }
@@ -1346,13 +1341,6 @@ var app = {
                             app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
                         }, 250);
                     }
-                    /*fix for infobox height jumping */
-                    var oldHeight = $('.controls').height();
-                    $('.controls').css('height', 'auto');
-                    var getRealHeight = $('.controls').height();
-                    $('.controls').height(oldHeight);
-                    $('.controls').height(getRealHeight);
-                    /* fix end */
 
                     if (data.type == 'parking') {
                         if (app.lockedBike && data.server_id == app.lockedBike.server_id) {
