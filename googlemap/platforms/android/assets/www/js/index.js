@@ -1208,7 +1208,12 @@ var app = {
         var southSWLat = bounds.getSouthWest().lat();
         var southSWLng = bounds.getSouthWest().lng();
 
-        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE (latitude < '" + northNEtLat + "' AND  latitude > '" + southSWLat + "') AND  (longitude < '" + northNELng + "' AND  longitude > '" + southSWLng + "') AND  status='1' ";
+        var longitudeQuery  = "(longitude < '" + northNELng + "' AND  longitude > '" + southSWLng + "')";
+        if (northNELng < southSWLng) {
+            longitudeQuery = "(longitude < '" + northNELng + "' OR  longitude > '" + southSWLng + "')";
+        }
+        
+        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE (latitude < '" + northNEtLat + "' AND  latitude > '" + southSWLat + "') AND  "+longitudeQuery+" AND  status='1' ";
         var notInList = '';
 
         /* don't select already loaded places */
@@ -1225,7 +1230,6 @@ var app = {
             query += ' AND server_id NOT IN (' + notInList + ')'
         }
         /* end of query */
-
         if (typeof type == 'string') {
             query += ' AND type="' + type + '"';
             $('img[data-type="' + type + '"]').addClass('active');
