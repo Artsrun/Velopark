@@ -140,6 +140,8 @@ var app = {
             app.defaultLocation.latitude = storedPosition.latitude;
             app.defaultLocation.longitude = storedPosition.longitude;
         }
+        /* set location perrmission to default state */
+        app.restoreLocationPermission();
 
         app.platform = device.platform.toLowerCase();
         $('html').addClass(app.platform);
@@ -654,8 +656,15 @@ var app = {
         }
     },
     gpsStart: function () {
+        if (app.checkLocationPermissionDenied()) {
+            return;
+        }
         if ((app.getActivePage() == 'main' || app.getActivePage() == 'add_places') && app.positionWatchId == null) {
-            app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            navigator.geolocation.getCurrentPosition(function (position) {
+                app.onPositionSuccess(position);
+                app.positionWatchId = navigator.geolocation.watchPosition(app.onPositionSuccess, app.onPositionError, app.geolocationOptions);
+            }, app.onPositionError, app.geolocationOptions);
+
         }
     },
     gpsStop: function () {
@@ -677,6 +686,7 @@ var app = {
 
         app.onPositionSuccess = function (position) {
             app.positionStatus = true;
+            app.restoreLocationPermission();
             if (DEBUG) {
                 app.currentLocation.latitude = app.defaultLocation.latitude;
                 app.currentLocation.longitude = app.defaultLocation.longitude;
@@ -730,6 +740,10 @@ var app = {
 
         app.onPositionError = function (error) {
             app.gpsStop();
+            if (error.code == error.PERMISSION_DENIED) {
+                localStorage.setItem('location_permission_denied', 'true');
+                return;
+            }
             setTimeout(function () {
                 app.gpsStart();
             }, 2000);
@@ -798,7 +812,7 @@ var app = {
             }
         });
         /*prevent dragging zone over north pole or under south pole */
-          google.maps.event.addListener(app.map, 'center_changed', function () {
+        google.maps.event.addListener(app.map, 'center_changed', function () {
             // If the map position is out of range, move it back
             if (!app.map.getBounds()) {
                 return;
@@ -1550,13 +1564,18 @@ var app = {
             if (typeof setMarker == 'undefined') {
                 setMarker = false;
             }
-            navigator.geolocation.getCurrentPosition(function (pos) {
-                center = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-                newPlace(center, setMarker);
-            }, function () {
+            if (app.checkLocationPermissionDenied()) {
                 center = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
                 newPlace(center);
-            }, app.geolocationOptions);
+            } else {
+                navigator.geolocation.getCurrentPosition(function (pos) {
+                    center = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                    newPlace(center, setMarker);
+                }, function () {
+                    center = new google.maps.LatLng(app.defaultLocation.latitude, app.defaultLocation.longitude);
+                    newPlace(center);
+                }, app.geolocationOptions);
+            }
         }
     },
     cameraError: function (samePage) {
@@ -1565,6 +1584,17 @@ var app = {
         } else {
             app.goToPage('main');
         }
+    },
+    checkLocationPermissionDenied: function () {
+        var location_denied = localStorage.getItem('location_permission_denied');
+        if (location_denied && location_denied == 'true') {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    restoreLocationPermission: function () {
+        localStorage.setItem('location_permission_denied', '');
     }
 };
 app.initialize();
