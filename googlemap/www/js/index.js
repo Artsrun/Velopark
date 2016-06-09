@@ -1208,12 +1208,12 @@ var app = {
         var southSWLat = bounds.getSouthWest().lat();
         var southSWLng = bounds.getSouthWest().lng();
 
-        var longitudeQuery  = "(longitude < '" + northNELng + "' AND  longitude > '" + southSWLng + "')";
+        var longitudeQuery = "(longitude < '" + northNELng + "' AND  longitude > '" + southSWLng + "')";
         if (northNELng < southSWLng) {
             longitudeQuery = "(longitude < '" + northNELng + "' OR  longitude > '" + southSWLng + "')";
         }
-        
-        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE (latitude < '" + northNEtLat + "' AND  latitude > '" + southSWLat + "') AND  "+longitudeQuery+" AND  status='1' ";
+
+        var query = "SELECT server_id, latitude, longitude , type  FROM places WHERE (latitude < '" + northNEtLat + "' AND  latitude > '" + southSWLat + "') AND  " + longitudeQuery + " AND  status='1' ";
         var notInList = '';
 
         /* don't select already loaded places */
@@ -1305,10 +1305,13 @@ var app = {
     },
     attachInfoWindow: function (marker) {
         marker.addListener('click', function () {
+            if (app.markersDisabled)
+                return;
             if (app.activeMarker && app.activeMarker.server_id == this.server_id) {
                 app.closeInfoWindow();
                 return;
             }
+            app.markersDisabled = true;
 
             if (app.activeMarker) {
                 app.activeMarker.setAnimation(null);
@@ -1392,9 +1395,14 @@ var app = {
                 setTimeout(function () {
                     app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
                         if (whatToDo.onCallback) {
-                            app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action);
+                            app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action, function () {
+                                app.markersDisabled = false;
+                            });
+                        } else {
+                            app.markersDisabled = false;
                         }
                     });
+
                 }, transitionDelay);
             });
 
@@ -1445,6 +1453,10 @@ var app = {
 
     },
     closeInfoWindow: function () {
+        if (app.markersDisabled) {
+            return;
+        }
+        app.markersDisabled = true;
         var whatToDo = {
             atFirst: null,
             onCallback: null
@@ -1463,15 +1475,26 @@ var app = {
         setTimeout(function () {
             $(".controls").removeClass("transition");
         }, 50);
-        if (whatToDo.atFirst) {
-            setTimeout(function () {
+
+        $('.actions a[data-action]').addClass('disabled');
+        setTimeout(function () {
+            if (whatToDo.atFirst) {
                 app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
                     if (whatToDo.onCallback) {
-                        app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action);
+                        app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action, function () {
+                            app.markersDisabled = false;
+                        });
+
+                    } else {
+                        app.markersDisabled = false;
                     }
                 });
-            }, 250);
-        }
+            } else {
+                app.markersDisabled = false;
+            }
+            $('.actions a[data-action]').removeClass('disabled');
+        }, 250);
+
     },
     cameraSuccess: function (imageURI, fromGallery) {
 
