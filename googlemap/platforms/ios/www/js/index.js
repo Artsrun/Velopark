@@ -1074,9 +1074,6 @@ var app = {
                 removeMarker(app.activeMarker, false, no_redraw);
 
             } else if (app.mainMarker) {
-                if (!app.allowLock(app.mainMarker.type)) {
-                    return;
-                }
                 dataForSave.server_id = null;
                 dataForSave.lat = app.mainMarker.position.lat();
                 dataForSave.lng = app.mainMarker.position.lng();
@@ -1466,7 +1463,6 @@ var app = {
                 callback();
             }, countOfActions * 200);
         }
-
     },
     closeInfoWindow: function () {
         if (app.markersDisabled) {
@@ -1736,6 +1732,7 @@ function removeMarker(marker, single, redraw) {
     } else {
         app.markerCluster.removeMarker(marker, redraw);
     }
+    marker = null;
 }
 
 function newPlace(center, setAddress) {
