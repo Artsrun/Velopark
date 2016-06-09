@@ -1257,7 +1257,7 @@ var app = {
     },
     clearPlaces: function (type) {
         app.selectedPlaces[type] = '';
-        if (app.activeMarker && app.activeMarker.type == type && !app.lockedBike) {
+        if (app.activeMarker && app.activeMarker.type == type && (!app.lockedBike || app.lockedBike.server_id != app.activeMarker.server_id ) ) {
             app.closeInfoWindow();
         } else if (app.activeMarker && !app.activeMarker.getAnimation()) {
             app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
