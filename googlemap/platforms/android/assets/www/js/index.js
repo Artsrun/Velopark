@@ -1469,6 +1469,8 @@ var app = {
                 whatToDo.onCallback = {'name': 'myBike', 'action': 'show'};
             } else if (!app.mainMarker) {
                 whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
+            } else if (app.mainMarker) {
+                whatToDo.atFirst = {'name': 'lock', 'action': 'show'};
             }
         }
 
