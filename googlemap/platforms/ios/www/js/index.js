@@ -1025,6 +1025,13 @@ var app = {
         }
 
     },
+    allowLock: function (type) {
+        if (type == 'parking' || type == 'bike') {
+            return true;
+        } else {
+            return false;
+        }
+    },
     lockPosition: function (marker) {
 
         var dataForSave = {
@@ -1040,6 +1047,9 @@ var app = {
         };
 
         if (typeof marker != 'undefined') {
+            if (!app.allowLock(marker.type)) {
+                return;
+            }
             dataForSave.server_id = marker.server_id;
             dataForSave.lat = marker.position.lat();
             dataForSave.lng = marker.position.lng();
@@ -1047,6 +1057,9 @@ var app = {
         } else {
             var position;
             if (app.activeMarker) {
+                if (!app.allowLock(app.activeMarker.type)) {
+                    return;
+                }
                 dataForSave.server_id = app.activeMarker.server_id;
                 dataForSave.lat = app.activeMarker.position.lat();
                 dataForSave.lng = app.activeMarker.position.lng();
@@ -1061,6 +1074,9 @@ var app = {
                 removeMarker(app.activeMarker, false, no_redraw);
 
             } else if (app.mainMarker) {
+                if (!app.allowLock(app.mainMarker.type)) {
+                    return;
+                }
                 dataForSave.server_id = null;
                 dataForSave.lat = app.mainMarker.position.lat();
                 dataForSave.lng = app.mainMarker.position.lng();
@@ -1257,7 +1273,7 @@ var app = {
     },
     clearPlaces: function (type) {
         app.selectedPlaces[type] = '';
-        if (app.activeMarker && app.activeMarker.type == type && (!app.lockedBike || app.lockedBike.server_id != app.activeMarker.server_id ) ) {
+        if (app.activeMarker && app.activeMarker.type == type && (!app.lockedBike || app.lockedBike.server_id != app.activeMarker.server_id)) {
             app.closeInfoWindow();
         } else if (app.activeMarker && !app.activeMarker.getAnimation()) {
             app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
