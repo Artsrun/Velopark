@@ -420,7 +420,7 @@ ul.menu_list img{
     float: right;
     margin-right: 3%;
     background-image: url(../img/lock_icon.png);
-    width: 14%;
+    width: 16%;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
@@ -436,7 +436,7 @@ ul.menu_list img{
     float: right;
     margin-right: 3%;
     background-image: url(../img/bike_icon.png);
-    width: 14%;
+    width: 16%;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
@@ -448,7 +448,7 @@ ul.menu_list img{
     float: right;   
     margin-right: 3%;
     cursor: pointer;
-    width: 14%;
+    width: 16%;
     background-image: url(../img/gps_icon.png); 
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -461,7 +461,7 @@ ul.menu_list img{
     float: right;   
     margin-right: 3%;
     cursor: pointer;
-    width: 14%;
+    width: 16%;
     background-image: url(../img/plus_icon.png); 
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
@@ -471,7 +471,7 @@ ul.menu_list img{
 }
 
 .actions a{
-    margin-top: -18%;
+    margin-top: -20%;
 }
 
 .controls{
