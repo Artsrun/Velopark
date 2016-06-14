@@ -1072,6 +1072,7 @@ var app = {
                     no_redraw = true;
                 }
                 removeMarker(app.activeMarker, false, no_redraw);
+                app.activeMarker = null;
 
             } else if (app.mainMarker) {
                 dataForSave.server_id = null;
@@ -1120,7 +1121,7 @@ var app = {
                 }
             } else if (app.lockedBike.server_id && !$('.menu_list [data-type="parking"]').hasClass('active')) {
                 closeInfoWindow = true;
-            } else if (!$('.menu_list [data-type="parking"]').hasClass('active')) {
+            } else {
                 app.activeMarker = null;
             }
             removeMarker(app.lockedBike, true);
@@ -1329,6 +1330,7 @@ var app = {
             if (app.activeMarker) {
                 app.activeMarker.setAnimation(null);
             }
+            app.activeMarker = null;
             app.activeMarker = this;
             app.getPlaceFromDB(this.server_id, function (data) {
 
@@ -1474,7 +1476,7 @@ var app = {
             onCallback: null
         };
         if (app.activeMarker) {
-            app.activeMarker.setAnimation(null)
+            app.activeMarker.setAnimation(null);
             app.activeMarker = null;
             if (app.lockedBike) {
                 whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
@@ -1664,7 +1666,7 @@ function elementInViewport(el) {
 function addMarker(map, image, pos, id, type, no_draw) {
 
     var markerOptions = {
-        //map: map,
+         //map: map,
         position: pos,
         optimized: true,
         draggable: false,
@@ -1676,7 +1678,6 @@ function addMarker(map, image, pos, id, type, no_draw) {
     if (map) {
         markerOptions['map'] = map;
     }
-
 
     var marker = new google.maps.Marker(markerOptions);
 
@@ -1716,7 +1717,7 @@ function addMarker(map, image, pos, id, type, no_draw) {
         app.markerCluster = new MarkerClusterer(app.map, [], {minimumClusterSize: 5, maxZoom: 12, styles: clusterIcons});
     }
     if (map == null) {
-        app.markerCluster.addMarker(marker, no_draw);
+        app.markerCluster.addMarker(marker, true);
     }
     if (type) {
         app.attachInfoWindow(marker);
