@@ -60,6 +60,44 @@ var app = {
         scaleControl: false,
         streetViewControl: false
     },
+    clusterOptions: {
+        maxZoom: 12,
+        minimumClusterSize: 5,
+        gridSize: 50,
+        styles: [{
+                url: './img/clusters/m1.png',
+                height: 53,
+                width: 53,
+                textColor: '#ffffff',
+                textSize: 12
+            }, {
+                url: './img/clusters/m2.png',
+                height: 56,
+                width: 56,
+                textColor: '#ffffff',
+                textSize: 12
+            }, {
+                url: './img/clusters/m3.png',
+                height: 66,
+                width: 66,
+                textColor: '#ffffff',
+                textSize: 12
+            },
+            , {
+                url: './img/clusters/m4.png',
+                height: 78,
+                width: 78,
+                textColor: '#ffffff',
+                textSize: 12
+            }, {
+                url: './img/clusters/m5.png',
+                height: 90,
+                width: 90,
+                textColor: '#ffffff',
+                textSize: 12
+            }]
+
+    },
     markerOptions: {
         places: {
             w: 28,
@@ -832,6 +870,18 @@ var app = {
                 app.map.setCenter(newCenter);
             }
         });
+        /* trick to fix marker blinking for cluster markers */
+        google.maps.event.addListener(app.map, 'zoom_changed', function () {
+            if (app.markerCluster) {
+                if (app.map.getZoom() <= app.clusterOptions.maxZoom) {
+                    app.markerCluster.setGridSize(app.clusterOptions.gridSize);
+                    app.markerCluster.setMaxZoom(app.clusterOptions.maxZoom)
+                } else {
+                    app.markerCluster.setGridSize(1);
+                    app.markerCluster.setMaxZoom(null)
+                }
+            }
+        });
 
         if (DEBUG) {
             app.onPositionSuccess();
@@ -1067,11 +1117,7 @@ var app = {
 
                 position = app.activeMarker.position;
                 /* replace active marker*/
-                var no_redraw = false;
-                if (app.map.getZoom() > app.markerCluster.getMaxZoom()) {
-                    no_redraw = true;
-                }
-                removeMarker(app.activeMarker, false, no_redraw);
+                removeMarker(app.activeMarker, false);
                 app.activeMarker = null;
 
             } else if (app.mainMarker) {
@@ -1666,7 +1712,7 @@ function elementInViewport(el) {
 function addMarker(map, image, pos, id, type, no_draw) {
 
     var markerOptions = {
-         //map: map,
+        //map: map,
         position: pos,
         optimized: true,
         draggable: false,
@@ -1714,7 +1760,15 @@ function addMarker(map, image, pos, id, type, no_draw) {
                 textColor: '#ffffff',
                 textSize: 12
             }];
-        app.markerCluster = new MarkerClusterer(app.map, [], {minimumClusterSize: 5, maxZoom: 12, styles: clusterIcons});
+        if (app.map.getZoom() > app.clusterOptions.maxZoom) {
+            var options =  $.extend({}, app.clusterOptions);
+            options.maxZoom = null;
+            options.gridSize = 1;
+            app.markerCluster = new MarkerClusterer(app.map, [], options);
+        } else {
+            app.markerCluster = new MarkerClusterer(app.map, [], app.clusterOptions);
+        }
+
     }
     if (map == null) {
         app.markerCluster.addMarker(marker, no_draw);
