@@ -1000,7 +1000,8 @@ var app = {
                         var markersByType = jQuery.grep(app.markerCluster.getMarkers(), function (e) {
                             return e.type == type;
                         });
-                        app.markerCluster.removeMarkers(markersByType);
+                        app.markerCluster.removeMarkers(markersByType, true);
+                        app.markerCluster.repaint();
                         app.clearPlaces(type);
                     }
                 }
@@ -1133,7 +1134,7 @@ var app = {
             var marker = addMarker(app.map, image, position, dataForSave.server_id, dataForSave.type);
             app.activeMarker = null;
             app.activeMarker = marker;
-            /* set animation and attache info window  */
+            /* set animation */
             marker.setAnimation(google.maps.Animation.BOUNCE);
 
         }
@@ -1709,7 +1710,7 @@ function elementInViewport(el) {
 }
 
 
-function addMarker(map, image, pos, id, type, no_draw) {
+function addMarker(map, image, pos, id, type) {
 
     var markerOptions = {
         //map: map,
@@ -1728,50 +1729,18 @@ function addMarker(map, image, pos, id, type, no_draw) {
     var marker = new google.maps.Marker(markerOptions);
 
     if (typeof app.markerCluster == 'undefined') {
-        var clusterIcons = [{
-                url: './img/clusters/m1.png',
-                height: 53,
-                width: 53,
-                textColor: '#ffffff',
-                textSize: 12
-            }, {
-                url: './img/clusters/m2.png',
-                height: 56,
-                width: 56,
-                textColor: '#ffffff',
-                textSize: 12
-            }, {
-                url: './img/clusters/m3.png',
-                height: 66,
-                width: 66,
-                textColor: '#ffffff',
-                textSize: 12
-            },
-            , {
-                url: './img/clusters/m4.png',
-                height: 78,
-                width: 78,
-                textColor: '#ffffff',
-                textSize: 12
-            }, {
-                url: './img/clusters/m5.png',
-                height: 90,
-                width: 90,
-                textColor: '#ffffff',
-                textSize: 12
-            }];
         if (app.map.getZoom() > app.clusterOptions.maxZoom) {
-            var options =  $.extend({}, app.clusterOptions);
+            var options = $.extend({}, app.clusterOptions);
             options.maxZoom = null;
             options.gridSize = 1;
             app.markerCluster = new MarkerClusterer(app.map, [], options);
         } else {
             app.markerCluster = new MarkerClusterer(app.map, [], app.clusterOptions);
         }
-
     }
+    
     if (map == null) {
-        app.markerCluster.addMarker(marker, no_draw);
+        app.markerCluster.addMarker(marker);
     }
     if (type) {
         app.attachInfoWindow(marker);
@@ -1785,7 +1754,8 @@ function removeMarker(marker, single, redraw) {
     if (single) {
         marker.setMap(null);
     } else {
-        app.markerCluster.removeMarker(marker, redraw);
+        app.markerCluster.removeMarker(marker, true);
+        app.markerCluster.repaint();
     }
     marker = null;
 }
