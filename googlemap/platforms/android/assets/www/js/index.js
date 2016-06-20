@@ -831,6 +831,7 @@ var app = {
                 if (app.getLocalVersion() != 0 && typeof app.firstDraw == 'undefined') {
                     app.selectPlaces(app.defaultType);
                     selectedPlacesDrawn = true;
+                    app.showPlacesMenu();
                 }
             } else {
                 var type;
@@ -875,7 +876,7 @@ var app = {
             if (app.markerCluster) {
                 if (app.map.getZoom() <= app.clusterOptions.maxZoom) {
                     app.markerCluster.setGridSize(app.clusterOptions.gridSize);
-                    app.markerCluster.setMaxZoom(app.clusterOptions.maxZoom)
+                    app.markerCluster.setMaxZoom(app.clusterOptions.maxZoom);
                 } else {
                     app.markerCluster.setGridSize(1);
                     app.markerCluster.setMaxZoom(null)
@@ -1169,7 +1170,7 @@ var app = {
             } else if (app.lockedBike.server_id && !$('.menu_list [data-type="parking"]').hasClass('active')) {
                 closeInfoWindow = true;
             } else {
-                app.activeMarker = null;
+                closeInfoWindow = true;
             }
             removeMarker(app.lockedBike, true);
             app.lockedBike = null;
@@ -1324,6 +1325,14 @@ var app = {
             app.activeMarker.setAnimation(google.maps.Animation.BOUNCE);
         }
     },
+    showPlacesMenu: function () {
+        if (!$('header .green-menu .arr').hasClass('visible')) {
+            $('header .green-menu .arr').addClass('displayBLock');
+            setTimeout(function () {
+                $('header .green-menu .arr').addClass('visible');
+            }, 0);
+        }
+    },
     drawGroupMarkers: function (places) {
 
         /* if there is no matched places do nothing */
@@ -1331,12 +1340,7 @@ var app = {
             return;
         }
 
-        if (!$('header .green-menu .arr').hasClass('visible')) {
-            $('header .green-menu .arr').addClass('displayBLock');
-            setTimeout(function () {
-                $('header .green-menu .arr').addClass('visible');
-            }, 0);
-        }
+        app.showPlacesMenu();
 
         var image = {
             scaledSize: new google.maps.Size(app.markerOptions.places.w, app.markerOptions.places.h)
@@ -1738,7 +1742,7 @@ function addMarker(map, image, pos, id, type) {
             app.markerCluster = new MarkerClusterer(app.map, [], app.clusterOptions);
         }
     }
-    
+
     if (map == null) {
         app.markerCluster.addMarker(marker);
     }
