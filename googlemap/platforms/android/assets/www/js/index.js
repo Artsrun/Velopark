@@ -53,7 +53,7 @@ var app = {
     },
     mapOptions: {
         minZoom: 1,
-        zoom: 1,
+        zoom: 2,
         scrollwheel: false,
         zoomControl: false,
         mapTypeControl: false,
@@ -890,7 +890,9 @@ var app = {
 
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
-            app.closeInfoWindow();
+            if (!app.animationInProcess) {
+                app.closeInfoWindow();
+            }
         });
         /* attach position watcher */
         app.gpsStart();
@@ -1044,6 +1046,11 @@ var app = {
             });
             /* action buttons */
             $(document).on('click', '.actions a[data-action]', function () {
+                if(app.animationInProcess){
+                    return ;
+                }else{
+                    app.animationInProcess = true;
+                }
                 var that = this;
                 if ($(this).hasClass('disabled')) {
                     return false;
@@ -1054,8 +1061,10 @@ var app = {
                 actionButtons($(this), 'toggle', null, function () {
                     if (action == 'myLocation') {
                         app.goToMyLocation();
+                        app.animationInProcess = false;
                     } else if (action == 'myBike') {
                         app.goToMyBike();
+                        app.animationInProcess = false;
                     } else if (action == 'lock') {
                         app.lockPosition();
                     } else if (action == 'unlock') {
@@ -1146,6 +1155,8 @@ var app = {
         app.lockedBike = marker;
         if (!app.activeMarker) {
             app.reorderActions('myBike', 'show');
+        }else{
+            app.animationInProcess = false;
         }
         $('.actions [data-button="lock"]').attr('data-action', 'unlock');
     },
@@ -1176,10 +1187,12 @@ var app = {
             app.lockedBike = null;
 
             localStorage.setItem("lockedBike", '');
-            app.reorderActions('myBike', 'hide');
+            //app.reorderActions('myBike', 'hide');
             $('.actions [data-button="lock"]').attr('data-action', 'lock');
             if (closeInfoWindow) {
                 app.closeInfoWindow();
+            }else{
+                 app.animationInProcess = false;
             }
         }
     },
@@ -1370,14 +1383,13 @@ var app = {
     },
     attachInfoWindow: function (marker) {
         marker.addListener('click', function () {
-            if (app.markersDisabled)
+            if (app.animationInProcess)
                 return;
             if (app.activeMarker && app.activeMarker.server_id == this.server_id) {
                 app.closeInfoWindow();
                 return;
             }
-            app.markersDisabled = true;
-
+            app.animationInProcess = true;
             if (app.activeMarker) {
                 app.activeMarker.setAnimation(null);
             }
@@ -1461,11 +1473,7 @@ var app = {
                 setTimeout(function () {
                     app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
                         if (whatToDo.onCallback) {
-                            app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action, function () {
-                                app.markersDisabled = false;
-                            });
-                        } else {
-                            app.markersDisabled = false;
+                            app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action);
                         }
                     });
 
@@ -1475,6 +1483,7 @@ var app = {
         });
     },
     reorderActions: function (button, action, callback) {
+        app.animationInProcess = true;
         var countOfActions = 1;
         var $buttonElement = $('[data-button="' + button + '"]');
         if (action == 'show') {
@@ -1511,17 +1520,16 @@ var app = {
             }
 
         });
-        if (typeof callback == 'function') {
-            setTimeout(function () {
+
+        setTimeout(function () {
+            app.animationInProcess = false;
+            if (typeof callback == 'function') {
                 callback();
-            }, countOfActions * 200);
-        }
+            }
+        }, countOfActions * 200);
     },
     closeInfoWindow: function () {
-        if (app.markersDisabled) {
-            return;
-        }
-        app.markersDisabled = true;
+        app.animationInProcess = true;
         var whatToDo = {
             atFirst: null,
             onCallback: null
@@ -1548,16 +1556,9 @@ var app = {
             if (whatToDo.atFirst) {
                 app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
                     if (whatToDo.onCallback) {
-                        app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action, function () {
-                            app.markersDisabled = false;
-                        });
-
-                    } else {
-                        app.markersDisabled = false;
+                        app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action);
                     }
                 });
-            } else {
-                app.markersDisabled = false;
             }
             $('.actions a[data-action]').removeClass('disabled');
         }, 250);
@@ -1878,7 +1879,7 @@ function actionButtons(el, animation, position, callback) {
                 '-webkit-transform': 'scale(1)',
                 'transform': 'scale(1)'
             });
-        }, 100);
+        }, 200);
     } else if (animation == 'hide') { /* hide with scale */
         $(el).addClass('action_trans');
         $(el).css({
