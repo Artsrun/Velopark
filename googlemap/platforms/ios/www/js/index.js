@@ -52,7 +52,7 @@ var app = {
         parts: ''
     },
     mapOptions: {
-        minZoom: 1,
+        minZoom: 2,
         zoom: 2,
         scrollwheel: false,
         zoomControl: false,
@@ -890,7 +890,7 @@ var app = {
 
         /* atach events to map */
         google.maps.event.addListener(app.map, "click", function () {
-            if (!app.animationInProcess) {
+            if (!app.animationInProcess && app.activeMarker) {
                 app.closeInfoWindow();
             }
         });
@@ -1046,32 +1046,27 @@ var app = {
             });
             /* action buttons */
             $(document).on('click', '.actions a[data-action]', function () {
-                if(app.animationInProcess){
-                    return ;
-                }else{
-                    app.animationInProcess = true;
-                }
-                var that = this;
-                if ($(this).hasClass('disabled')) {
+                if (app.animationInProcess) {
                     return false;
                 } else {
-                    $(this).addClass('disabled');
+                    app.animationInProcess = true;
                 }
-                var action = $(that).attr('data-action');
-                actionButtons($(this), 'toggle', null, function () {
-                    if (action == 'myLocation') {
-                        app.goToMyLocation();
-                        app.animationInProcess = false;
-                    } else if (action == 'myBike') {
-                        app.goToMyBike();
-                        app.animationInProcess = false;
-                    } else if (action == 'lock') {
+                var action = $(this).attr('data-action');
+                if (action == 'lock') {
+                    actionButtons($(this), 'scale', null, function () {
                         app.lockPosition();
-                    } else if (action == 'unlock') {
-                        app.unlockPosition();
-                    }
-                    $(that).removeClass('disabled');
-                });
+                    });
+                } else {
+                    actionButtons($(this), 'toggle', null, function () {
+                        if (action == 'myLocation') {
+                            app.goToMyLocation();
+                        } else if (action == 'myBike') {
+                            app.goToMyBike();
+                        } else if (action == 'unlock') {
+                            app.unlockPosition();
+                        }
+                    });
+                }
                 return false;
             });
         }
@@ -1146,24 +1141,28 @@ var app = {
             app.activeMarker = marker;
             /* set animation */
             marker.setAnimation(google.maps.Animation.BOUNCE);
-
         }
+
 
         /* save data in localstorage */
         localStorage.setItem("lockedBike", JSON.stringify(dataForSave));
-
+        /* set lockedBike */
         app.lockedBike = marker;
+
         if (!app.activeMarker) {
-            app.reorderActions('myBike', 'show');
-        }else{
-            app.animationInProcess = false;
+            app.reorderActions('lock', 'hide', function () {
+                app.reorderActions('myBike', 'show', function () {
+                    $('.actions [data-button="lock"]').attr('data-action', 'unlock');
+                });
+            });
+        } else {
+            app.closeInfoWindow(function () {
+                $('.actions [data-button="lock"]').attr('data-action', 'unlock');
+            });
         }
-        $('.actions [data-button="lock"]').attr('data-action', 'unlock');
     },
     unlockPosition: function () {
-
         if (app.lockedBike) {
-            var closeInfoWindow = false;
             /* revert back to correct marker */
             if (app.lockedBike.server_id && $('.menu_list [data-type="parking"]').hasClass('active')) {
                 var image = {
@@ -1178,33 +1177,29 @@ var app = {
                     app.activeMarker = null;
                     app.activeMarker = marker;
                 }
-            } else if (app.lockedBike.server_id && !$('.menu_list [data-type="parking"]').hasClass('active')) {
-                closeInfoWindow = true;
-            } else {
-                closeInfoWindow = true;
             }
+            /* remove lockedBike and its marker*/
             removeMarker(app.lockedBike, true);
             app.lockedBike = null;
-
             localStorage.setItem("lockedBike", '');
-            //app.reorderActions('myBike', 'hide');
+ 
             $('.actions [data-button="lock"]').attr('data-action', 'lock');
-            if (closeInfoWindow) {
-                app.closeInfoWindow();
-            }else{
-                 app.animationInProcess = false;
-            }
+            app.closeInfoWindow();
+        } else {
+            app.animationInProcess = false;
         }
     },
     goToMyLocation: function () {
         if (app.currentLocation.latitude != null) {
             app.map.panTo(new google.maps.LatLng(app.currentLocation.latitude, app.currentLocation.longitude));
         }
+        app.animationInProcess = false;
     },
     goToMyBike: function () {
         if (app.lockedBike) {
             app.map.panTo(app.lockedBike.position);
         }
+        app.animationInProcess = false;
     },
     showReviewMap: function () {
         var allVoteElements = $('.vot_wrap:not(".loaded")');
@@ -1385,6 +1380,7 @@ var app = {
         marker.addListener('click', function () {
             if (app.animationInProcess)
                 return;
+            
             if (app.activeMarker && app.activeMarker.server_id == this.server_id) {
                 app.closeInfoWindow();
                 return;
@@ -1484,17 +1480,29 @@ var app = {
     },
     reorderActions: function (button, action, callback) {
         app.animationInProcess = true;
-        var countOfActions = 1;
+        var countOfActions = 0;
         var $buttonElement = $('[data-button="' + button + '"]');
         if (action == 'show') {
             var $getNextVisible = $buttonElement.nextAll('.visible:first');
             if ($getNextVisible) {
                 var correctPosition = $getNextVisible.data('current-position') ? $getNextVisible.data('current-position') + 1 : 1;
             }
-            actionButtons($buttonElement, 'move', correctPosition);
 
+            var needAction = false;
+            if ($buttonElement.hasClass('visible') && $buttonElement.data('current-position') == correctPosition) {
+                needAction = false;
+            } else {
+                needAction = true;
+                countOfActions++
+            }
+            if (needAction) {
+                actionButtons($buttonElement, 'move', correctPosition);
+            }
         } else if (action == 'hide') {
-            actionButtons($buttonElement, 'hide');
+            if ($buttonElement.hasClass('visible')) {
+                countOfActions++;
+                actionButtons($buttonElement, 'hide');
+            }
         }
 
 
@@ -1520,7 +1528,7 @@ var app = {
             }
 
         });
-
+        
         setTimeout(function () {
             app.animationInProcess = false;
             if (typeof callback == 'function') {
@@ -1528,41 +1536,53 @@ var app = {
             }
         }, countOfActions * 200);
     },
-    closeInfoWindow: function () {
-        app.animationInProcess = true;
+    closeInfoWindow: function (callback) {
+
+        /* just call callback if there is no activeMarkers */
+        if (!app.activeMarker) {
+            if (typeof callback == 'function') {
+                callback();
+            }
+            return false;
+        }
+
         var whatToDo = {
             atFirst: null,
             onCallback: null
         };
-        if (app.activeMarker) {
-            app.activeMarker.setAnimation(null);
-            app.activeMarker = null;
-            if (app.lockedBike) {
-                whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
-                whatToDo.onCallback = {'name': 'myBike', 'action': 'show'};
-            } else if (!app.mainMarker) {
-                whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
-            } else if (app.mainMarker) {
-                whatToDo.atFirst = {'name': 'lock', 'action': 'show'};
-            }
+        /* clear active Marker */
+        app.animationInProcess = true;
+        app.activeMarker.setAnimation(null);
+        app.activeMarker = null;
+
+        if (app.lockedBike) {
+            whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
+            whatToDo.onCallback = {'name': 'myBike', 'action': 'show'};
+        } else if (!app.mainMarker) {
+            whatToDo.atFirst = {'name': 'lock', 'action': 'hide'};
+        } else if (app.mainMarker) {
+            whatToDo.atFirst = {'name': 'lock', 'action': 'show'};
         }
 
-        setTimeout(function () {
+
+        if (whatToDo.atFirst) {
+            app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
+                if (whatToDo.onCallback) {
+                    app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action, function () {
+                        fullClose();
+                    });
+                } else {
+                    fullClose();
+                }
+            });
+        }
+
+        function fullClose() {
             $(".controls").removeClass("transition");
-        }, 50);
-
-        $('.actions a[data-action]').addClass('disabled');
-        setTimeout(function () {
-            if (whatToDo.atFirst) {
-                app.reorderActions(whatToDo.atFirst.name, whatToDo.atFirst.action, function () {
-                    if (whatToDo.onCallback) {
-                        app.reorderActions(whatToDo.onCallback.name, whatToDo.onCallback.action);
-                    }
-                });
+            if (typeof callback == 'function') {
+                callback();
             }
-            $('.actions a[data-action]').removeClass('disabled');
-        }, 250);
-
+        }
     },
     cameraSuccess: function (imageURI, fromGallery) {
 
@@ -1868,6 +1888,7 @@ function actionButtons(el, animation, position, callback) {
         $(el).addClass('displayBLock');
     }
 
+    var animationDuration = 200;
     if (animation == 'toggle') { /* toogle scale */
         $(el).addClass('action_trans').addClass('toggle');
         $(el).css({
@@ -1879,7 +1900,14 @@ function actionButtons(el, animation, position, callback) {
                 '-webkit-transform': 'scale(1)',
                 'transform': 'scale(1)'
             });
-        }, 200);
+        }, 100);
+    } else if (animation == 'scale') { /* toogle scale */
+        $(el).addClass('action_trans').addClass('toggle');
+        $(el).css({
+            '-webkit-transform': 'scale(1.2)',
+            'transform': 'scale(1.2)'
+        });
+        animationDuration = 100;
     } else if (animation == 'hide') { /* hide with scale */
         $(el).addClass('action_trans');
         $(el).css({
@@ -1957,7 +1985,7 @@ function actionButtons(el, animation, position, callback) {
         if (typeof callback == 'function') {
             callback();
         }
-    }, 200);
+    }, animationDuration);
 }
 
 function addLoader(selector) {
