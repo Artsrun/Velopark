@@ -1,3 +1,3 @@
-# view AndroidManifest.xml #generated:8
+# view AndroidManifest.xml #generated:7
 -keep class am.velopark.velopark.MainActivity { <init>(...); }
 

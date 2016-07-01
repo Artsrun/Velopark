@@ -8,6 +8,7 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\classes\am\velopark\velopar
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\am\velopark\velopark\R$style.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\am\velopark\velopark\R$xml.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\am\velopark\velopark\R.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\camera\CameraLauncher$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\camera\CameraLauncher.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\camera\ExifHelper.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\camera\FileHelper.class \
@@ -31,6 +32,7 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\dialogs\Notification$6$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\dialogs\Notification$6.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\dialogs\Notification.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\AssetFilesystem.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\ContentFilesystem.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\DirectoryManager.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\EncodingException.class \
@@ -59,6 +61,9 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$24.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$25.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$26.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$27.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$28.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$29.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$3.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$4.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileUtils$5.class \
@@ -72,6 +77,9 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\LocalFilesystem.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\LocalFilesystemURL.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\NoModificationAllowedException.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\PendingRequests$1.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\PendingRequests$Request.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\PendingRequests.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\TypeMismatchException.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\filetransfer\FileProgressResult.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\filetransfer\FileTransfer$1.class \
@@ -86,11 +94,15 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\filetransfer\FileTransfer$TrackingInputStream.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\filetransfer\FileTransfer.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\filetransfer\FileUploadResult.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\geolocation\Geolocation.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\networkinformation\NetworkManager$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\networkinformation\NetworkManager.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\PermissionHelper.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$2.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$3$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$3.class \
+D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$4$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$4.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$5$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$5.class \
