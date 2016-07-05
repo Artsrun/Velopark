@@ -1,0 +1,160 @@
+@font-face {
+    font-family: 'gothic';
+    src: url('fonts/gothic/gothic.eot');
+    src: local('gothic'), url('fonts/gothic/gothic.woff') format('woff'), url('fonts/gothic/gothic.ttf') format('truetype');
+}
+
+body {
+    font-family: 'gothic' !important;
+	background-color:#eee;
+}
+
+body,html{
+    margin:0;
+    width:100%;
+    height:100%;
+}
+body{
+    background-image:url(images/bg.jpg);
+    background-size:cover;
+    background-repeat:no-repeat;
+}
+.header{
+    height:70px;
+    background-color: #2ECC71;
+    -webkit-box-shadow: 0px 3px 5px 0px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow:    0px 3px 5px 0px rgba(0, 0, 0, 0.5);
+    box-shadow:         0px 3px 5px 0px rgba(0, 0, 0, 0.5);
+}
+.aparg{
+    background-image: url(images/aparg.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 30px;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+}
+.fb{
+    width: 30px;
+    height: 30px;
+    float: right;
+    background-image: url(images/fb.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+    margin-right: 15px;
+    display: block;
+}
+.logo{
+    background-image: url(images/logo2.png);
+	background-size: 200px auto;
+	background-repeat: no-repeat;
+	width: 200px;
+	height: 60px;
+	display: inline-block;
+	margin-top: 10px;
+	margin-left: 20px;
+}
+
+
+.popup{
+    position:fixed;
+    width:585px;
+    height:345px;
+    top:220px;
+    right:100px;    
+    border-top: 4px solid #2ECC71;    
+    background-color: rgba(255,255,255,0.55);
+    padding: 25px 30px;
+}
+.popup .text{
+    color:#ffffff;  
+    font-size:24px;
+}
+.popup .text .app-name{
+    font-size:28px;
+}
+.popup p{
+    margin:0;
+}
+.popup .markets{
+    margin-top: 70px;
+	text-align: center;
+    display: block;
+}
+.popup .markets .play{
+    background-image:url(images/play_download.png);
+    background-size:contain;
+    background-repeat: no-repeat;
+	display:inline-block;    
+	margin:0 15px;
+}
+.popup .markets .app{
+    background-image:url(images/app_download.png);
+    background-size:contain;
+    background-repeat: no-repeat;
+    display:inline-block;    
+	margin:0 10px;
+}
+.popup .markets a{
+    width:216px;
+    height:62px;
+    display: inline-block;
+}
+
+@media screen and (max-width: 1400px)  {
+    .popup{
+        width: 465px;
+        height: 255px;
+        top: 180px;
+        right: 60px;
+    }
+    .popup .text{
+        font-size: 19px;
+    }
+    .popup .text .app-name{
+        font-size: 25px;
+    }
+    .popup .markets {
+        margin-top: 30px;
+    }
+    .popup .markets a {
+        width: 185px;
+        height: 53px;
+
+    }
+}
+
+@media screen and (max-width: 800px)  {
+
+	body,html{
+		height:auto;
+	}
+    .popup{
+        position: relative;
+        top: inherit;
+        margin: 0 auto;
+        right: auto;
+        width: 80%;
+		height:auto;
+		margin-bottom: 30px;
+		margin-top: 100px;
+    }
+	.popup .markets .play, .popup .markets .app{
+		float: none;
+		margin:10px auto;		
+		display:block;
+	}
+	
+	.aparg{
+		right: inherit;
+		bottom: inherit;
+		position: relative;
+		margin: 0 auto;
+		display: block;
+		margin-bottom:10px;
+	}
+}

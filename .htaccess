@@ -1,0 +1,7 @@
+
+RewriteEngine on
+
+RewriteCond %{HTTP_HOST} ^velopark\.am$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.velopark\.am$
+RewriteRule ^/?$ "http\:\/\/velopark\.aparg\.com" [R=301,L]
+
