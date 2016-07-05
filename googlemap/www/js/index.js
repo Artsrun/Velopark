@@ -1868,7 +1868,7 @@ function newPlace(center, setAddress) {
                 for (var i = 0; i < results[0].address_components.length; i++) {
                     var component = results[0].address_components[i];
                     if (component.types[0] == 'country') {
-                        country = component.long_name;
+                        country = component.short_name.toLowerCase();
                         break;
                     }
                 }
