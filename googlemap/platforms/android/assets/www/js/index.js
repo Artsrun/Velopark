@@ -10,8 +10,8 @@ if (DEBUG) {
 
 var app = {
 // Application Constructor
-    apiURL: "http://velopark.am/api/",
-    uploadsURL: 'http://velopark.am/uploads/',
+    apiURL: "http://velopark.aparg.com/api/",
+    uploadsURL: 'http://velopark.aparg.com/uploads/',
     map: null,
     db: null,
     lockedBike: null,
@@ -672,6 +672,7 @@ var app = {
                         if (app.getLocalVersion() == 0) {
                             app.firstDraw = true;
                             app.selectPlaces(app.defaultType);
+                            app.showPlacesMenu();
                         }
                         localStorage.setItem("version", version);
                     });
@@ -1867,7 +1868,7 @@ function newPlace(center, setAddress) {
                 for (var i = 0; i < results[0].address_components.length; i++) {
                     var component = results[0].address_components[i];
                     if (component.types[0] == 'country') {
-                        country = component.long_name;
+                        country = component.short_name.toLowerCase();
                         break;
                     }
                 }

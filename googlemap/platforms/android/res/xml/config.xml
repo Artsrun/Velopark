@@ -1,21 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="22000" id="am.velopark.velopark" ios-CFBundleVersion="2.2.0" version="2.2.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-versionCode="22101" id="am.velopark.velopark" ios-CFBundleVersion="2.2.101" version="2.2.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <preference name="loglevel" value="DEBUG" />
     <feature name="Camera">
         <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
     </feature>
-    <feature name="Notification">
-        <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
-    </feature>
-    <feature name="Geolocation">
-        <param name="android-package" value="org.apache.cordova.geolocation.Geolocation" />
-    </feature>
-    <feature name="Whitelist">
-        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
-        <param name="onload" value="true" />
-    </feature>
     <feature name="Device">
         <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
+    <feature name="Notification">
+        <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
     </feature>
     <feature name="File">
         <param name="android-package" value="org.apache.cordova.file.FileUtils" />
@@ -24,11 +17,18 @@
     <feature name="FileTransfer">
         <param name="android-package" value="org.apache.cordova.filetransfer.FileTransfer" />
     </feature>
+    <feature name="Geolocation">
+        <param name="android-package" value="org.apache.cordova.geolocation.Geolocation" />
+    </feature>
     <feature name="NetworkStatus">
         <param name="android-package" value="org.apache.cordova.networkinformation.NetworkManager" />
     </feature>
     <feature name="SplashScreen">
         <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
         <param name="onload" value="true" />
     </feature>
     <icon density="ldpi" src="res/android/icons/ldpi.png" />
@@ -45,7 +45,7 @@
     <splash density="port-xxxhdpi" src="res/android/splash/screen-xxxhdpi-portrait.9.png" />
     <name>Velopark</name>
     <description>
-        Velopark is an app for bicycle lovers in Armenia. This app will keep you in touch with the community and also provide information about  parking places, shops and rent places all over Armenia.
+        Velopark is an app for bicycle lovers. This app will keep you in touch with the community and also provide information about  nearest  parking places, shops and rent spots.
     </description>
     <author email="info@aparg.com" href="http://aparg.com">
         Aparg

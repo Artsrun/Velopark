@@ -13,19 +13,11 @@
                             "count": 1
                         },
                         {
-                            "xml": "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"Geolocation\"><param name=\"android-package\" value=\"org.apache.cordova.geolocation.Geolocation\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"Whitelist\"><param name=\"android-package\" value=\"org.apache.cordova.whitelist.WhitelistPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>",
                             "count": 1
                         },
                         {
@@ -37,11 +29,19 @@
                             "count": 1
                         },
                         {
+                            "xml": "<feature name=\"Geolocation\"><param name=\"android-package\" value=\"org.apache.cordova.geolocation.Geolocation\" /></feature>",
+                            "count": 1
+                        },
+                        {
                             "xml": "<feature name=\"NetworkStatus\"><param name=\"android-package\" value=\"org.apache.cordova.networkinformation.NetworkManager\" /></feature>",
                             "count": 1
                         },
                         {
                             "xml": "<feature name=\"SplashScreen\"><param name=\"android-package\" value=\"org.apache.cordova.splashscreen.SplashScreen\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Whitelist\"><param name=\"android-package\" value=\"org.apache.cordova.whitelist.WhitelistPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
                         }
                     ]
@@ -51,16 +51,16 @@
                 "parents": {
                     "/*": [
                         {
+                            "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
+                            "count": 3
+                        },
+                        {
                             "xml": "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />",
                             "count": 1
                         },
                         {
                             "xml": "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />",
                             "count": 1
-                        },
-                        {
-                            "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
-                            "count": 2
                         },
                         {
                             "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
@@ -78,16 +78,10 @@
         "cordova-plugin-camera": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
-        "cordova-plugin-dialogs": {
-            "PACKAGE_NAME": "am.velopark.velopark"
-        },
-        "cordova-plugin-geolocation": {
-            "PACKAGE_NAME": "am.velopark.velopark"
-        },
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "am.velopark.velopark"
-        },
         "cordova-plugin-device": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-dialogs": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
         "cordova-plugin-file": {
@@ -96,10 +90,16 @@
         "cordova-plugin-file-transfer": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
+        "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
         "cordova-plugin-network-information": {
             "PACKAGE_NAME": "am.velopark.velopark"
         },
         "cordova-plugin-splashscreen": {
+            "PACKAGE_NAME": "am.velopark.velopark"
+        },
+        "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "am.velopark.velopark"
         }
     },
@@ -134,6 +134,13 @@
             ]
         },
         {
+            "file": "plugins/cordova-plugin-device/www/device.js",
+            "id": "cordova-plugin-device.device",
+            "clobbers": [
+                "device"
+            ]
+        },
+        {
             "file": "plugins/cordova-plugin-dialogs/www/notification.js",
             "id": "cordova-plugin-dialogs.notification",
             "merges": [
@@ -145,25 +152,6 @@
             "id": "cordova-plugin-dialogs.notification_android",
             "merges": [
                 "navigator.notification"
-            ]
-        },
-        {
-            "file": "plugins/cordova-plugin-geolocation/www/android/geolocation.js",
-            "id": "cordova-plugin-geolocation.geolocation",
-            "clobbers": [
-                "navigator.geolocation"
-            ]
-        },
-        {
-            "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
-            "id": "cordova-plugin-geolocation.PositionError",
-            "runs": true
-        },
-        {
-            "file": "plugins/cordova-plugin-device/www/device.js",
-            "id": "cordova-plugin-device.device",
-            "clobbers": [
-                "device"
             ]
         },
         {
@@ -332,6 +320,18 @@
             ]
         },
         {
+            "file": "plugins/cordova-plugin-geolocation/www/android/geolocation.js",
+            "id": "cordova-plugin-geolocation.geolocation",
+            "clobbers": [
+                "navigator.geolocation"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
+            "id": "cordova-plugin-geolocation.PositionError",
+            "runs": true
+        },
+        {
             "file": "plugins/cordova-plugin-network-information/www/network.js",
             "id": "cordova-plugin-network-information.network",
             "clobbers": [
@@ -357,13 +357,13 @@
     "plugin_metadata": {
         "cordova-plugin-compat": "1.0.0",
         "cordova-plugin-camera": "2.2.0",
-        "cordova-plugin-dialogs": "1.2.1",
-        "cordova-plugin-geolocation": "2.2.0",
-        "cordova-plugin-whitelist": "1.2.2",
         "cordova-plugin-device": "1.1.2",
+        "cordova-plugin-dialogs": "1.2.1",
         "cordova-plugin-file": "4.2.0",
         "cordova-plugin-file-transfer": "1.5.1",
+        "cordova-plugin-geolocation": "2.2.0",
         "cordova-plugin-network-information": "1.2.1",
-        "cordova-plugin-splashscreen": "3.2.2"
+        "cordova-plugin-splashscreen": "3.2.2",
+        "cordova-plugin-whitelist": "1.2.2"
     }
 }

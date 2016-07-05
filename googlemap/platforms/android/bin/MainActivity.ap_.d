@@ -1,6 +1,5 @@
 D:\phonegap\velopark\googlemap\platforms\android\bin\MainActivity.ap_ \
- : D:\phonegap\velopark\googlemap\platforms\android\res\drawable\icon.png \
-D:\phonegap\velopark\googlemap\platforms\android\res\drawable-hdpi\icon.png \
+ : D:\phonegap\velopark\googlemap\platforms\android\res\drawable-hdpi\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\res\drawable-ldpi\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\res\drawable-mdpi\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\res\drawable-port-hdpi\screen.9.png \
@@ -16,7 +15,6 @@ D:\phonegap\velopark\googlemap\platforms\android\res\values\strings.xml \
 D:\phonegap\velopark\googlemap\platforms\android\res\values\theme.xml \
 D:\phonegap\velopark\googlemap\platforms\android\res\values-hy\strings.xml \
 D:\phonegap\velopark\googlemap\platforms\android\res\xml\config.xml \
-D:\phonegap\velopark\googlemap\platforms\android\bin\res\drawable\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\bin\res\drawable-hdpi\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\bin\res\drawable-ldpi\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\bin\res\drawable-mdpi\icon.png \
@@ -30,7 +28,6 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\res\drawable-xhdpi\icon.png
 D:\phonegap\velopark\googlemap\platforms\android\bin\res\drawable-xxhdpi\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\bin\res\drawable-xxxhdpi\icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www \
-D:\phonegap\velopark\googlemap\platforms\android\assets\_where-is-www.txt \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\cordova-js-src \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\cordova.js \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\cordova_plugins.js \
@@ -83,7 +80,6 @@ D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\menu_icon4.png \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\new_place.png \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\note.png \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\no_internet.png \
-D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\plus_icon.png \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\totorial_overlay.png \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\t_menu_parking.png \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\img\t_menu_parts.png \
@@ -100,7 +96,6 @@ D:\phonegap\velopark\googlemap\platforms\android\assets\www\js\functions.js \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\js\index.js \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\js\jquery-2.1.4.js \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\js\jquery.swipebox.js \
-D:\phonegap\velopark\googlemap\platforms\android\assets\www\js\markerclusterer.js \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\js\mclusterer.js \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\plugins\cordova-plugin-camera \
 D:\phonegap\velopark\googlemap\platforms\android\assets\www\plugins\cordova-plugin-device \

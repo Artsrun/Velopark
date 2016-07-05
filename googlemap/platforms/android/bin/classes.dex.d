@@ -37,8 +37,6 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\DirectoryManager.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\EncodingException.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileExistsException.class \
-D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\FileHelper.class \
-D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\Filesystem$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\Filesystem$LimitedInputStream.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\Filesystem$ReadFileCallback.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\file\Filesystem.class \
@@ -106,9 +104,7 @@ D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$4.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$5$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$5.class \
-D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$6$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$6.class \
-D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen$7.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\splashscreen\SplashScreen.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\whitelist\WhitelistPlugin$1.class \
 D:\phonegap\velopark\googlemap\platforms\android\bin\classes\org\apache\cordova\whitelist\WhitelistPlugin$CustomConfigXmlParser.class \

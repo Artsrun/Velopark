@@ -29,6 +29,13 @@ module.exports = [
         ]
     },
     {
+        "file": "plugins/cordova-plugin-device/www/device.js",
+        "id": "cordova-plugin-device.device",
+        "clobbers": [
+            "device"
+        ]
+    },
+    {
         "file": "plugins/cordova-plugin-dialogs/www/notification.js",
         "id": "cordova-plugin-dialogs.notification",
         "merges": [
@@ -40,25 +47,6 @@ module.exports = [
         "id": "cordova-plugin-dialogs.notification_android",
         "merges": [
             "navigator.notification"
-        ]
-    },
-    {
-        "file": "plugins/cordova-plugin-geolocation/www/android/geolocation.js",
-        "id": "cordova-plugin-geolocation.geolocation",
-        "clobbers": [
-            "navigator.geolocation"
-        ]
-    },
-    {
-        "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
-        "id": "cordova-plugin-geolocation.PositionError",
-        "runs": true
-    },
-    {
-        "file": "plugins/cordova-plugin-device/www/device.js",
-        "id": "cordova-plugin-device.device",
-        "clobbers": [
-            "device"
         ]
     },
     {
@@ -227,6 +215,18 @@ module.exports = [
         ]
     },
     {
+        "file": "plugins/cordova-plugin-geolocation/www/android/geolocation.js",
+        "id": "cordova-plugin-geolocation.geolocation",
+        "clobbers": [
+            "navigator.geolocation"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
+        "id": "cordova-plugin-geolocation.PositionError",
+        "runs": true
+    },
+    {
         "file": "plugins/cordova-plugin-network-information/www/network.js",
         "id": "cordova-plugin-network-information.network",
         "clobbers": [
@@ -254,14 +254,14 @@ module.exports.metadata =
 {
     "cordova-plugin-compat": "1.0.0",
     "cordova-plugin-camera": "2.2.0",
-    "cordova-plugin-dialogs": "1.2.1",
-    "cordova-plugin-geolocation": "2.2.0",
-    "cordova-plugin-whitelist": "1.2.2",
     "cordova-plugin-device": "1.1.2",
+    "cordova-plugin-dialogs": "1.2.1",
     "cordova-plugin-file": "4.2.0",
     "cordova-plugin-file-transfer": "1.5.1",
+    "cordova-plugin-geolocation": "2.2.0",
     "cordova-plugin-network-information": "1.2.1",
-    "cordova-plugin-splashscreen": "3.2.2"
+    "cordova-plugin-splashscreen": "3.2.2",
+    "cordova-plugin-whitelist": "1.2.2"
 };
 // BOTTOM OF METADATA
 });
