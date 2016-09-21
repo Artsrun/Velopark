@@ -102,7 +102,7 @@ Now move into the bin directory and run these jarsigner commands:
 ```
 #!
 
-cdbinjarsigner-verbose-sigalgSHA1withRSA-digestalgSHA1-keystore/Users/username/Documents/path/to/my-release-key.keystore AppName-release-unsigned.apkapp_name
+cd bin jarsigner-verbose-sigalgSHA1withRSA-digestalgSHA1-keystore/Users/username/Documents/path/to/my-release-key.keystore AppName-release-unsigned.apkapp_name
 ```
 
 Enter your keystore password
