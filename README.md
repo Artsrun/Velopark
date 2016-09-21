@@ -7,7 +7,9 @@ So you’ve got your awesome app programmed, tested, added a cool icon, and you 
 It was pretty hard to find a good guide out there on the Internet about what to do to finally get your app to submit to the Google Play Store for Android. The official documentation is pretty wordy and somewhat vague. These instructions are specifically for apps built with Phonegap, because that’s what I used, but it might be helpful for other people as well.
 Make sure your app is good to go
 Make sure you’ve set your versionName in www/config.xml and versionCode  platforms/android/AndroidManifest.xml. The reason you have to set the versionName in config.xml inside the www folder is because phonegap will overwrite the versionName in the androidManifest file with whatever is in config.xml. Google Play won’t accept the app unless the versionCode is different than the previous versions in the store (preferably larger). versionCode is an integer value, so just increment it by 1 each time you submit regardless of whether it’s a major or minor update. versionName isn’t used for anything except for displaying to users and it’s a string so you can name it whatever you want. For example, you could set it to 1.0.3 while versionCode might be 3. (http://developer.android.com/tools/publishing/versioning.html#appversioning)
+
 <manifestandroid:hardwareAccelerated="true"android:versionCode="3"android:versionName="1.0.3"android:windowSoftInputMode="adjustPan"package="com.compay.app"xmlns:android="http://schemas.android.com/apk/res/android">
+
 Also, make sure you set debuggable to false in AndroidoManifest.xml in the application tag like this: android:debuggable=”false”
 
 
@@ -17,7 +19,13 @@ Always use a different keystore file for each app because it’s your private ke
 Put the keystore file somewhere on your computer. It doesn’t really matter where.
 
 The command that you have provided for generating the keystore is correct i.e.
+
+```
+#!
+
 keytool -v -genkey -v -keystore just2try.keystore -alias someKindOfName -keyalg RSA -validity 10000
+```
+
 Please do the following. Do not copy it, since I believe the error that you are seeing it related to some special characters. Type the whole thing as is in your command prompt or shell.
 The just2try.keystore is any name for your Java based keystore file. You can select any name as you have done or give it some name that you know you can identify the keystore file with.
 Finally, keep in mind that a keystore is like a collection of keys, where each one is identified by a name or an alias. So you should pick an alias that you know identifies the specific key. Examples : myorgkey, myandroidappkey, etc.
@@ -30,36 +38,90 @@ Where key.store equals the path to the keystore file starting at the C Drive if 
 
 ## Build your app ##
 Open up the command prompt, and navigate to your project and run phonegap build.
+
+```
+#!
+
 phonegap build android
+```
+
 in platforms/android/bin you should have:
 AppName.ap_AppName.ap_.dAppName-debug.apkAppName-debug-unaligned.apkAppName-debug-unaligned.apk.d
 Sign in release mode
 Then navigate to the android directory and run ant release:
+
+```
+#!
+
 cd platforms/android ant release
+```
+
 It might prompt you for your keystore password and the password for the alias ‘app_name’. Enter your keystore password for both of them.
 In platforms/android/bin you should now also have release versions of the app:
 AppName-release.apk AppName-release-unaligned.apk AppName-release-unsigned.apk AppName-release-unsigned.apk.d
 
 If you get
+
+```
+#!
+
 Buildfile: build.xml does not exist!
 Build failed
+```
+
 Solution
 Run
+
+```
+#!
+
 android update project --target 5 --path /path/to/android/project
+```
+
 or, if you are in your project's root directory already:
+
+```
+#!
+
 android update project --target 5 --path .
+```
+
 target is the build target for your project. Run
+
+```
+#!
+
 android list targets
+```
+
 to get a list of all available targets.
 
 
 Now move into the bin directory and run these jarsigner commands:
+
+```
+#!
+
 cdbinjarsigner-verbose-sigalgSHA1withRSA-digestalgSHA1-keystore/Users/username/Documents/path/to/my-release-key.keystore AppName-release-unsigned.apkapp_name
+```
+
 Enter your keystore password
+
+```
+#!
+
 Jarsigner -verify-verbose-certs AppName-release-unsigned.apk
+```
+
 If you get a warning like this ignore it: Warning: This jar contains entries whose certificate chain is not validated.
 Then run this zipalign command to create the final apk file:
+
+```
+#!
+
 zipalign-v4 AppName-release-unsigned.apkAppName.apk
+```
+
 it will say: Verification successful
 And your final apk (AppName.apk) will be created in the bin directory.
 (http://developer.android.com/tools/publishing/app-signing.html#releasemode)
