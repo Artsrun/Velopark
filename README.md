@@ -11,8 +11,7 @@ Make sure you’ve set your versionName in www/config.xml and versionCode  platf
 Also, make sure you set debuggable to false in AndroidoManifest.xml in the application tag like this: android:debuggable=”false”
 
 
-## 
-Create a keystore file ## 
+##Create a keystore file ## 
 Create a keystore file and set a password. I won’t go into a lot of detail about how to actually do this. Just make sure you don’t lose this file. If you lose it, and you have to create a new one, then it will become a new app when you try to add it to the Google Play Store. (http://developer.android.com/tools/publishing/app-signing.html#cert)
 Always use a different keystore file for each app because it’s your private key for uploading apps to the store. If you ever decide to transfer your app to another developer, you’ll have to give them the keystore file, and if you also use that keystore for other apps, then you have a security issue. (http://developer.android.com/tools/publishing/app-signing.html#secure-key)
 Put the keystore file somewhere on your computer. It doesn’t really matter where.
@@ -23,8 +22,7 @@ Please do the following. Do not copy it, since I believe the error that you are 
 The just2try.keystore is any name for your Java based keystore file. You can select any name as you have done or give it some name that you know you can identify the keystore file with.
 Finally, keep in mind that a keystore is like a collection of keys, where each one is identified by a name or an alias. So you should pick an alias that you know identifies the specific key. Examples : myorgkey, myandroidappkey, etc.
 In case, you forget what alias' are present in the keystore, you can always use the -list command to see all the keys in the keystore. Example : keytool -v -list -keystore just2try.keystore
-## 
-Tell ant where your keystore file is for this app ## 
+##Tell ant where your keystore file is for this app ## 
 Then you just need to tell ant where the keystore file is by going to your android project folder (For phonegap it’s in platforms/android) and create an ant.properties file and put the following in it:
 key.store=/Users/username/Documents/path/to/my-release-key.keystorekey.alias=app_name
 Where key.store equals the path to the keystore file starting at the C Drive if you’re on windows and it’s a relative path starting from the location of the ant.properties file if you’re on mac (example: key.store=../../../../lifeUnlimited-release-key.keystore), and key.Alias is whatever you setup when you created the keystore.
