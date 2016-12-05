@@ -8,5 +8,5 @@ define("DB_NAME", "apargcom_velo");
 ini_set('allow_url_include', 'on');
 ini_set('allow_url_fopen', 'on');
 define('MAP_API_KEY', 'AIzaSyBsYtxMlYprnQHJwoluRvDADOeoQSFN9sA');
-define("PATH","http://velopark.aparg.com/");
+define("PATH","https://velopark.aparg.com/");
 

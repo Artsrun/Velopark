@@ -1,7 +1,12 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*) https://%{SERVER_NAME}/$1 [R=301,L]
+</IfModule>
 
+<IfModule mod_rewrite.c>
 RewriteEngine on
-
 RewriteCond %{HTTP_HOST} ^velopark\.am$ [OR]
 RewriteCond %{HTTP_HOST} ^www\.velopark\.am$
 RewriteRule ^/?$ "http\:\/\/velopark\.aparg\.com" [R=301,L]
-
+</IfModule>

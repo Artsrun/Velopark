@@ -23,7 +23,7 @@ function initMap(){
 	
 	
 	var image = {
-            url: "//velopark.am/images/marker_" + $('.add-type:checked').val() + ".png",
+            url: "//velopark.aparg.com/images/marker_" + $('.add-type:checked').val() + ".png",
             scaledSize: new google.maps.Size(28, 44)
         };
 	
@@ -39,7 +39,7 @@ function initMap(){
 	var geocoder = new google.maps.Geocoder();
 	$('.add-type').on('change',function(){
 		var image = {
-            url: "//velopark.am/images/marker_" + $(this).val() + ".png",
+            url: "//velopark.aparg.com/images/marker_" + $(this).val() + ".png",
             scaledSize: new google.maps.Size(28, 44)
         };
 		marker.setIcon(image);		

@@ -10,8 +10,8 @@ if (DEBUG) {
 
 var app = {
 // Application Constructor
-    apiURL: "http://velopark.aparg.com/api/",
-    uploadsURL: 'http://velopark.aparg.com/uploads/',
+    apiURL: "https://velopark.aparg.com/api/",
+    uploadsURL: 'https://velopark.aparg.com/uploads/',
     map: null,
     db: null,
     lockedBike: null,
@@ -406,6 +406,7 @@ var app = {
         } else {
             var options = new FileUploadOptions();
             options.fileKey = "file";
+            options.chunkedMode = false;
             var params = {};
             params.device_id = device.uuid;
             params.lat = $(".hidden-lat").val();
@@ -471,7 +472,7 @@ var app = {
                 if (places[i].description) {
                     output += "<p>Description</p><p class='cont'>" + places[i].description + "</p>";
                 }
-                output += "<div style='height:" + wrapper_height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:http://velopark.am/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
+                output += "<div style='height:" + wrapper_height + "px' class='place_map' id='place_map_" + places[i].server_id + "'  data-src='https://maps.googleapis.com/maps/api/staticmap?center=" + places[i].latitude + "," + places[i].longitude + "&markers=icon:https://velopark.aparg.com/images/marker_" + places[i].type + "_small.png|" + places[i].latitude + "," + places[i].longitude + "&zoom=17&size=" + map_size.width + "x" + map_size.height + "&maptype=roadmap&sensor=false&scale=2&key=" + this.gMapApiKey + "'></div>";
                 output += "<div class='new_place_icon_wrap'><a href='javascript:void(0);' class='new_place_icon accept' data-value='1' ><img  src='img/add_place.png'  alt='' /></a><a href='javascript:void(0);' class='new_place_icon decline' data-value='0' ><img  src='img/new_place.png' alt='' /></a></div>";
                 output += "<span class='hr'></span></div>";
                 $("#new_places .content").append(output);
