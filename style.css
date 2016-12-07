@@ -6,7 +6,7 @@
 
 body {
     font-family: 'gothic' !important;
-	background-color:#eee;
+    background-color:#eee;
 }
 
 body,html{
@@ -36,6 +36,17 @@ body{
     bottom: 10px;
     right: 10px;
 }
+.privacy {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+}
+.privacy:hover{
+    text-decoration:underline;
+}
 .fb{
     width: 30px;
     height: 30px;
@@ -50,13 +61,13 @@ body{
 }
 .logo{
     background-image: url(images/logo2.png);
-	background-size: 200px auto;
-	background-repeat: no-repeat;
-	width: 200px;
-	height: 60px;
-	display: inline-block;
-	margin-top: 10px;
-	margin-left: 20px;
+    background-size: 200px auto;
+    background-repeat: no-repeat;
+    width: 200px;
+    height: 60px;
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 20px;
 }
 
 
@@ -82,22 +93,22 @@ body{
 }
 .popup .markets{
     margin-top: 70px;
-	text-align: center;
+    text-align: center;
     display: block;
 }
 .popup .markets .play{
     background-image:url(images/play_download.png);
     background-size:contain;
     background-repeat: no-repeat;
-	display:inline-block;    
-	margin:0 15px;
+    display:inline-block;    
+    margin:0 15px;
 }
 .popup .markets .app{
     background-image:url(images/app_download.png);
     background-size:contain;
     background-repeat: no-repeat;
     display:inline-block;    
-	margin:0 10px;
+    margin:0 10px;
 }
 .popup .markets a{
     width:216px;
@@ -130,31 +141,37 @@ body{
 
 @media screen and (max-width: 800px)  {
 
-	body,html{
-		height:auto;
-	}
+    body,html{
+        height:auto;
+    }
     .popup{
         position: relative;
         top: inherit;
         margin: 0 auto;
         right: auto;
         width: 80%;
-		height:auto;
-		margin-bottom: 30px;
-		margin-top: 100px;
+        height:auto;
+        margin-bottom: 30px;
+        margin-top: 100px;
     }
-	.popup .markets .play, .popup .markets .app{
-		float: none;
-		margin:10px auto;		
-		display:block;
-	}
-	
-	.aparg{
-		right: inherit;
-		bottom: inherit;
-		position: relative;
-		margin: 0 auto;
-		display: block;
-		margin-bottom:10px;
-	}
+    .popup .markets .play, .popup .markets .app{
+        float: none;
+        margin:10px auto;		
+        display:block;
+    }
+
+    .aparg{
+        right: inherit;
+        bottom: inherit;
+        position: relative;
+        margin: 0 auto;
+        display: block;
+        margin-bottom:10px;
+    }
+    .privacy {
+        display: block;
+        position: inherit;
+        text-align: center;
+        margin-bottom: 10px;
+    }
 }
