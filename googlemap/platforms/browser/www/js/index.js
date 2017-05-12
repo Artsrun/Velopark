@@ -348,6 +348,16 @@ var app = {
             }
         });
     },
+    showNotification: function (message, timer) {
+        if (typeof timer == 'undefined')
+            timer = 4000;
+        $('.system_notification .notification_message').text(message);
+        fadeIn('.system_notification', function () {
+            setTimeout(function () {
+                fadeOut('.system_notification');
+            }, timer);
+        });
+    },
     notification: function (title, text, button, callback) {
         if (callback == null) {
             callback = function () {
@@ -432,8 +442,9 @@ var app = {
                             response = null
                         }
                         if (response && response.status == 'success') {
-                            if (app.getActivePage() == 'add_places') {
+                            if (app.getActivePage() == 'add_places') {                                
                                 app.goToPage('main');
+                                app.showNotification("Your spot was submitted for review.");
                             }
                         } else {
                             if (app.getActivePage() == 'add_places') {
@@ -955,7 +966,7 @@ var app = {
                 return false;
             });
             $(document).on("click touchend", function (e) {
-                if (!$(e.target).hasClass('menu') && $(e.target).parents('.menu').length == 0) {
+                if (!$(e.target).hasClass('menu') && $(e.target).parents('.menu').length == 0) {     
                     if ($('.menu').hasClass('active')) {
                         fadeOut('.menu', function () {
                             $(".menu").removeClass('active');
@@ -1184,7 +1195,7 @@ var app = {
             removeMarker(app.lockedBike, true);
             app.lockedBike = null;
             localStorage.setItem("lockedBike", '');
- 
+
             $('.actions [data-button="lock"]').attr('data-action', 'lock');
             app.closeInfoWindow();
         } else {
@@ -1382,7 +1393,7 @@ var app = {
         marker.addListener('click', function () {
             if (app.animationInProcess)
                 return;
-            
+
             if (app.activeMarker && app.activeMarker.server_id == this.server_id) {
                 app.closeInfoWindow();
                 return;
@@ -1530,7 +1541,7 @@ var app = {
             }
 
         });
-        
+
         setTimeout(function () {
             app.animationInProcess = false;
             if (typeof callback == 'function') {

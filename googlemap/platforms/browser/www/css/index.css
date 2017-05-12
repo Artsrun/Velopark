@@ -489,6 +489,26 @@ ul.menu_list img{
     transform-style: preserve-3d;
     top:100%;
 }
+
+.system_notification{ 
+    position: fixed;
+    bottom: 60px;
+    z-index: 999999;
+    width: 100%;
+    text-align: center;
+    display:none;
+}
+
+.system_notification .notification_message{
+    background: rgba(0,0,0,0.6);
+    padding: 14px 22px;
+    color: #fff;
+    border-radius: 22px;
+    font-size: 12px;
+    display: inline-block;
+    margin: 0 10px;
+}
+
 #info{    
     -webkit-transition: transform 0.05s linear 0.2s;
     -webkit-transition: -webkit-transform 0.05s linear 0.2s;
